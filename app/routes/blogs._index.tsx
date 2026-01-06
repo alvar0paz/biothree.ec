@@ -7,7 +7,7 @@ import type {BlogsQuery} from 'storefrontapi.generated';
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
+  return [{title: `Bio-Three | Blogs`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
