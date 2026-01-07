@@ -37,7 +37,6 @@ const COPY = {
       cta: 'Sostén el avance',
     },
   ],
-  ticker: 'TECNOLOGÍA JAPONESA REAL * CEPAS PATENTADAS ACTIVAS * RESISTENCIA',
   modals: {
     discover: {
       title: 'Descubre Bio-Three',
@@ -376,41 +375,11 @@ function Drawer({
 // TOP NAV COMPONENT
 // ============================================================================
 
-function TopNav({
-  onOpenDrawer,
-  onOpenModal,
-}: {
-  onOpenDrawer: () => void;
-  onOpenModal: (type: ModalType) => void;
-}) {
+function TopNav() {
   return (
     <nav className="landing-nav" role="navigation" aria-label="Navegación principal">
       <div className="landing-brand">{COPY.brand}</div>
-
-      <div className="landing-nav-center">
-        <div className="landing-pill-group">
-          <button
-            className="landing-pill landing-pill--filled"
-            onClick={onOpenDrawer}
-            aria-label="Abrir menú de navegación"
-          >
-            <span className="landing-pill-icon">
-              <HamburgerIcon />
-            </span>
-            {COPY.nav.menu}
-          </button>
-          <button
-            className="landing-pill landing-pill--dark"
-            onClick={() => onOpenModal('discover')}
-          >
-            {COPY.nav.discover}
-          </button>
-        </div>
-      </div>
-
-      <Link to="/test" className="landing-cta-btn">
-        {COPY.nav.testCta}
-      </Link>
+      <Link to="/acerca-de" className="landing-nav-link">Acerca de</Link>
     </nav>
   );
 }
@@ -432,6 +401,9 @@ function Headline() {
           {COPY.headline.emphasis}
         </span>
       </span>
+      <Link to="/test" className="landing-cta-btn landing-headline-cta">
+        {COPY.nav.testCta}
+      </Link>
     </div>
   );
 }
@@ -452,18 +424,6 @@ function StepCards() {
           </Link>
         </div>
       ))}
-    </div>
-  );
-}
-
-// ============================================================================
-// BOTTOM TICKER COMPONENT
-// ============================================================================
-
-function BottomTicker() {
-  return (
-    <div className="landing-ticker">
-      <span className="landing-ticker-text">{COPY.ticker}</span>
     </div>
   );
 }
@@ -500,9 +460,8 @@ export default function Homepage() {
   return (
     <div className="landing-shell">
       <div className="landing-container">
-        <TopNav onOpenDrawer={openDrawer} onOpenModal={openModal} />
+        <TopNav />
         <MainGrid />
-        <BottomTicker />
       </div>
 
       <Drawer

@@ -1,0 +1,31 @@
+/*
+ * Design Tokens
+ * Centralized CSS custom properties
+ */
+
+:root {
+  /* Colors */
+  --color-dark: #000;
+  --color-light: #fff;
+
+  /* Landing Colors */
+  --landing-bg: #F4F4F2;
+  --landing-navy: #0E1B2B;
+  --landing-purple: #6B5B95;
+  --landing-white: #fff;
+  --landing-card-bg: rgba(255, 255, 255, 0.65);
+  --landing-border: rgba(14, 27, 43, 0.15);
+
+  /* Shadows */
+  --landing-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --aside-width: 400px;
+  --header-height: 64px;
+  --grid-item-width: 355px;
+  --landing-max-width: 1280px;
+
+  /* Cart */
+  --cart-aside-summary-height: 250px;
+  --cart-aside-summary-height-with-discount: 300px;
+}
