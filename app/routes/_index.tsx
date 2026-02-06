@@ -7,12 +7,7 @@ import type {Route} from './+types/_index';
 // ============================================================================
 
 const COPY = {
-  brand: 'BIO-THREE®',
-  nav: {
-    menu: 'Menú',
-    discover: '+ Descubre más',
-    testCta: 'TEST SALUD INTESTINAL',
-  },
+  testCta: 'TEST SALUD INTESTINAL',
   headline: {
     small: 'Tres',
     large1: 'Cepas',
@@ -67,14 +62,6 @@ const COPY = {
       email: 'info@biothree.ec',
     },
   },
-  drawer: {
-    title: 'Menú',
-    links: [
-      {label: 'Productos', href: '/products'},
-      {label: 'Cómo funciona', action: 'howItWorks'},
-      {label: 'Contacto', action: 'contact'},
-    ],
-  },
 } as const;
 
 // ============================================================================
@@ -103,26 +90,6 @@ export async function loader() {
 // ============================================================================
 // ICONS
 // ============================================================================
-
-function HamburgerIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 4h12M2 8h12M2 12h12"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function CloseIcon() {
   return (
@@ -284,116 +251,27 @@ function Modal({
 }
 
 // ============================================================================
-// DRAWER COMPONENT
-// ============================================================================
-
-function Drawer({
-  isOpen,
-  onClose,
-  onOpenModal,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onOpenModal: (type: ModalType) => void;
-}) {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleEscape);
-    }
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
-
-  const handleLinkClick = (
-    link: (typeof COPY.drawer.links)[number],
-    e: React.MouseEvent,
-  ) => {
-    if ('action' in link && link.action) {
-      e.preventDefault();
-      onClose();
-      setTimeout(() => {
-        onOpenModal(link.action as ModalType);
-      }, 300);
-    } else {
-      onClose();
-    }
-  };
-
-  return (
-    <div
-      className={`landing-drawer-overlay ${isOpen ? 'open' : ''}`}
-      onClick={onClose}
-    >
-      <div
-        className="landing-drawer"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="drawer-title"
-      >
-        <div className="landing-drawer-header">
-          <h2 id="drawer-title" className="landing-drawer-title">
-            {COPY.drawer.title}
-          </h2>
-          <button
-            className="landing-drawer-close"
-            onClick={onClose}
-            aria-label="Cerrar menú"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-        <nav className="landing-drawer-nav">
-          {COPY.drawer.links.map((link, i) => (
-            <Link
-              key={i}
-              to={'href' in link ? link.href : '#'}
-              className="landing-drawer-link"
-              onClick={(e) => handleLinkClick(link, e)}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// TOP NAV COMPONENT
-// ============================================================================
-
-function TopNav() {
-  return (
-    <nav className="landing-nav" role="navigation" aria-label="Navegación principal">
-      <div className="landing-brand">{COPY.brand}</div>
-      <Link to="/acerca-de" className="landing-nav-link">Acerca de</Link>
-    </nav>
-  );
-}
-
-// ============================================================================
 // HEADLINE COMPONENT
 // ============================================================================
 
+const CYCLING_WORDS = ['Cepas', 'Pasos'];
+
 function Headline() {
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % CYCLING_WORDS.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="landing-headline">
       <span className="landing-headline-small">{COPY.headline.small}</span>
-      <span className="landing-headline-large">{COPY.headline.large1}</span>
-      <span className="landing-headline-large">{COPY.headline.large2}</span>
+      <span className="landing-headline-large cycling-word" key={wordIndex}>
+        {CYCLING_WORDS[wordIndex]}
+      </span>
       <span className="landing-headline-text">
         {COPY.headline.text1}
         <br />
@@ -401,9 +279,6 @@ function Headline() {
           {COPY.headline.emphasis}
         </span>
       </span>
-      <Link to="/test" className="landing-cta-btn landing-headline-cta">
-        {COPY.nav.testCta}
-      </Link>
     </div>
   );
 }
@@ -434,13 +309,13 @@ function StepCards() {
 
 function MainGrid() {
   return (
-    <main className="landing-main">
+    <div className="landing-main">
       <div className="landing-grid">
         <Headline />
         <div className="landing-hero-placeholder" aria-hidden="true" />
         <StepCards />
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -448,27 +323,18 @@ function MainGrid() {
 // HOMEPAGE COMPONENT
 // ============================================================================
 
+// ============================================================================
+// HOMEPAGE COMPONENT
+// ============================================================================
+
 export default function Homepage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
 
-  const openDrawer = useCallback(() => setDrawerOpen(true), []);
-  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
-  const openModal = useCallback((type: ModalType) => setModalType(type), []);
   const closeModal = useCallback(() => setModalType(null), []);
 
   return (
-    <div className="landing-shell">
-      <div className="landing-container">
-        <TopNav />
-        <MainGrid />
-      </div>
-
-      <Drawer
-        isOpen={drawerOpen}
-        onClose={closeDrawer}
-        onOpenModal={openModal}
-      />
+    <div className="landing-content">
+      <MainGrid />
       <Modal type={modalType} onClose={closeModal} />
     </div>
   );

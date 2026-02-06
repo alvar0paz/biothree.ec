@@ -5,16 +5,16 @@
 
 :root {
   /* Colors */
-  --color-dark: #000;
-  --color-light: #fff;
+  --color-dark: #052137;
+  --color-light: #F0F0F0;
 
   /* Landing Colors */
-  --landing-bg: #F4F4F2;
-  --landing-navy: #0E1B2B;
-  --landing-purple: #6B5B95;
+  --landing-bg: #F0F0F0;
+  --landing-navy: #052137;
+  --landing-purple: #9DA0FF;
   --landing-white: #fff;
   --landing-card-bg: rgba(255, 255, 255, 0.65);
-  --landing-border: rgba(14, 27, 43, 0.15);
+  --landing-border: rgba(5, 33, 55, 0.15);
 
   /* Shadows */
   --landing-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);

@@ -35,6 +35,7 @@ function TikTokIcon() {
 export function Footer() {
   return (
     <footer className="footer">
+      <span className="footer-text">© 2026 BioScience Ecuador. Todos los derechos reservados.</span>
       <div className="footer-social">
         <a
           href="https://instagram.com/biothree.ec"
@@ -53,7 +54,6 @@ export function Footer() {
           <TikTokIcon />
         </a>
       </div>
-      <span className="footer-text">© 2026 BioScience Ecuador. Todos los derechos reservados.</span>
     </footer>
   );
 }

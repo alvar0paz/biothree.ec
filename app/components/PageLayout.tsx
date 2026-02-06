@@ -14,6 +14,19 @@ import {
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import bacteria1 from '~/assets/bacteria1.png';
+import bacteria2 from '~/assets/bacteria2.png';
+import bacteria3 from '~/assets/bacteria3.png';
+
+function BacteriaBackground() {
+  return (
+    <div className="bacteria-bg" aria-hidden="true">
+      <img src={bacteria1} alt="" className="bacteria-layer bacteria-1" />
+      <img src={bacteria2} alt="" className="bacteria-layer bacteria-2" />
+      <img src={bacteria3} alt="" className="bacteria-layer bacteria-3" />
+    </div>
+  );
+}
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -34,6 +47,7 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
+      <BacteriaBackground />
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />

@@ -18,7 +18,7 @@ export async function loader() {
 export default function AcercaDe() {
   return (
     <div className="about-page">
-      <h1>Acerca de</h1>
+      <h1>ACERCA DE</h1>
       <div className="about-content">
         <p>
           BioThree llega a Ecuador a través de Bioscience, una empresa
