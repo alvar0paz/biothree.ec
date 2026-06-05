@@ -19,7 +19,7 @@ export const ASSETS = {
 // Ciencia and FAQ live on the same page, so they share one nav entry.
 export const NAV = [
   {label: 'Producto', href: '/productos'},
-  {label: 'Ciencia y FAQ', href: '/ciencia'},
+  {label: 'Ciencia', href: '/ciencia'},
 ] as const;
 
 export const hero = {
@@ -117,7 +117,7 @@ export const productosPage = {
 };
 
 export const cienciaPage = {
-  eyebrow: 'Ciencia y FAQ',
+  eyebrow: 'Ciencia',
   heroTitle: 'Probióticos, microbiota y rutina diaria.',
   heroSubtitle:
     'Una explicación simple sobre cómo Biothree acompaña el bienestar intestinal como parte de una rutina constante.',
