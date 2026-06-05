@@ -1,3 +1,7 @@
+import {Link} from 'react-router';
+import {footer} from '~/data/copy';
+import biothreeLogo from '~/assets/biothree1.png';
+
 function InstagramIcon() {
   return (
     <svg
@@ -32,27 +36,71 @@ function TikTokIcon() {
   );
 }
 
+function FooterLink({href, label}: {href: string; label: string}) {
+  const isInternal = href.startsWith('/');
+  const className =
+    'text-sm text-muted transition-colors hover:text-ink';
+  return isInternal ? (
+    <Link to={href} prefetch="intent" className={className}>
+      {label}
+    </Link>
+  ) : (
+    <a href={href} className={className}>
+      {label}
+    </a>
+  );
+}
+
 export function Footer() {
   return (
-    <footer className="footer">
-      <span className="footer-text">© 2026 BioScience Ecuador. Todos los derechos reservados.</span>
-      <div className="footer-social">
-        <a
-          href="https://instagram.com/biothree.ec"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram"
-        >
-          <InstagramIcon />
-        </a>
-        <a
-          href="https://tiktok.com/@biothree.ec"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="TikTok"
-        >
-          <TikTokIcon />
-        </a>
+    <footer className="border-t border-line bg-background">
+      <div className="mx-auto max-w-6xl px-5 py-14">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div className="flex flex-col gap-4">
+            <img src={biothreeLogo} alt="Biothree" className="h-7 w-auto self-start" />
+            <p className="max-w-xs text-sm leading-relaxed text-muted">
+              {footer.tagline}
+            </p>
+            <div className="mt-1 flex items-center gap-3 text-ink">
+              <a
+                href="https://instagram.com/biothree.ec"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="transition-colors hover:text-purple"
+              >
+                <InstagramIcon />
+              </a>
+              <a
+                href="https://tiktok.com/@biothree.ec"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="transition-colors hover:text-purple"
+              >
+                <TikTokIcon />
+              </a>
+            </div>
+          </div>
+
+          {footer.columns.map((column) => (
+            <div key={column.title} className="flex flex-col gap-3">
+              <span className="font-mono text-xs uppercase tracking-[0.14em] text-ink">
+                {column.title}
+              </span>
+              {column.links.map((link) => (
+                <FooterLink key={link.label} href={link.href} label={link.label} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 border-t border-line pt-6">
+          <p className="max-w-3xl text-xs leading-relaxed text-muted">
+            {footer.disclaimer}
+          </p>
+          <p className="mt-4 text-xs text-muted">{footer.copyright}</p>
+        </div>
       </div>
     </footer>
   );

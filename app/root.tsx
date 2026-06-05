@@ -16,6 +16,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import normalizeStyles from 'normalize.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
+import tailwindStyles from '~/styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
@@ -74,6 +75,10 @@ export function links() {
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
@@ -166,6 +171,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={normalizeStyles}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
+        <link rel="stylesheet" href={tailwindStyles}></link>
         <Meta />
         <Links />
       </head>
