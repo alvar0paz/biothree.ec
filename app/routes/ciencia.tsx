@@ -32,44 +32,30 @@ export default function Ciencia() {
           className="absolute inset-0 h-full w-full object-cover opacity-70"
         />
         <div className="absolute inset-0 bg-background/70" aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 md:py-28">
-          <div className="flex max-w-2xl flex-col items-start gap-5">
-            <SectionLabel>Ciencia</SectionLabel>
-            <h1 className="font-tight text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-5xl">
-              {cienciaPage.heroTitle}
-            </h1>
-            <p className="text-lg leading-relaxed text-muted">
+        <div className="bt-container bt-hero relative z-10">
+          <div className="flex max-w-[720px] flex-col items-start gap-4">
+            <SectionLabel>{cienciaPage.eyebrow}</SectionLabel>
+            <h1 className="bt-h1 text-ink">{cienciaPage.heroTitle}</h1>
+            <p className="bt-lead max-w-[600px] text-muted">
               {cienciaPage.heroSubtitle}
             </p>
           </div>
         </div>
       </section>
 
-      {/* Content sections — alternating image / copy */}
+      {/* Compact science explainer — three rows, one consistent icon system.
+          Line icons only here, all the same size and panel treatment. */}
       <section>
-        <div className="mx-auto flex max-w-5xl flex-col gap-16 px-5 py-16 md:py-24">
-          {cienciaPage.sections.map((s, i) => (
+        <div className="bt-container-narrow bt-section flex flex-col gap-6">
+          {cienciaPage.sections.map((s) => (
             <Reveal key={s.title}>
-              <div
-                className={`grid items-center gap-8 md:grid-cols-2 ${
-                  i % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''
-                }`}
-              >
-                <div className="flex justify-center">
-                  <div className="flex h-48 w-48 items-center justify-center rounded-card bg-cream sm:h-56 sm:w-56">
-                    <img
-                      src={s.image}
-                      alt=""
-                      aria-hidden="true"
-                      className="h-32 w-32 object-contain sm:h-36 sm:w-36"
-                    />
-                  </div>
+              <div className="flex items-center gap-6 rounded-card border border-line bg-surface/60 p-6 sm:gap-8 sm:p-7">
+                <div className="bt-science-icon">
+                  <img src={s.image} alt="" aria-hidden="true" />
                 </div>
-                <div className="flex flex-col gap-3">
-                  <h2 className="font-tight text-2xl font-bold leading-tight tracking-tight text-ink sm:text-3xl">
-                    {s.title}
-                  </h2>
-                  <p className="text-lg leading-relaxed text-muted">{s.body}</p>
+                <div className="flex flex-col gap-2">
+                  <h2 className="bt-h3 text-ink">{s.title}</h2>
+                  <p className="bt-p text-muted">{s.body}</p>
                 </div>
               </div>
             </Reveal>
@@ -79,26 +65,22 @@ export default function Ciencia() {
 
       {/* Full FAQ */}
       <section id="faq" className="scroll-mt-24 bg-cream/50">
-        <div className="mx-auto max-w-3xl px-5 py-16 md:py-24">
+        <div className="bt-container-narrow bt-section">
           <Reveal>
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start gap-3">
               <SectionLabel>Preguntas</SectionLabel>
-              <h2 className="font-tight text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
-                {cienciaPage.faqTitle}
-              </h2>
+              <h2 className="bt-h2 text-ink">{cienciaPage.faqTitle}</h2>
             </div>
           </Reveal>
-          <div className="mt-10">
+          <div className="mt-8">
             <FAQAccordion items={faqs} />
           </div>
         </div>
       </section>
 
       {/* Disclaimer */}
-      <section className="mx-auto max-w-3xl px-5 py-12">
-        <p className="text-center text-sm leading-relaxed text-muted">
-          {cienciaPage.disclaimer}
-        </p>
+      <section className="bt-container-narrow py-10">
+        <p className="bt-p text-center text-muted">{cienciaPage.disclaimer}</p>
       </section>
     </div>
   );

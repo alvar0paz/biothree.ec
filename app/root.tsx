@@ -119,13 +119,21 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context}: Route.LoaderArgs) {
   const {storefront} = context;
 
+  // The marketing site renders its own header/footer and does not depend on
+  // the Shopify menu data. Keep the query (used by the cart/search asides on
+  // Shopify routes) but don't let a missing storefront connection 500 the page.
   const [header] = await Promise.all([
-    storefront.query(HEADER_QUERY, {
-      cache: storefront.CacheLong(),
-      variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
-      },
-    }),
+    storefront
+      .query(HEADER_QUERY, {
+        cache: storefront.CacheLong(),
+        variables: {
+          headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        },
+      })
+      .catch((error: Error) => {
+        console.error(error);
+        return null;
+      }),
     // Add other queries here, so that they are loaded in parallel
   ]);
 

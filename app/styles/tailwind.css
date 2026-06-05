@@ -14,11 +14,11 @@
   --color-purple-soft: #ece8ff;
   --color-cream: #fff9ec;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-tight: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-tight: 'Inter Tight', 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-  --radius-card: 32px;
+  --radius-card: 24px;
 }
 
 /* Base layer: marketing pages opt in via the `.biothree` wrapper so the rest
@@ -28,6 +28,8 @@
     background-color: var(--color-background);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    /* Tighter global tracking — the page should read compact, not airy. */
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -36,6 +38,120 @@
   .biothree *::before,
   .biothree *::after {
     box-sizing: border-box;
+  }
+}
+
+/* ==========================================================================
+   Layout + type system — one consistent rhythm across every section.
+   Defined unlayered so they win over utility classes they pair with.
+   ========================================================================== */
+
+/* Containers */
+.bt-container {
+  width: min(100% - 40px, 1160px);
+  margin-inline: auto;
+}
+.bt-container-narrow {
+  width: min(100% - 40px, 760px);
+  margin-inline: auto;
+}
+
+/* Section padding — compact, deliberate, less floating whitespace */
+.bt-section {
+  padding-block: clamp(48px, 6vw, 88px);
+}
+.bt-section-compact {
+  padding-block: clamp(40px, 5vw, 72px);
+}
+.bt-hero {
+  padding-top: clamp(56px, 7vw, 96px);
+  padding-bottom: clamp(48px, 6vw, 80px);
+}
+
+/* Consistent science explainer icon panel */
+.bt-science-icon {
+  width: 144px;
+  height: 144px;
+  border-radius: 28px;
+  background: #fbf6ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bt-science-icon img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+/* Headings — editorial, tight tracking, compact leading */
+.bt-h1 {
+  font-family: var(--font-tight);
+  font-size: clamp(2.6rem, 5vw, 4.75rem);
+  line-height: 0.95;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+.bt-h2 {
+  font-family: var(--font-tight);
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+.bt-h3 {
+  font-family: var(--font-tight);
+  font-size: 1.125rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Body copy — calmer and more compact */
+.bt-p {
+  font-size: 1rem;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+.bt-lead {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+}
+
+/* Eyebrow / kicker labels — the only place wide tracking is allowed */
+.bt-eyebrow {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Cards */
+.bt-card {
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: var(--radius-card);
+}
+
+@media (max-width: 768px) {
+  .bt-section {
+    padding-block: 48px;
+  }
+  .bt-section-compact {
+    padding-block: 40px;
+  }
+  .bt-hero {
+    padding-top: 48px;
+    padding-bottom: 44px;
+  }
+  .bt-h1 {
+    font-size: clamp(2.35rem, 12vw, 3.25rem);
+    line-height: 0.98;
+  }
+  .bt-h2 {
+    font-size: clamp(1.85rem, 9vw, 2.5rem);
+  }
+  .bt-card {
+    padding: 22px;
   }
 }
 

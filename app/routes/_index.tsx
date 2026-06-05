@@ -34,15 +34,13 @@ export default function Homepage() {
     <div className="biothree">
       <Hero />
 
-      {/* Benefits */}
+      {/* Benefits — framed as benefits of the same single formula */}
       <section className="bg-cream/50">
-        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
+        <div className="bt-container bt-section">
           <Reveal>
-            <h2 className="max-w-2xl font-tight text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
-              {benefits.title}
-            </h2>
+            <h2 className="bt-h2 max-w-[700px] text-ink">{benefits.title}</h2>
           </Reveal>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
             {benefits.cards.map((card, i) => (
               <Reveal key={card.title} delay={i * 0.08}>
                 <BenefitCard
@@ -56,22 +54,22 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* Product preview */}
+      {/* Product — one formula, two presentations */}
       <section>
-        <div className="mx-auto max-w-6xl px-5 py-16 md:py-24">
+        <div className="bt-container bt-section">
           <Reveal>
-            <div className="flex flex-col items-start gap-4">
-              <SectionLabel>Productos</SectionLabel>
-              <h2 className="max-w-2xl font-tight text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
+            <div className="flex flex-col items-start gap-3">
+              <SectionLabel>{productPreview.eyebrow}</SectionLabel>
+              <h2 className="bt-h2 max-w-[700px] text-ink">
                 {productPreview.title}
               </h2>
-              <p className="max-w-xl text-lg text-muted">
+              <p className="bt-lead max-w-[560px] text-muted">
                 {productPreview.subtitle}
               </p>
             </div>
           </Reveal>
-          <div className="mt-12">
-            <ProductGrid variant="preview" />
+          <div className="mt-8">
+            <ProductGrid />
           </div>
         </div>
       </section>
@@ -82,19 +80,17 @@ export default function Homepage() {
 
       {/* FAQ preview */}
       <section>
-        <div className="mx-auto max-w-3xl px-5 py-16 md:py-24">
+        <div className="bt-container-narrow bt-section">
           <Reveal>
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-start gap-3">
               <SectionLabel>Preguntas</SectionLabel>
-              <h2 className="font-tight text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
-                {faqPreview.title}
-              </h2>
+              <h2 className="bt-h2 text-ink">{faqPreview.title}</h2>
             </div>
           </Reveal>
-          <div className="mt-10">
+          <div className="mt-8">
             <FAQAccordion items={faqs.slice(0, 4)} />
           </div>
-          <div className="mt-8">
+          <div className="mt-6">
             <Button href={faqPreview.href} variant="secondary">
               {faqPreview.cta}
             </Button>

@@ -3,6 +3,9 @@
 // bienestar digestivo / rutina diaria / equilibrio intestinal / microbiota.
 // Avoid: cura, trata, previene enfermedades, desinflama, etc.
 
+// All purchase CTAs point here until Shopify checkout is integrated.
+export const INSTAGRAM_URL = 'https://instagram.com/biothree.ec';
+
 export const ASSETS = {
   probioticChain: '/assets/biothree/probiotic-chain.png',
   probioticRods: '/assets/biothree/probiotic-rods.png',
@@ -13,10 +16,10 @@ export const ASSETS = {
   scienceBg: '/assets/biothree/science-bg.png',
 } as const;
 
+// Ciencia and FAQ live on the same page, so they share one nav entry.
 export const NAV = [
-  {label: 'Productos', href: '/productos'},
-  {label: 'Ciencia', href: '/ciencia'},
-  {label: 'Preguntas', href: '/ciencia#faq'},
+  {label: 'Producto', href: '/productos'},
+  {label: 'Ciencia y FAQ', href: '/ciencia'},
 ] as const;
 
 export const hero = {
@@ -29,12 +32,13 @@ export const hero = {
 };
 
 export const benefits = {
-  title: 'Sentirse bien también empieza en el intestino.',
+  title:
+    'Una sola fórmula para acompañar tres momentos clave de tu bienestar intestinal.',
   cards: [
     {
       title: 'Digestión diaria',
       description:
-        'Acompaña tu bienestar digestivo con una rutina probiótica simple.',
+        'Acompaña tu bienestar digestivo como parte de una rutina constante.',
       icon: ASSETS.iconDigestion,
     },
     {
@@ -44,16 +48,18 @@ export const benefits = {
     },
     {
       title: 'Rutina simple',
-      description: 'Una toma al día. Sin complicaciones. Sin promesas exageradas.',
+      description: 'Una toma diaria, fácil de integrar a tu día.',
       icon: ASSETS.iconRoutine,
     },
   ],
 };
 
 export const productPreview = {
-  title: 'Tres formas de empezar una rutina Biothree.',
-  subtitle: 'Elige la presentación que mejor se adapta a tu día a día.',
-  cta: 'Ver producto',
+  eyebrow: 'Producto',
+  title: 'Una fórmula japonesa. Dos presentaciones.',
+  subtitle:
+    'Biothree está disponible en tabletas y sobres para que puedas incorporarlo a tu rutina de la forma que prefieras.',
+  cta: 'Consultar por Instagram',
 };
 
 export const howItWorks = {
@@ -95,39 +101,42 @@ export const faqPreview = {
 
 export const finalCta = {
   title: 'Empieza con una rutina simple para tu bienestar digestivo.',
-  cta: 'Comprar Biothree',
+  cta: 'Consultar por Instagram',
 };
 
 export const productosPage = {
-  heroTitle: 'Elige tu Biothree.',
+  eyebrow: 'Producto',
+  heroTitle: 'Una fórmula japonesa. Dos presentaciones.',
   heroSubtitle:
-    'Tres presentaciones de probióticos japoneses para acompañar tu bienestar intestinal diario.',
+    'Biothree es un solo producto probiótico japonés, disponible en tabletas y sobres para que lo incorpores a tu rutina de la forma que prefieras.',
   comparisonTitle: 'Compara las presentaciones',
-  comparisonHeaders: ['Producto', 'Ideal para', 'Uso', 'Formato'],
-  buyCta: 'Comprar',
+  comparisonHeaders: ['Presentación', 'Ideal para', 'Uso', 'Formato'],
+  buyCta: 'Consultar por Instagram',
   disclaimer:
     'Biothree es un suplemento alimenticio. No es un medicamento. No está destinado a diagnosticar, tratar, curar ni prevenir enfermedades.',
 };
 
 export const cienciaPage = {
-  heroTitle: 'La ciencia detrás de Biothree, sin complicarla.',
+  eyebrow: 'Ciencia y FAQ',
+  heroTitle: 'Probióticos, microbiota y rutina diaria.',
   heroSubtitle:
-    'Creemos en explicar lo que vendemos con claridad: qué son los probióticos, por qué importan y cómo pueden formar parte de una rutina diaria.',
+    'Una explicación simple sobre cómo Biothree acompaña el bienestar intestinal como parte de una rutina constante.',
+  // Science page uses the line icons only, at one consistent size.
   sections: [
     {
       title: '¿Qué son los probióticos?',
-      body: 'Los probióticos son microorganismos vivos que se consumen como parte de alimentos o suplementos. Cuando se consumen en cantidades adecuadas, pueden contribuir al bienestar del huésped.',
+      body: 'Los probióticos son microorganismos vivos presentes en alimentos y suplementos. Cuando se consumen en cantidades adecuadas, pueden contribuir al bienestar del huésped.',
       image: ASSETS.iconBalance,
     },
     {
       title: '¿Por qué importa la microbiota?',
-      body: 'La microbiota intestinal participa en procesos relacionados con la digestión, la absorción de nutrientes y el equilibrio general del intestino. Cuidarla puede ser parte de una rutina saludable.',
+      body: 'La microbiota intestinal participa en procesos relacionados con la digestión, la absorción de nutrientes y el equilibrio general del intestino.',
       image: ASSETS.iconDigestion,
     },
     {
       title: '¿Qué hace diferente a Biothree?',
-      body: 'Biothree está basado en una fórmula japonesa de probióticos, presentada de forma simple para que sea fácil incorporarla al día a día.',
-      image: ASSETS.probioticRods,
+      body: 'Biothree está basado en una fórmula japonesa de probióticos, presentada de forma simple para incorporarse al día a día.',
+      image: ASSETS.iconRoutine,
     },
   ],
   faqTitle: 'Preguntas frecuentes',
@@ -150,7 +159,7 @@ export const footer = {
     {
       title: 'Biothree',
       links: [
-        {label: 'Comprar', href: '/productos'},
+        {label: 'Consultar por Instagram', href: INSTAGRAM_URL},
         {label: 'Contacto', href: 'mailto:info@biothree.ec'},
       ],
     },

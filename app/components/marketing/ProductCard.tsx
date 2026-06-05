@@ -1,17 +1,16 @@
 import {Button} from './Button';
+import {productPreview} from '~/data/copy';
 import type {Product} from '~/data/products';
 
 type ProductCardProps = {
   product: Product;
-  /** Show price + "Comprar" (productos page) vs. "Ver producto" preview (home). */
-  variant?: 'buy' | 'preview';
 };
 
 function CheckIcon() {
   return (
     <svg
-      width="16"
-      height="16"
+      width="15"
+      height="15"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -26,28 +25,26 @@ function CheckIcon() {
   );
 }
 
-export function ProductCard({product, variant = 'preview'}: ProductCardProps) {
+// Both presentations share one image treatment: same cream panel, same asset
+// size, same label position — so the two cards read as one product.
+export function ProductCard({product}: ProductCardProps) {
   return (
-    <div className="flex h-full flex-col rounded-card border border-line bg-surface/70 p-6 transition-shadow hover:shadow-[0_16px_50px_-22px_rgba(36,11,133,0.3)]">
-      <div className="mb-5 flex items-center justify-center rounded-[24px] bg-cream p-6">
+    <div className="flex h-full flex-col rounded-card border border-line bg-surface/70 p-6 transition-shadow hover:shadow-[0_16px_50px_-24px_rgba(36,11,133,0.28)]">
+      <div className="relative mb-5 flex h-[180px] items-center justify-center rounded-[18px] bg-cream">
+        <span className="bt-eyebrow absolute left-4 top-4 rounded-full bg-surface/80 px-2.5 py-1 font-mono text-[0.65rem] text-purple">
+          {product.tagline}
+        </span>
         <img
           src={product.image}
           alt={product.name}
-          className="h-36 w-36 object-contain sm:h-40 sm:w-40"
+          className="h-32 w-32 object-contain"
         />
       </div>
 
-      <span className="font-mono text-xs uppercase tracking-[0.14em] text-purple">
-        {product.shortName}
-      </span>
-      <h3 className="mt-1.5 font-tight text-2xl font-semibold text-ink">
-        {product.name}
-      </h3>
-      <p className="mt-2 text-[15px] leading-relaxed text-muted">
-        {product.description}
-      </p>
+      <h3 className="bt-h3 mb-2 text-ink">{product.name}</h3>
+      <p className="bt-p mb-4 text-muted">{product.description}</p>
 
-      <ul className="mt-5 flex flex-col gap-2">
+      <ul className="mb-6 flex flex-col gap-2">
         {product.bullets.map((bullet) => (
           <li key={bullet} className="flex items-start gap-2 text-sm text-ink">
             <CheckIcon />
@@ -56,22 +53,9 @@ export function ProductCard({product, variant = 'preview'}: ProductCardProps) {
         ))}
       </ul>
 
-      <div className="mt-6 flex items-center justify-between gap-3 pt-2">
-        {variant === 'buy' ? (
-          <>
-            <span className="font-tight text-xl font-semibold text-ink">
-              {product.price}
-            </span>
-            <Button href={product.checkoutUrl} variant="primary">
-              Comprar
-            </Button>
-          </>
-        ) : (
-          <Button href="/productos" variant="secondary" className="w-full">
-            Ver producto
-          </Button>
-        )}
-      </div>
+      <Button href={product.ctaUrl} variant="primary" className="w-full">
+        {productPreview.cta}
+      </Button>
     </div>
   );
 }

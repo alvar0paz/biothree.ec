@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Link, NavLink} from 'react-router';
 import {Button} from '~/components/marketing/Button';
-import {NAV} from '~/data/copy';
+import {NAV, INSTAGRAM_URL} from '~/data/copy';
 import biothreeLogo from '~/assets/biothree1.png';
 
 function MenuIcon({open}: {open: boolean}) {
@@ -33,57 +33,70 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
-        <Link
-          to="/"
-          prefetch="intent"
-          className="flex items-center"
-          onClick={() => setOpen(false)}
-        >
-          <img src={biothreeLogo} alt="Biothree" className="h-7 w-auto" />
-        </Link>
+    <header className="sticky top-0 z-50 h-16 border-b border-line bg-background/85 backdrop-blur-md">
+      <div className="bt-container grid h-16 grid-cols-[auto_1fr_auto] items-center">
+        {/* Logo + grouped nav (left) */}
+        <div className="flex items-center">
+          <Link
+            to="/"
+            prefetch="intent"
+            className="flex items-center"
+            onClick={() => setOpen(false)}
+          >
+            <img src={biothreeLogo} alt="Biothree" className="h-[30px] w-auto" />
+          </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              prefetch="intent"
-              className={({isActive}) =>
-                `text-sm font-medium transition-colors hover:text-purple ${
-                  isActive ? 'text-purple' : 'text-ink'
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="hidden md:block">
-          <Button href="/productos" variant="primary">
-            Comprar
-          </Button>
+          <nav className="ml-12 hidden items-center gap-8 md:flex">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                prefetch="intent"
+                className={({isActive}) =>
+                  `text-[0.95rem] font-medium tracking-[-0.015em] transition-colors hover:text-purple ${
+                    isActive ? 'text-purple' : 'text-ink'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-ink/5 md:hidden"
-          aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <MenuIcon open={open} />
-        </button>
+        {/* Spacer column keeps grid balanced */}
+        <span aria-hidden="true" />
+
+        {/* Actions (right) */}
+        <div className="flex items-center justify-end">
+          <div className="hidden md:block">
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[0.95rem] font-semibold tracking-[-0.015em] text-ink transition-colors hover:text-purple"
+            >
+              Comprar
+            </a>
+          </div>
+
+          {/* Mobile toggle */}
+          <button
+            type="button"
+            className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-ink/5 md:hidden"
+            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <MenuIcon open={open} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <nav className="border-t border-line bg-background/95 px-5 py-4 md:hidden">
-          <div className="flex flex-col gap-1">
+        <nav className="border-t border-line bg-background/95 md:hidden">
+          <div className="bt-container flex flex-col gap-1 py-4">
             {NAV.map((item) => (
               <Link
                 key={item.href}
@@ -96,7 +109,7 @@ export function Header() {
               </Link>
             ))}
             <Button
-              href="/productos"
+              href={INSTAGRAM_URL}
               variant="primary"
               size="lg"
               className="mt-2 w-full"

@@ -1,17 +1,18 @@
-// Product configuration for the Biothree marketing site.
-// Names and prices are placeholders — easy to change here in one place.
-// checkoutUrl uses placeholder links for now; swap in Shopify checkout URLs later.
+// Biothree is ONE Japanese probiotic formula, offered in TWO presentations.
+// These are NOT separate products / SKUs / formulas — just two ways to take
+// the same product. CTAs point to Instagram until Shopify checkout is ready.
+
+import {INSTAGRAM_URL} from './copy';
 
 export type Product = {
   id: string;
   name: string;
-  shortName: string;
+  tagline: string;
   description: string;
   bullets: string[];
-  price: string;
   image: string;
-  checkoutUrl: string;
-  // Fields used by the comparison table on /productos.
+  ctaUrl: string;
+  // Used by the presentation comparison table on /productos.
   idealFor: string;
   usage: string;
   format: string;
@@ -19,49 +20,33 @@ export type Product = {
 
 export const products: Product[] = [
   {
-    id: 'biothree-01',
-    name: 'Biothree Digestión',
-    shortName: 'Digestión diaria',
-    description:
-      'Probióticos japoneses para acompañar tu bienestar digestivo como parte de una rutina diaria.',
-    bullets: ['Uso diario', 'Fórmula japonesa', 'Rutina simple'],
-    price: '$XX.XX',
-    image: '/assets/biothree/probiotic-chain.png',
-    checkoutUrl: '#',
-    idealFor: 'Empezar una rutina digestiva diaria',
-    usage: '1 vez al día',
-    format: 'Caja mensual',
-  },
-  {
-    id: 'biothree-02',
-    name: 'Biothree Rutina',
-    shortName: 'Rutina simple',
-    description:
-      'Una presentación pensada para quienes quieren incorporar probióticos de forma fácil y constante.',
-    bullets: ['Una toma al día', 'Fácil de incorporar', 'Apoya tu microbiota'],
-    price: '$XX.XX',
-    image: '/assets/biothree/probiotic-rods.png',
-    checkoutUrl: '#',
-    idealFor: 'Incorporar probióticos con constancia',
-    usage: '1 vez al día',
-    format: 'Caja mensual',
-  },
-  {
-    id: 'biothree-03',
-    name: 'Biothree Balance',
-    shortName: 'Equilibrio intestinal',
-    description:
-      'Una fórmula para acompañar el equilibrio natural de tu microbiota todos los días.',
-    bullets: [
-      'Bienestar desde adentro',
-      'Presentación mensual',
-      'Información clara',
-    ],
-    price: '$XX.XX',
+    id: 'biothree-tabletas',
+    name: 'Biothree Tabletas',
+    tagline: 'Tabletas',
+    description: 'Para una rutina diaria simple y práctica.',
+    bullets: ['Uso diario', 'Fácil de llevar', 'Ideal para una rutina constante'],
+    // Both presentations share the same unified Bio3 composition so the cards
+    // read as one product, not two different formulas.
     image: '/assets/biothree/probiotic-cells.png',
-    checkoutUrl: '#',
-    idealFor: 'Acompañar el equilibrio intestinal',
+    ctaUrl: INSTAGRAM_URL,
+    idealFor: 'Una rutina constante y fácil de llevar',
     usage: '1 vez al día',
-    format: 'Caja mensual',
+    format: 'Tabletas',
+  },
+  {
+    id: 'biothree-sobres',
+    name: 'Biothree Sobres',
+    tagline: 'Sobres',
+    description: 'Para una presentación individual fácil de llevar o mezclar.',
+    bullets: [
+      'Presentación individual',
+      'Fácil de incorporar',
+      'Pensada para el día a día',
+    ],
+    image: '/assets/biothree/probiotic-cells.png',
+    ctaUrl: INSTAGRAM_URL,
+    idealFor: 'Quienes prefieren mezclarlo o un formato individual',
+    usage: '1 vez al día',
+    format: 'Sobres',
   },
 ];

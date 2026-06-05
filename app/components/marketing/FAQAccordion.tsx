@@ -4,8 +4,8 @@ import type {Faq} from '~/data/faq';
 function ChevronIcon({open}: {open: boolean}) {
   return (
     <svg
-      width="20"
-      height="20"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -27,7 +27,7 @@ function FAQItem({faq}: {faq: Faq}) {
   const id = useId();
 
   return (
-    <div className="border-b border-line">
+    <div className="border-b border-line last:border-0">
       <h3>
         <button
           type="button"
@@ -35,7 +35,7 @@ function FAQItem({faq}: {faq: Faq}) {
           aria-controls={`${id}-panel`}
           id={`${id}-button`}
           onClick={() => setOpen((v) => !v)}
-          className="flex w-full items-center justify-between gap-4 py-5 text-left font-tight text-lg font-medium text-ink transition-colors hover:text-purple"
+          className="bt-h3 flex w-full items-center justify-between gap-4 py-4 text-left text-ink transition-colors hover:text-purple"
         >
           {faq.question}
           <ChevronIcon open={open} />
@@ -46,7 +46,7 @@ function FAQItem({faq}: {faq: Faq}) {
         role="region"
         aria-labelledby={`${id}-button`}
         hidden={!open}
-        className="pb-5 pr-8 text-base leading-relaxed text-muted"
+        className="bt-p max-w-[620px] pb-4 pr-8 text-muted"
       >
         {faq.answer}
       </div>
@@ -56,7 +56,7 @@ function FAQItem({faq}: {faq: Faq}) {
 
 export function FAQAccordion({items}: {items: Faq[]}) {
   return (
-    <div className="rounded-card border border-line bg-surface/60 px-6 sm:px-8">
+    <div className="bt-card border border-line bg-surface/60 !py-1">
       {items.map((faq) => (
         <FAQItem key={faq.question} faq={faq} />
       ))}

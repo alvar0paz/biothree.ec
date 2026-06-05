@@ -6,20 +6,22 @@ type Size = 'md' | 'lg';
 
 const base =
   'inline-flex items-center justify-center gap-2 rounded-full font-medium ' +
-  'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 ' +
-  'focus-visible:ring-purple/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
-  'disabled:opacity-50 disabled:pointer-events-none';
+  'tracking-[-0.01em] transition-all duration-200 focus-visible:outline-none ' +
+  'focus-visible:ring-2 focus-visible:ring-purple/50 focus-visible:ring-offset-2 ' +
+  'focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-ink text-white hover:opacity-90 hover:scale-[1.02]',
+  primary: 'bg-ink text-white hover:opacity-90',
   secondary:
     'bg-transparent text-ink border border-ink/80 hover:bg-ink hover:text-white',
   ghost: 'bg-transparent text-ink hover:bg-ink/5',
 };
 
 const sizes: Record<Size, string> = {
-  md: 'px-5 py-2.5 text-sm',
-  lg: 'px-7 py-3.5 text-base',
+  // Compact, confident: 44px min height, 20px horizontal padding.
+  md: 'min-h-[44px] px-5 text-[0.95rem]',
+  // Slightly larger for hero moments only.
+  lg: 'min-h-[50px] px-6 text-base',
 };
 
 type CommonProps = {
