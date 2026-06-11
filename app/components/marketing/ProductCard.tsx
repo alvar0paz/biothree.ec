@@ -53,7 +53,12 @@ export function ProductCard({product}: ProductCardProps) {
         ))}
       </ul>
 
-      <Button href={product.ctaUrl} variant="primary" className="w-full">
+      {/* Bottom-aligned so both cards' CTAs line up regardless of copy length. */}
+      <Button
+        href={product.ctaUrl}
+        variant="soft"
+        className="mt-auto w-full"
+      >
         {productPreview.cta}
       </Button>
     </div>

@@ -146,6 +146,38 @@ main:has(.biothree) {
   border-radius: var(--radius-card);
 }
 
+/* Button colors — unlayered so they beat normalize.css `a { background }` and
+   reset.css `a { color }`, which otherwise strip the fill/text color from
+   anchor-rendered buttons. Layout (padding, radius, flex) stays in the component. */
+.bt-btn-primary {
+  background-color: var(--color-ink);
+  color: #ffffff;
+}
+.bt-btn-secondary {
+  background-color: transparent;
+  color: var(--color-ink);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 80%, transparent);
+}
+.bt-btn-secondary:hover {
+  background-color: var(--color-ink);
+  color: #ffffff;
+}
+.bt-btn-ghost {
+  background-color: transparent;
+  color: var(--color-ink);
+}
+.bt-btn-ghost:hover {
+  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+/* Subtle: lighter Biothree purple background, darker purple text. */
+.bt-btn-soft {
+  background-color: var(--color-purple-soft);
+  color: var(--color-purple-dark);
+}
+.bt-btn-soft:hover {
+  background-color: color-mix(in srgb, var(--color-purple-soft) 86%, var(--color-purple));
+}
+
 @media (max-width: 768px) {
   .bt-section {
     padding-block: 48px;

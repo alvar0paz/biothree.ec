@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import type {ReactNode} from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'soft';
 type Size = 'md' | 'lg';
 
 const base =
@@ -10,11 +10,13 @@ const base =
   'focus-visible:ring-2 focus-visible:ring-purple/50 focus-visible:ring-offset-2 ' +
   'focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none';
 
+// Color/background live in unlayered .bt-btn-* classes (tailwind.css) so they
+// survive the Shopify reset's global `a` styles.
 const variants: Record<Variant, string> = {
-  primary: 'bg-ink text-white hover:opacity-90',
-  secondary:
-    'bg-transparent text-ink border border-ink/80 hover:bg-ink hover:text-white',
-  ghost: 'bg-transparent text-ink hover:bg-ink/5',
+  primary: 'bt-btn-primary hover:opacity-90',
+  secondary: 'bt-btn-secondary',
+  ghost: 'bt-btn-ghost',
+  soft: 'bt-btn-soft',
 };
 
 const sizes: Record<Size, string> = {
