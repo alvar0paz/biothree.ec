@@ -140,6 +140,17 @@ main:has(.biothree) {
   text-transform: uppercase;
 }
 
+/* Footer legal strip — unlayered so it beats reset.css `p { font-size: 1rem }`. */
+.bt-legal p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .bt-legal p {
+    font-size: 11px;
+  }
+}
+
 /* Cards */
 .bt-card {
   padding: clamp(20px, 3vw, 32px);

@@ -40,7 +40,7 @@ function FooterLink({href, label}: {href: string; label: string}) {
 export function Footer() {
   return (
     <footer className="border-t border-line bg-background">
-      <div className="bt-container py-12">
+      <div className="bt-container pt-12">
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div className="flex flex-col gap-4">
             <img
@@ -74,11 +74,14 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-line pt-6">
-          <p className="max-w-3xl text-xs leading-relaxed text-muted">
-            {footer.disclaimer}
+        <div className="bt-legal mt-12 border-t border-line pb-12 pt-7 text-muted">
+          <p>{footer.legalLine1.join(' · ')}</p>
+          <p className="mt-2">
+            Importado y distribuido por{' '}
+            <span className="font-medium text-[#4f4f4f]">{footer.importer}</span>
+            {' · '}
+            {footer.legalLine2.join(' · ')}
           </p>
-          <p className="mt-4 text-xs text-muted">{footer.copyright}</p>
         </div>
       </div>
     </footer>

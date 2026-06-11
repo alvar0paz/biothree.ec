@@ -185,7 +185,14 @@ export const footer = {
       ],
     },
   ],
-  disclaimer:
-    'Biothree es un suplemento alimenticio, no un medicamento. La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud.',
-  copyright: '© 2026 Biothree Ecuador. Todos los derechos reservados.',
+  // Bottom legal strip. The "·" separators are rendered inline on desktop and
+  // wrap naturally on mobile. Company legal name is the only all-caps element.
+  legalLine1: [
+    'Biothree es un suplemento alimenticio',
+    'No es un medicamento',
+    'Consulta siempre las indicaciones del empaque',
+    'La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud',
+  ],
+  importer: 'BIOSCIENCE TRADING EC',
+  legalLine2: ['Ecuador', '© 2026 Biothree Ecuador. Todos los derechos reservados.'],
 };
