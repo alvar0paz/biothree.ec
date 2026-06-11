@@ -1,9 +1,20 @@
-import {motion} from 'framer-motion';
+import {useEffect, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
 import {Button} from './Button';
 import {SectionLabel} from './SectionLabel';
-import {ASSETS, hero, INSTAGRAM_URL} from '~/data/copy';
+import {hero, heroBacteria, INSTAGRAM_URL} from '~/data/copy';
 
 export function Hero() {
+  const [index, setIndex] = useState(0);
+
+  // Cycle through every available bacteria illustration.
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((prev) => (prev + 1) % heroBacteria.length);
+    }, 1600);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section className="relative overflow-hidden">
       <div className="bt-container bt-hero grid items-center gap-10 md:grid-cols-2 md:gap-8">
@@ -22,16 +33,27 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Floating product composition */}
+        {/* Floating, cycling product composition */}
         <div className="order-2 flex justify-center md:justify-end">
-          <motion.img
-            src={ASSETS.probioticCells}
-            alt=""
-            aria-hidden="true"
-            className="w-60 max-w-full select-none sm:w-72 lg:w-[400px]"
+          <motion.div
+            className="relative flex h-60 w-60 items-center justify-center sm:h-72 sm:w-72 lg:h-[400px] lg:w-[400px]"
             animate={{y: [0, -6, 0]}}
             transition={{duration: 5, repeat: Infinity, ease: 'easeInOut'}}
-          />
+          >
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={index}
+                src={heroBacteria[index]}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full select-none object-contain"
+                initial={{opacity: 0, scale: 0.96}}
+                animate={{opacity: 1, scale: 1}}
+                exit={{opacity: 0, scale: 0.98}}
+                transition={{duration: 0.4, ease: 'easeInOut'}}
+              />
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </section>

@@ -41,6 +41,20 @@
   }
 }
 
+/* The shared Shopify reset.css (unlayered) adds a grey body background and
+   padding around <main>/<section>. These overrides must also be unlayered to
+   win the cascade, so marketing pages render full-bleed. Sections carry their
+   own padding on an inner wrapper, so zeroing the <section> element is safe. */
+body:has(.biothree) {
+  background: var(--color-background);
+}
+main:has(.biothree) {
+  padding: 0;
+}
+.biothree section {
+  padding-block: 0;
+}
+
 /* ==========================================================================
    Layout + type system — one consistent rhythm across every section.
    Defined unlayered so they win over utility classes they pair with.

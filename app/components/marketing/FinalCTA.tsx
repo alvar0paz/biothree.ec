@@ -3,8 +3,9 @@ import {ASSETS, finalCta, INSTAGRAM_URL} from '~/data/copy';
 
 export function FinalCTA() {
   return (
-    <section className="bt-container bt-section-compact">
-      <div className="relative overflow-hidden rounded-card border border-line bg-purple-soft px-6 py-14 text-center sm:px-12">
+    <section>
+      <div className="bt-container bt-section-compact">
+        <div className="relative overflow-hidden rounded-card border border-line bg-purple-soft px-6 py-14 text-center sm:px-12">
         {/* Subtle decorative visuals — kept low-opacity so text stays readable. */}
         <img
           src={ASSETS.probioticCells}
@@ -24,6 +25,7 @@ export function FinalCTA() {
           <Button href={INSTAGRAM_URL} variant="primary" size="lg">
             {finalCta.cta}
           </Button>
+        </div>
         </div>
       </div>
     </section>

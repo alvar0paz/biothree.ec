@@ -2,7 +2,7 @@
 // These are NOT separate products / SKUs / formulas — just two ways to take
 // the same product. CTAs point to Instagram until Shopify checkout is ready.
 
-import {INSTAGRAM_URL} from './copy';
+import {INSTAGRAM_URL, ASSETS} from './copy';
 
 export type Product = {
   id: string;
@@ -25,9 +25,8 @@ export const products: Product[] = [
     tagline: 'Tabletas',
     description: 'Para una rutina diaria simple y práctica.',
     bullets: ['Uso diario', 'Fácil de llevar', 'Ideal para una rutina constante'],
-    // Both presentations share the same unified Bio3 composition so the cards
-    // read as one product, not two different formulas.
-    image: '/assets/biothree/probiotic-cells.png',
+    // Presentation imagery: blister for tablets, sachet for sobres.
+    image: ASSETS.iconBlister,
     ctaUrl: INSTAGRAM_URL,
     idealFor: 'Una rutina constante y fácil de llevar',
     usage: '1 vez al día',
@@ -43,7 +42,7 @@ export const products: Product[] = [
       'Fácil de incorporar',
       'Pensada para el día a día',
     ],
-    image: '/assets/biothree/probiotic-cells.png',
+    image: ASSETS.iconSachet,
     ctaUrl: INSTAGRAM_URL,
     idealFor: 'Quienes prefieren mezclarlo o un formato individual',
     usage: '1 vez al día',

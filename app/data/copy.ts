@@ -6,15 +6,36 @@
 // All purchase CTAs point here until Shopify checkout is integrated.
 export const INSTAGRAM_URL = 'https://instagram.com/biothree.ec';
 
+// Assets live in app/assets/biothree and are bundled through Vite, so they get
+// hashed/cached URLs. Import them here once and reference via ASSETS everywhere.
+import probioticChain from '~/assets/biothree/probiotic-chain.png';
+import probioticRods from '~/assets/biothree/probiotic-rods.png';
+import probioticCells from '~/assets/biothree/probiotic-cells.png';
+import iconDigestion from '~/assets/biothree/icon-digestion.png';
+import iconRoutine from '~/assets/biothree/icon-routine.png';
+import iconBalance from '~/assets/biothree/icon-balance.png';
+import iconBlister from '~/assets/biothree/icon-blister.png';
+import iconSachet from '~/assets/biothree/icon-sachet.png';
+import scienceBg from '~/assets/biothree/science-bg.png';
+
 export const ASSETS = {
-  probioticChain: '/assets/biothree/probiotic-chain.png',
-  probioticRods: '/assets/biothree/probiotic-rods.png',
-  probioticCells: '/assets/biothree/probiotic-cells.png',
-  iconDigestion: '/assets/biothree/icon-digestion.png',
-  iconRoutine: '/assets/biothree/icon-routine.png',
-  iconBalance: '/assets/biothree/icon-balance.png',
-  scienceBg: '/assets/biothree/science-bg.png',
+  probioticChain,
+  probioticRods,
+  probioticCells,
+  iconDigestion,
+  iconRoutine,
+  iconBalance,
+  iconBlister,
+  iconSachet,
+  scienceBg,
 } as const;
+
+// Every abstract "bacteria" illustration available, for the hero to cycle through.
+export const heroBacteria = [
+  ASSETS.probioticCells,
+  ASSETS.probioticRods,
+  ASSETS.probioticChain,
+];
 
 // Ciencia and FAQ live on the same page, so they share one nav entry.
 export const NAV = [

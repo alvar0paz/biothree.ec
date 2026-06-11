@@ -79,8 +79,10 @@ export default function Ciencia() {
       </section>
 
       {/* Disclaimer */}
-      <section className="bt-container-narrow py-10">
-        <p className="bt-p text-center text-muted">{cienciaPage.disclaimer}</p>
+      <section>
+        <div className="bt-container-narrow py-10">
+          <p className="bt-p text-center text-muted">{cienciaPage.disclaimer}</p>
+        </div>
       </section>
     </div>
   );

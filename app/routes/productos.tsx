@@ -134,8 +134,10 @@ export default function Productos() {
       </section>
 
       {/* Disclaimer */}
-      <section className="bt-container-narrow py-10">
-        <p className="bt-p text-center text-muted">{productosPage.disclaimer}</p>
+      <section>
+        <div className="bt-container-narrow py-10">
+          <p className="bt-p text-center text-muted">{productosPage.disclaimer}</p>
+        </div>
       </section>
     </div>
   );
