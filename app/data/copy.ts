@@ -50,6 +50,13 @@ export const hero = {
     'Biothree combina probióticos seleccionados en una fórmula simple, pensada para acompañar tu bienestar digestivo todos los días.',
   primaryCta: 'Comprar Biothree',
   secondaryCta: 'Ver cómo funciona',
+  // Quiet trust strip rendered below the hero CTAs.
+  trust: [
+    'Fórmula japonesa',
+    'Uso diario',
+    'Importado por BIOSCIENCE TRADING EC',
+    'Ecuador',
+  ],
 };
 
 export const benefits = {
@@ -112,6 +119,7 @@ export const scienceTeaser = {
   body: 'Los probióticos son microorganismos vivos que, consumidos en cantidades adecuadas, pueden aportar beneficios al huésped. En Biothree, la idea es simple: convertir el cuidado intestinal en una rutina diaria clara y fácil de seguir.',
   cta: 'Leer sobre la ciencia',
   href: '/ciencia',
+  note: 'Información educativa · No es un medicamento',
 };
 
 export const faqPreview = {
@@ -123,6 +131,7 @@ export const faqPreview = {
 export const finalCta = {
   title: 'Empieza con una rutina simple para tu bienestar digestivo.',
   cta: 'Consultar por Instagram',
+  note: 'Disponible en tabletas y sobres',
 };
 
 export const productosPage = {

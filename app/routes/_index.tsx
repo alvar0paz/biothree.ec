@@ -42,11 +42,12 @@ export default function Homepage() {
           </Reveal>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {benefits.cards.map((card, i) => (
-              <Reveal key={card.title} delay={i * 0.08}>
+              <Reveal key={card.title} delay={i * 0.08} className="h-full">
                 <BenefitCard
                   title={card.title}
                   description={card.description}
                   icon={card.icon}
+                  index={i}
                 />
               </Reveal>
             ))}
@@ -55,7 +56,7 @@ export default function Homepage() {
       </section>
 
       {/* Product — one formula, two presentations */}
-      <section>
+      <section className="bt-section-divided">
         <div className="bt-container bt-section">
           <Reveal>
             <div className="flex flex-col items-start gap-3">
@@ -79,7 +80,7 @@ export default function Homepage() {
       <ScienceTeaser />
 
       {/* FAQ preview */}
-      <section>
+      <section className="bt-section-divided">
         <div className="bt-container-narrow bt-section">
           <Reveal>
             <div className="flex flex-col items-start gap-3">

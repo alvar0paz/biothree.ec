@@ -39,6 +39,9 @@ export default function Ciencia() {
             <p className="bt-lead max-w-[600px] text-muted">
               {cienciaPage.heroSubtitle}
             </p>
+            <span className="bt-note inline-flex rounded-full border border-line bg-surface/80 px-3.5 py-1.5 text-muted">
+              Información educativa · No es un medicamento
+            </span>
           </div>
         </div>
       </section>
@@ -49,7 +52,7 @@ export default function Ciencia() {
         <div className="bt-container-narrow bt-section flex flex-col gap-6">
           {cienciaPage.sections.map((s) => (
             <Reveal key={s.title}>
-              <div className="flex items-center gap-6 rounded-card border border-line bg-surface/60 p-6 sm:gap-8 sm:p-7">
+              <div className="bt-card-hover flex flex-col gap-5 rounded-card border border-line bg-surface/60 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-7">
                 <div className="bt-science-icon">
                   <img
                     src={s.image}
@@ -86,8 +89,10 @@ export default function Ciencia() {
 
       {/* Disclaimer */}
       <section>
-        <div className="bt-container-narrow py-10">
-          <p className="bt-p text-center text-muted">{cienciaPage.disclaimer}</p>
+        <div className="bt-container-narrow py-12">
+          <p className="bt-legal-note border-t border-line pt-6 text-center">
+            {cienciaPage.disclaimer}
+          </p>
         </div>
       </section>
     </div>
