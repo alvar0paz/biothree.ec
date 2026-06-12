@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Link, NavLink} from 'react-router';
+import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import {Button} from '~/components/marketing/Button';
 import {NAV, INSTAGRAM_URL} from '~/data/copy';
 import biothreeLogo from '~/assets/biothree1.png';
@@ -31,6 +32,9 @@ function MenuIcon({open}: {open: boolean}) {
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  // Header renders outside PageLayout's <MotionConfig>, so reduced motion has
+  // to be honored manually for the mobile menu animation.
+  const reduceMotion = useReducedMotion();
 
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-line bg-background/85 backdrop-blur-md">
@@ -70,14 +74,9 @@ export function Header() {
         {/* Actions (right) */}
         <div className="flex items-center justify-end">
           <div className="hidden md:block">
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bt-nav-link text-[0.95rem] font-semibold tracking-[-0.015em] transition-colors"
-            >
+            <Button href={INSTAGRAM_URL} variant="primary">
               Comprar
-            </a>
+            </Button>
           </div>
 
           {/* Mobile toggle */}
@@ -94,32 +93,41 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <nav id="mobile-menu" className="border-t border-line bg-background/95 md:hidden">
-          <div className="bt-container flex flex-col gap-1 py-4">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                prefetch="intent"
-                onClick={() => setOpen(false)}
-                className="bt-nav-link rounded-xl px-3 py-3 text-base font-medium hover:bg-ink/5"
+      {/* Mobile menu — quick fade/slide; static toggle under reduced motion. */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.nav
+            id="mobile-menu"
+            className="overflow-hidden border-t border-line bg-background/95 shadow-[0_18px_30px_-22px_rgba(17,17,17,0.25)] backdrop-blur-md md:hidden"
+            initial={reduceMotion ? false : {opacity: 0, y: -6}}
+            animate={{opacity: 1, y: 0}}
+            exit={reduceMotion ? {opacity: 1} : {opacity: 0, y: -6}}
+            transition={{duration: 0.18, ease: 'easeOut'}}
+          >
+            <div className="bt-container flex flex-col gap-1 py-4">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  prefetch="intent"
+                  onClick={() => setOpen(false)}
+                  className="bt-nav-link rounded-xl px-3 py-3 text-base font-medium hover:bg-ink/5"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <Button
+                href={INSTAGRAM_URL}
+                variant="primary"
+                size="lg"
+                className="mt-2 w-full"
               >
-                {item.label}
-              </Link>
-            ))}
-            <Button
-              href={INSTAGRAM_URL}
-              variant="primary"
-              size="lg"
-              className="mt-2 w-full"
-            >
-              Comprar
-            </Button>
-          </div>
-        </nav>
-      )}
+                Comprar
+              </Button>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

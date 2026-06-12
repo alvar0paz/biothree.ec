@@ -73,11 +73,11 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="bt-legal mt-12 border-t border-line pb-12 pt-7 text-muted">
-          <p>{footer.legalLine1.join(' · ')}</p>
-          <p className="mt-2">
+        <div className="bt-legal mt-14 border-t border-line pb-12 pt-7 text-muted">
+          <p className="max-w-[880px]">{footer.legalLine1.join(' · ')}</p>
+          <p className="mt-2.5">
             Importado y distribuido por{' '}
-            <span className="font-medium text-[#4f4f4f]">{footer.importer}</span>
+            <span className="font-medium text-ink/70">{footer.importer}</span>
             {' · '}
             {footer.legalLine2.join(' · ')}
           </p>

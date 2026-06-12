@@ -62,6 +62,9 @@ main:has(.biothree) {
 .biothree dl {
   margin: 0;
 }
+.biothree dd {
+  margin: 0;
+}
 
 /* ==========================================================================
    Layout + type system — one consistent rhythm across every section.
@@ -155,6 +158,194 @@ main:has(.biothree) {
   text-transform: uppercase;
 }
 
+/* ==========================================================================
+   Surfaces, dividers and decorative layers
+   ========================================================================== */
+
+/* Soft lavender wash for alternating section backgrounds. */
+.bt-wash {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-purple-soft) 38%, var(--color-background)) 0%,
+    var(--color-background) 100%
+  );
+}
+
+/* Subtle gradient hairline at the top of a section — softer than a border. */
+.bt-section-divided {
+  position: relative;
+}
+.bt-section-divided::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100% - 40px, 1160px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-line) 18%,
+    var(--color-line) 82%,
+    transparent
+  );
+}
+
+/* Soft radial glow behind the hero illustration. */
+.bt-hero-glow {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-purple) 10%, var(--color-cream)) 0%,
+    color-mix(in srgb, var(--color-purple-soft) 55%, transparent) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Soft purple stage behind product/visual imagery inside cards. */
+.bt-stage {
+  background: linear-gradient(
+    160deg,
+    var(--color-purple-soft) 0%,
+    color-mix(in srgb, var(--color-purple-soft) 40%, var(--color-cream)) 100%
+  );
+}
+
+/* ==========================================================================
+   Card + icon polish
+   ========================================================================== */
+
+/* Hover: card lifts 2px, border tints purple, shadow deepens. */
+.bt-card-hover {
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.bt-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-purple) 24%, var(--color-line));
+  box-shadow: 0 18px 44px -24px rgba(36, 11, 133, 0.28);
+}
+
+/* Consistent badge container for line icons; background shifts on card hover. */
+.bt-icon-badge {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background-color: var(--color-purple-soft);
+  border: 1px solid color-mix(in srgb, var(--color-purple) 10%, transparent);
+  transition: background-color 0.25s ease;
+}
+.bt-card-hover:hover .bt-icon-badge {
+  background-color: color-mix(in srgb, var(--color-purple-soft) 84%, var(--color-purple));
+}
+
+/* Numbered card labels (01, 02, 03). */
+.bt-card-number {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--color-muted) 70%, var(--color-line));
+}
+
+/* ==========================================================================
+   Small text treatments
+   ========================================================================== */
+
+/* Hero trust strip — quiet, mono, uppercase. */
+.bt-trust-strip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Small contextual note (e.g. "Disponible por Instagram"). Unlayered so it
+   beats reset.css `p { font-size: 1rem }`. Color comes from utilities so each
+   surface can tint it. */
+.bt-note {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+/* Page-level legal/disclaimer note. */
+.bt-legal-note {
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* ==========================================================================
+   FAQ accordion — animated open/close without JS measurement
+   ========================================================================== */
+.bt-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+.bt-acc-panel[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.bt-acc-panel > div {
+  overflow: hidden;
+  /* visibility flips at the end of the transition, keeping closed answers out
+     of the accessibility tree without blocking the height animation. */
+  visibility: hidden;
+  transition: visibility 0.25s;
+}
+.bt-acc-panel[data-open='true'] > div {
+  visibility: visible;
+}
+.bt-faq-answer {
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+/* Strong, consistent focus ring for keyboard navigation. reset.css and
+   normalize.css strip outlines, so this must be unlayered. */
+.bt-focus:focus-visible,
+.bt-nav-link:focus-visible,
+.bt-footer-link:focus-visible {
+  outline: 2px solid var(--color-purple);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ==========================================================================
+   Decorative motion — CSS keyframes so the global reduced-motion rule below
+   disables them automatically.
+   ========================================================================== */
+@keyframes bt-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.bt-drift {
+  animation: bt-drift 7s ease-in-out infinite;
+}
+.bt-drift-slow {
+  animation: bt-drift 9.5s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
 /* Footer legal strip — unlayered so it beats reset.css `p { font-size: 1rem }`. */
 .bt-legal p {
   font-size: 12px;
@@ -216,6 +407,14 @@ main:has(.biothree) {
 }
 .bt-nav-link-active {
   color: var(--color-purple);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 7px;
+  text-decoration-color: color-mix(in srgb, var(--color-purple) 45%, transparent);
+}
+.bt-nav-link-active:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-purple);
 }
 .bt-footer-link {
   color: var(--color-muted);
@@ -245,6 +444,16 @@ main:has(.biothree) {
   }
   .bt-card {
     padding: 22px;
+  }
+  /* Science rows stack vertically on mobile — keep the icon panel compact. */
+  .bt-science-icon {
+    width: 104px;
+    height: 104px;
+    border-radius: 22px;
+  }
+  .bt-science-icon img {
+    width: 56px;
+    height: 56px;
   }
 }
 

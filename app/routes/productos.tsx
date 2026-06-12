@@ -29,7 +29,7 @@ export default function Productos() {
           src={ASSETS.probioticChain}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-10 w-64 select-none opacity-20 sm:w-80"
+          className="bt-drift pointer-events-none absolute -right-16 -top-10 w-64 select-none opacity-20 sm:w-80"
         />
         <div className="bt-container bt-hero relative z-10">
           <div className="flex max-w-[720px] flex-col items-start gap-4">
@@ -137,8 +137,10 @@ export default function Productos() {
 
       {/* Disclaimer */}
       <section>
-        <div className="bt-container-narrow py-10">
-          <p className="bt-p text-center text-muted">{productosPage.disclaimer}</p>
+        <div className="bt-container-narrow py-12">
+          <p className="bt-legal-note border-t border-line pt-6 text-center">
+            {productosPage.disclaimer}
+          </p>
         </div>
       </section>
     </div>

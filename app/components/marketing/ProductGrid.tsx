@@ -7,7 +7,7 @@ export function ProductGrid() {
   return (
     <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
       {products.map((product, i) => (
-        <Reveal key={product.id} delay={i * 0.08}>
+        <Reveal key={product.id} delay={i * 0.08} className="h-full">
           <ProductCard product={product} />
         </Reveal>
       ))}

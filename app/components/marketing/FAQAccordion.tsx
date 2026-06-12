@@ -14,7 +14,7 @@ function ChevronIcon({open}: {open: boolean}) {
       strokeLinejoin="round"
       aria-hidden="true"
       className={`shrink-0 transition-transform duration-200 ${
-        open ? 'rotate-180' : ''
+        open ? 'rotate-180 text-purple' : 'text-muted'
       }`}
     >
       <path d="m6 9 6 6 6-6" />
@@ -35,20 +35,26 @@ function FAQItem({faq}: {faq: Faq}) {
           aria-controls={`${id}-panel`}
           id={`${id}-button`}
           onClick={() => setOpen((v) => !v)}
-          className="bt-h3 flex w-full items-center justify-between gap-4 py-4 text-left text-ink transition-colors hover:text-purple"
+          className="bt-h3 bt-focus flex w-full items-center justify-between gap-4 py-5 text-left text-ink transition-colors hover:text-purple"
         >
           {faq.question}
           <ChevronIcon open={open} />
         </button>
       </h3>
+      {/* CSS grid-rows animation (.bt-acc-panel) — smooth height transition
+          without measuring; reduced motion collapses it to an instant toggle. */}
       <div
         id={`${id}-panel`}
         role="region"
         aria-labelledby={`${id}-button`}
-        hidden={!open}
-        className="bt-p max-w-[620px] pb-4 pr-8 text-muted"
+        data-open={open}
+        className="bt-acc-panel"
       >
-        {faq.answer}
+        <div>
+          <p className="bt-faq-answer max-w-[620px] pb-5 pr-8 text-muted">
+            {faq.answer}
+          </p>
+        </div>
       </div>
     </div>
   );
