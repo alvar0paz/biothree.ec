@@ -11,12 +11,16 @@ export function FinalCTA() {
           src={ASSETS.probioticCells}
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none absolute -left-10 -top-10 w-36 select-none opacity-20 sm:w-48"
         />
         <img
           src={ASSETS.probioticRods}
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none absolute -bottom-12 -right-8 w-36 select-none opacity-20 sm:w-48"
         />
 

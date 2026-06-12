@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import type {ReactNode} from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'soft';
+type Variant = 'primary' | 'secondary' | 'soft';
 type Size = 'md' | 'lg';
 
 const base =
@@ -15,7 +15,6 @@ const base =
 const variants: Record<Variant, string> = {
   primary: 'bt-btn-primary hover:opacity-90',
   secondary: 'bt-btn-secondary',
-  ghost: 'bt-btn-ghost',
   soft: 'bt-btn-soft',
 };
 

@@ -1,5 +1,6 @@
 import {Await, Link} from 'react-router';
 import {Suspense, useId} from 'react';
+import {MotionConfig} from 'framer-motion';
 import type {
   CartApiQueryFragment,
   FooterQuery,
@@ -38,7 +39,11 @@ export function PageLayout({
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
       <Header />
-      <main>{children}</main>
+      {/* framer-motion animates via inline styles, so the CSS
+          prefers-reduced-motion rule can't catch it — honor it here. */}
+      <MotionConfig reducedMotion="user">
+        <main>{children}</main>
+      </MotionConfig>
       <Footer />
     </Aside.Provider>
   );

@@ -24,6 +24,8 @@ export function HowItWorks() {
                       src={ASSETS.iconRoutine}
                       alt=""
                       aria-hidden="true"
+                      loading="lazy"
+                      decoding="async"
                       className="ml-auto h-10 w-10 object-contain opacity-90"
                     />
                   )}

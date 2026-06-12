@@ -16,7 +16,7 @@ import iconRoutine from '~/assets/biothree/icon-routine.png';
 import iconBalance from '~/assets/biothree/icon-balance.png';
 import iconBlister from '~/assets/biothree/icon-blister.png';
 import iconSachet from '~/assets/biothree/icon-sachet.png';
-import scienceBg from '~/assets/biothree/science-bg.png';
+import scienceBg from '~/assets/biothree/science-bg.webp';
 
 export const ASSETS = {
   probioticChain,

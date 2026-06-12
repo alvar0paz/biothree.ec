@@ -53,8 +53,8 @@ export function Header() {
                 to={item.href}
                 prefetch="intent"
                 className={({isActive}) =>
-                  `text-[0.95rem] font-medium tracking-[-0.015em] transition-colors hover:text-purple ${
-                    isActive ? 'text-purple' : 'text-ink'
+                  `bt-nav-link text-[0.95rem] font-medium tracking-[-0.015em] transition-colors ${
+                    isActive ? 'bt-nav-link-active' : ''
                   }`
                 }
               >
@@ -74,7 +74,7 @@ export function Header() {
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[0.95rem] font-semibold tracking-[-0.015em] text-ink transition-colors hover:text-purple"
+              className="bt-nav-link text-[0.95rem] font-semibold tracking-[-0.015em] transition-colors"
             >
               Comprar
             </a>
@@ -86,6 +86,7 @@ export function Header() {
             className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-ink/5 md:hidden"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
+            aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
           >
             <MenuIcon open={open} />
@@ -95,7 +96,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <nav className="border-t border-line bg-background/95 md:hidden">
+        <nav id="mobile-menu" className="border-t border-line bg-background/95 md:hidden">
           <div className="bt-container flex flex-col gap-1 py-4">
             {NAV.map((item) => (
               <Link
@@ -103,7 +104,7 @@ export function Header() {
                 to={item.href}
                 prefetch="intent"
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-3 text-base font-medium text-ink hover:bg-ink/5"
+                className="bt-nav-link rounded-xl px-3 py-3 text-base font-medium hover:bg-ink/5"
               >
                 {item.label}
               </Link>
