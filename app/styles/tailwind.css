@@ -54,6 +54,14 @@ main:has(.biothree) {
 .biothree section {
   padding-block: 0;
 }
+/* reset.css also adds li/dl margins that double up with flex `gap` spacing
+   inside cards (product bullets, comparison cards). */
+.biothree li {
+  margin: 0;
+}
+.biothree dl {
+  margin: 0;
+}
 
 /* ==========================================================================
    Layout + type system — one consistent rhythm across every section.
@@ -99,13 +107,16 @@ main:has(.biothree) {
   object-fit: contain;
 }
 
-/* Headings — editorial, tight tracking, compact leading */
+/* Headings — editorial, tight tracking, compact leading.
+   margin: 0 beats reset.css's unlayered h1/h2 margins, which would otherwise
+   leak into the flex `gap` rhythm of every section. */
 .bt-h1 {
   font-family: var(--font-tight);
   font-size: clamp(2.6rem, 5vw, 4.75rem);
   line-height: 0.95;
   font-weight: 600;
   letter-spacing: -0.045em;
+  margin: 0;
 }
 .bt-h2 {
   font-family: var(--font-tight);
@@ -113,6 +124,7 @@ main:has(.biothree) {
   line-height: 1;
   font-weight: 600;
   letter-spacing: -0.04em;
+  margin: 0;
 }
 .bt-h3 {
   font-family: var(--font-tight);
@@ -120,6 +132,7 @@ main:has(.biothree) {
   line-height: 1.2;
   font-weight: 600;
   letter-spacing: -0.02em;
+  margin: 0;
 }
 
 /* Body copy — calmer and more compact */
@@ -127,11 +140,13 @@ main:has(.biothree) {
   font-size: 1rem;
   line-height: 1.55;
   letter-spacing: -0.01em;
+  margin: 0;
 }
 .bt-lead {
   font-size: 1.0625rem;
   line-height: 1.5;
   letter-spacing: -0.015em;
+  margin: 0;
 }
 
 /* Eyebrow / kicker labels — the only place wide tracking is allowed */
@@ -173,13 +188,6 @@ main:has(.biothree) {
   background-color: var(--color-ink);
   color: #ffffff;
 }
-.bt-btn-ghost {
-  background-color: transparent;
-  color: var(--color-ink);
-}
-.bt-btn-ghost:hover {
-  background-color: color-mix(in srgb, var(--color-ink) 6%, transparent);
-}
 /* Subtle: lighter Biothree purple background, darker purple text. */
 .bt-btn-soft {
   background-color: var(--color-purple-soft);
@@ -187,6 +195,34 @@ main:has(.biothree) {
 }
 .bt-btn-soft:hover {
   background-color: color-mix(in srgb, var(--color-purple-soft) 86%, var(--color-purple));
+}
+/* reset.css's `a:hover { text-decoration: underline }` would underline
+   anchor-rendered pill buttons on hover. */
+.bt-btn-primary:hover,
+.bt-btn-secondary:hover,
+.bt-btn-soft:hover {
+  text-decoration: none;
+}
+
+/* Header/footer chrome links — color must live in unlayered classes because
+   reset.css's `a { color: #052137 }` beats Tailwind text-color utilities,
+   silently repainting nav/footer links dark blue and killing hover colors. */
+.bt-nav-link {
+  color: var(--color-ink);
+}
+.bt-nav-link:hover {
+  color: var(--color-purple);
+  text-decoration: none;
+}
+.bt-nav-link-active {
+  color: var(--color-purple);
+}
+.bt-footer-link {
+  color: var(--color-muted);
+}
+.bt-footer-link:hover {
+  color: var(--color-ink);
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {

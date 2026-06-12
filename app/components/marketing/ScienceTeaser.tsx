@@ -9,6 +9,8 @@ export function ScienceTeaser() {
         src={ASSETS.scienceBg}
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover opacity-70"
       />
       <div className="absolute inset-0 bg-background/70" aria-hidden="true" />

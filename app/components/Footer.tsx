@@ -1,5 +1,5 @@
 import {Link} from 'react-router';
-import {footer} from '~/data/copy';
+import {footer, INSTAGRAM_URL} from '~/data/copy';
 import biothreeLogo from '~/assets/biothree1.png';
 
 function InstagramIcon() {
@@ -24,8 +24,7 @@ function InstagramIcon() {
 
 function FooterLink({href, label}: {href: string; label: string}) {
   const isInternal = href.startsWith('/');
-  const className =
-    'text-sm text-muted transition-colors hover:text-ink';
+  const className = 'bt-footer-link text-sm transition-colors';
   return isInternal ? (
     <Link to={href} prefetch="intent" className={className}>
       {label}
@@ -49,13 +48,13 @@ export function Footer() {
               className="max-h-[30px] w-auto self-start"
             />
             <p className="bt-p max-w-xs text-muted">{footer.tagline}</p>
-            <div className="mt-1 flex items-center gap-3 text-ink">
+            <div className="mt-1 flex items-center gap-3">
               <a
-                href="https://instagram.com/biothree.ec"
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="transition-colors hover:text-purple"
+                className="bt-nav-link transition-colors"
               >
                 <InstagramIcon />
               </a>

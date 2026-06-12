@@ -42,9 +42,11 @@ export default function Productos() {
         </div>
       </section>
 
-      {/* Two presentations */}
+      {/* Two presentations. !pt-0 because the unlayered .bt-section-compact
+          padding would otherwise beat a plain pt-0 utility. */}
       <section>
-        <div className="bt-container bt-section-compact pt-0">
+        <div className="bt-container bt-section-compact !pt-0">
+          <h2 className="sr-only">Presentaciones</h2>
           <ProductGrid />
         </div>
       </section>
@@ -101,7 +103,7 @@ export default function Productos() {
                 className="bt-card border border-line bg-surface/70"
               >
                 <h3 className="bt-h3 text-ink">{product.name}</h3>
-                <dl className="mt-3 flex flex-col gap-2.5">
+                <dl className="pt-3 flex flex-col gap-2.5">
                   <div className="flex justify-between gap-4">
                     <dt className="bt-eyebrow font-mono text-[0.7rem] text-purple">
                       Ideal para

@@ -19,6 +19,15 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    // The marketing typography (Inter, Inter Tight, IBM Plex Mono) is served
+    // from Google Fonts; Hydrogen's default CSP blocks it.
+    styleSrc: [
+      "'self'",
+      "'unsafe-inline'",
+      'https://cdn.shopify.com',
+      'https://fonts.googleapis.com',
+    ],
+    fontSrc: ["'self'", 'https://cdn.shopify.com', 'https://fonts.gstatic.com'],
   });
 
   const body = await renderToReadableStream(

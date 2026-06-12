@@ -37,6 +37,8 @@ export function ProductCard({product}: ProductCardProps) {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           className="h-32 w-32 object-contain"
         />
       </div>

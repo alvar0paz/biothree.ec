@@ -8,6 +8,8 @@ type RevealProps = {
 };
 
 // Gentle fade + small rise when the element scrolls into view.
+// PageLayout wraps routes in <MotionConfig reducedMotion="user">, which drops
+// the transform for users who prefer reduced motion.
 export function Reveal({children, className, delay = 0}: RevealProps) {
   return (
     <motion.div

@@ -51,7 +51,13 @@ export default function Ciencia() {
             <Reveal key={s.title}>
               <div className="flex items-center gap-6 rounded-card border border-line bg-surface/60 p-6 sm:gap-8 sm:p-7">
                 <div className="bt-science-icon">
-                  <img src={s.image} alt="" aria-hidden="true" />
+                  <img
+                    src={s.image}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <h2 className="bt-h3 text-ink">{s.title}</h2>

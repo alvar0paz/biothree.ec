@@ -1,19 +1,22 @@
 import {useEffect, useState} from 'react';
-import {AnimatePresence, motion} from 'framer-motion';
+import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import {Button} from './Button';
 import {SectionLabel} from './SectionLabel';
 import {hero, heroBacteria, INSTAGRAM_URL} from '~/data/copy';
 
 export function Hero() {
   const [index, setIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
-  // Cycle through every available bacteria illustration.
+  // Cycle through every available bacteria illustration. The auto-cycling is
+  // plain JS, so prefers-reduced-motion has to be honored manually here.
   useEffect(() => {
+    if (reduceMotion) return;
     const id = setInterval(() => {
       setIndex((prev) => (prev + 1) % heroBacteria.length);
     }, 1600);
     return () => clearInterval(id);
-  }, []);
+  }, [reduceMotion]);
 
   return (
     <section className="relative overflow-hidden">
