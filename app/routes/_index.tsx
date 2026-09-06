@@ -1,3 +1,4 @@
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
 import {Hero} from '~/components/marketing/Hero';
 import {BenefitCard} from '~/components/marketing/BenefitCard';
@@ -11,6 +12,7 @@ import {Button} from '~/components/marketing/Button';
 import {Reveal} from '~/components/marketing/Reveal';
 import {benefits, productPreview, faqPreview} from '~/data/copy';
 import {faqs} from '~/data/faq';
+import {loadPresentations} from '~/lib/biothree';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -25,11 +27,15 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export async function loader() {
-  return {};
+export async function loader({context}: Route.LoaderArgs) {
+  // Live price + stock for the two presentations. Never throws: an empty
+  // Shopify admin yields variant: null and the cards fall back to Instagram.
+  return {presentations: await loadPresentations(context.storefront, context.env)};
 }
 
 export default function Homepage() {
+  const {presentations} = useLoaderData<typeof loader>();
+
   return (
     <div className="biothree">
       <Hero />
@@ -70,7 +76,7 @@ export default function Homepage() {
             </div>
           </Reveal>
           <div className="mt-8">
-            <ProductGrid />
+            <ProductGrid presentations={presentations} />
           </div>
         </div>
       </section>

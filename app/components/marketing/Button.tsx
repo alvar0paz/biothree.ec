@@ -25,6 +25,24 @@ const sizes: Record<Size, string> = {
   lg: 'min-h-[50px] px-6 text-base',
 };
 
+/**
+ * The button look as a plain class string, for the cases that can't use
+ * <Button>: Hydrogen's <CartForm> renders its own <button>, so add-to-cart and
+ * the cart actions style themselves from here instead of duplicating the
+ * classes and drifting.
+ */
+export function buttonClasses({
+  variant = 'primary',
+  size = 'md',
+  className = '',
+}: {
+  variant?: Variant;
+  size?: Size;
+  className?: string;
+} = {}) {
+  return `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+}
+
 type CommonProps = {
   children: ReactNode;
   variant?: Variant;
@@ -47,7 +65,7 @@ export function Button({
   onClick,
   type = 'button',
 }: ButtonProps) {
-  const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = buttonClasses({variant, size, className});
 
   if (href) {
     const isInternal = href.startsWith('/');

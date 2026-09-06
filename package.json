@@ -8,6 +8,8 @@
     "build": "shopify hydrogen build --codegen",
     "dev": "shopify hydrogen dev --codegen",
     "preview": "shopify hydrogen preview --build",
+    "preview:local": "vite --config vite.local-preview.config.ts",
+    "preview:mock": "vite --config vite.local-preview.config.ts --mode mock",
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "react-router typegen && tsc --noEmit",
     "codegen": "shopify hydrogen codegen && react-router typegen"

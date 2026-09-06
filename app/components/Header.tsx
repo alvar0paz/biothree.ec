@@ -1,9 +1,15 @@
-import {useState} from 'react';
-import {Link, NavLink} from 'react-router';
+import {Suspense, useState} from 'react';
+import {Await, Link, NavLink} from 'react-router';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
+import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {Button} from '~/components/marketing/Button';
-import {NAV, INSTAGRAM_URL} from '~/data/copy';
+import {useAside} from '~/components/Aside';
+import {NAV} from '~/data/copy';
 import biothreeLogo from '~/assets/biothree1.png';
+
+type HeaderProps = {
+  cart: Promise<CartApiQueryFragment | null>;
+};
 
 function MenuIcon({open}: {open: boolean}) {
   return (
@@ -30,7 +36,79 @@ function MenuIcon({open}: {open: boolean}) {
   );
 }
 
-export function Header() {
+function BagIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 8h12l-1 12H7L6 8Z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </svg>
+  );
+}
+
+/**
+ * Cart trigger. The count comes from the deferred root cart promise, so the
+ * header paints immediately and the badge fills in — rendering 0 until then
+ * rather than a spinner, because a flickering number in the nav reads as a bug.
+ */
+function CartButton({cart}: {cart: HeaderProps['cart']}) {
+  const {open} = useAside();
+
+  return (
+    <Suspense fallback={<CartButtonView count={0} onClick={() => open('cart')} />}>
+      <Await resolve={cart} errorElement={null}>
+        {(resolved) => (
+          <CartButtonView
+            count={resolved?.totalQuantity ?? 0}
+            onClick={() => open('cart')}
+          />
+        )}
+      </Await>
+    </Suspense>
+  );
+}
+
+function CartButtonView({
+  count,
+  onClick,
+}: {
+  count: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative -mr-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5"
+      aria-label={
+        count > 0
+          ? `Abrir carrito, ${count} ${count === 1 ? 'artículo' : 'artículos'}`
+          : 'Abrir carrito'
+      }
+    >
+      <BagIcon />
+      {count > 0 && (
+        <span
+          aria-hidden="true"
+          className="absolute -right-0.5 -top-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-purple px-1 text-[0.65rem] font-semibold leading-none text-white"
+        >
+          {count > 99 ? '99+' : count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+export function Header({cart}: HeaderProps) {
   const [open, setOpen] = useState(false);
   // Header renders outside PageLayout's <MotionConfig>, so reduced motion has
   // to be honored manually for the mobile menu animation.
@@ -72,12 +150,17 @@ export function Header() {
         <span aria-hidden="true" />
 
         {/* Actions (right) */}
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end gap-1">
+          {/* "Comprar" now lands on /productos, where the presentations carry
+              real prices and add-to-cart (or the Instagram fallback until the
+              Shopify product exists). */}
           <div className="hidden md:block">
-            <Button href={INSTAGRAM_URL} variant="primary">
+            <Button href="/productos" variant="primary">
               Comprar
             </Button>
           </div>
+
+          <CartButton cart={cart} />
 
           {/* Mobile toggle */}
           <button
@@ -117,7 +200,7 @@ export function Header() {
                 </Link>
               ))}
               <Button
-                href={INSTAGRAM_URL}
+                href="/productos"
                 variant="primary"
                 size="lg"
                 className="mt-2 w-full"

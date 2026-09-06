@@ -58,11 +58,14 @@ export function Aside({
       className={`overlay ${expanded ? 'expanded' : ''}`}
       role="dialog"
     >
-      <button className="close-outside" onClick={close} />
-      <aside>
+      <button className="close-outside" onClick={close} aria-label="Cerrar" />
+      {/* `biothree` opts the drawer into the marketing theme (font, border-box
+          sizing, colours); without it the Shopify reset's content-box inputs
+          overflow the panel's right edge. */}
+      <aside className="biothree">
         <header>
-          <h3>{heading}</h3>
-          <button className="close reset" onClick={close} aria-label="Close">
+          <h3 className="bt-h3 text-ink">{heading}</h3>
+          <button className="close reset" onClick={close} aria-label="Cerrar">
             &times;
           </button>
         </header>

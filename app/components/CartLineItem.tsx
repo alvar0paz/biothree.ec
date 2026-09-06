@@ -9,6 +9,11 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
+const stepperButton =
+  'inline-flex h-8 w-8 items-center justify-center rounded-full border ' +
+  'border-line bg-surface text-ink transition-colors hover:bg-ink/5 ' +
+  'disabled:opacity-40 disabled:pointer-events-none';
+
 /**
  * A single line item in the cart. It displays the product image, title, price.
  * It also provides controls to update the quantity or remove the line item.
@@ -26,19 +31,20 @@ export function CartLineItem({
   const {close} = useAside();
 
   return (
-    <li key={id} className="cart-line">
+    <li key={id} className="cart-line border-b border-line/70 last:border-0">
       {image && (
         <Image
           alt={title}
           aspectRatio="1/1"
           data={image}
-          height={100}
+          height={80}
           loading="lazy"
-          width={100}
+          width={80}
+          className="rounded-[14px] border border-line/70 bg-cream/40"
         />
       )}
 
-      <div>
+      <div className="min-w-0 flex-1">
         <Link
           prefetch="intent"
           to={lineItemUrl}
@@ -48,21 +54,32 @@ export function CartLineItem({
             }
           }}
         >
-          <p>
-            <strong>{product.title}</strong>
+          <p className="bt-p font-medium leading-snug text-ink">
+            {product.title}
           </p>
         </Link>
-        <ProductPrice price={line?.cost?.totalAmount} />
-        <ul>
-          {selectedOptions.map((option) => (
-            <li key={option.name}>
-              <small>
-                {option.name}: {option.value}
-              </small>
-            </li>
-          ))}
+        {/* Presentación (Tabletas / Sobres) — the only option this product has,
+            but rendered generically so extra options still show up. "Default
+            Title" is Shopify's placeholder for option-less products. */}
+        <ul className="pt-0.5">
+          {selectedOptions
+            .filter((option) => option.value !== 'Default Title')
+            .map((option) => (
+              <li key={option.name}>
+                <small className="bt-note text-muted">
+                  {option.name}: {option.value}
+                </small>
+              </li>
+            ))}
         </ul>
-        <CartLineQuantity line={line} />
+        {/* Price and stepper on one row: the drawer is narrow, so stacking
+            them left a lot of dead space under each line. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-2">
+          <CartLineQuantity line={line} />
+          <span className="font-medium text-ink">
+            <ProductPrice price={line?.cost?.totalAmount} />
+          </span>
+        </div>
       </div>
     </li>
   );
@@ -80,30 +97,35 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+    <div className="cart-line-quantity flex items-center gap-2">
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
-          aria-label="Decrease quantity"
+          aria-label="Reducir cantidad"
           disabled={quantity <= 1 || !!isOptimistic}
           name="decrease-quantity"
           value={prevQuantity}
+          className={stepperButton}
         >
-          <span>&#8722; </span>
+          <span aria-hidden="true">&#8722;</span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
+
+      <span className="min-w-[1.5rem] text-center text-sm text-ink">
+        {quantity}
+      </span>
+
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
-          aria-label="Increase quantity"
+          aria-label="Aumentar cantidad"
           name="increase-quantity"
           value={nextQuantity}
           disabled={!!isOptimistic}
+          className={stepperButton}
         >
-          <span>&#43;</span>
+          <span aria-hidden="true">&#43;</span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
+
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
     </div>
   );
@@ -128,8 +150,12 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button disabled={disabled} type="submit">
-        Remove
+      <button
+        disabled={disabled}
+        type="submit"
+        className="ml-1 text-sm text-muted underline underline-offset-2 transition-colors hover:text-ink disabled:opacity-40"
+      >
+        Quitar
       </button>
     </CartForm>
   );

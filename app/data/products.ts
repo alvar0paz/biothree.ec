@@ -1,6 +1,12 @@
 // Biothree is ONE Japanese probiotic formula, offered in TWO presentations.
 // These are NOT separate products / SKUs / formulas — just two ways to take
-// the same product. CTAs point to Instagram until Shopify checkout is ready.
+// the same product.
+//
+// This file holds the *marketing* copy only. Price, stock and the buyable
+// variant id come from Shopify at request time — see ~/lib/biothree.ts, which
+// joins each entry here to a Shopify variant via `optionValue`.
+//
+// `ctaUrl` is the fallback CTA used until the Shopify product exists.
 
 import {INSTAGRAM_URL, ASSETS} from './copy';
 
@@ -12,6 +18,11 @@ export type Product = {
   bullets: string[];
   image: string;
   ctaUrl: string;
+  /**
+   * Value of the "Presentación" option on the Shopify product that identifies
+   * this presentation's variant. Must match the admin exactly (case-insensitive).
+   */
+  optionValue: string;
   // Used by the presentation comparison table on /productos.
   idealFor: string;
   usage: string;
@@ -28,6 +39,7 @@ export const products: Product[] = [
     // Presentation imagery: blister for tablets, sachet for sobres.
     image: ASSETS.iconBlister,
     ctaUrl: INSTAGRAM_URL,
+    optionValue: 'Tabletas',
     idealFor: 'Una rutina constante y fácil de llevar',
     usage: '1 vez al día',
     format: 'Tabletas',
@@ -44,6 +56,7 @@ export const products: Product[] = [
     ],
     image: ASSETS.iconSachet,
     ctaUrl: INSTAGRAM_URL,
+    optionValue: 'Sobres',
     idealFor: 'Quienes prefieren mezclarlo o un formato individual',
     usage: '1 vez al día',
     format: 'Sobres',

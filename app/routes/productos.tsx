@@ -1,9 +1,10 @@
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/productos';
 import {ProductGrid} from '~/components/marketing/ProductGrid';
 import {SectionLabel} from '~/components/marketing/SectionLabel';
 import {Reveal} from '~/components/marketing/Reveal';
 import {ASSETS, productosPage} from '~/data/copy';
-import {products} from '~/data/products';
+import {loadPresentations} from '~/lib/biothree';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -16,11 +17,15 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export async function loader() {
-  return {};
+export async function loader({context}: Route.LoaderArgs) {
+  // Live price + stock for the two presentations. Never throws: an empty
+  // Shopify admin yields variant: null and the cards fall back to Instagram.
+  return {presentations: await loadPresentations(context.storefront, context.env)};
 }
 
 export default function Productos() {
+  const {presentations} = useLoaderData<typeof loader>();
+
   return (
     <div className="biothree">
       {/* Hero */}
@@ -47,7 +52,7 @@ export default function Productos() {
       <section>
         <div className="bt-container bt-section-compact !pt-0">
           <h2 className="sr-only">Presentaciones</h2>
-          <ProductGrid />
+          <ProductGrid presentations={presentations} />
         </div>
       </section>
 
@@ -74,7 +79,7 @@ export default function Productos() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
+                {presentations.map((product) => (
                   <tr
                     key={product.id}
                     className="border-b border-line last:border-0"
@@ -97,7 +102,7 @@ export default function Productos() {
 
           {/* Mobile stacked cards */}
           <div className="mt-8 flex flex-col gap-4 md:hidden">
-            {products.map((product) => (
+            {presentations.map((product) => (
               <div
                 key={product.id}
                 className="bt-card border border-line bg-surface/70"

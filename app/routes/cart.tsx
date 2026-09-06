@@ -5,7 +5,7 @@ import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Bio-Three | Cart`}];
+  return [{title: `Carrito | Biothree Ecuador`}];
 };
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
@@ -109,9 +109,13 @@ export default function Cart() {
   const cart = useLoaderData<typeof loader>();
 
   return (
-    <div className="cart">
-      <h1>Cart</h1>
-      <CartMain layout="page" cart={cart} />
+    <div className="cart biothree">
+      {/* Narrow column: a two-line cart stretched across 1160px put the
+          price a screen-width away from the product it belongs to. */}
+      <div className="bt-container-narrow bt-section flex flex-col gap-6">
+        <h1 className="bt-h2 text-ink">Tu carrito</h1>
+        <CartMain layout="page" cart={cart} />
+      </div>
     </div>
   );
 }
