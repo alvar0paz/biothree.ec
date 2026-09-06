@@ -135,50 +135,96 @@ aparecen precio, stock y "Agregar al carrito" solos.
 
 ## 3. Pagos
 
-Shopify Payments **no opera en Ecuador**. Hay que usar proveedores locales.
-Plan recomendado: arrancar con transferencia manual y sumar tarjetas con
-PayPhone.
+Shopify Payments **no opera en Ecuador**, y PayPhone **no tiene integración
+oficial con Shopify** (su "Cajita de pagos" es para sitios a medida; sus
+plugins oficiales son WooCommerce y Prestashop). Decisión tomada el 6 de
+septiembre de 2026: **un solo método de pago manual** que cubre PayPhone, DeUna
+y transferencia, con enlaces de pago de PayPhone enviados a mano por pedido.
+Cero código, cero comisión de Shopify, y sirve para medir volumen antes de
+automatizar nada.
 
-### 3a. Transferencia / DeUna (sin integración, sin comisión)
+### 3a. Crear el método manual (una sola vez)
 
-Lo más rápido para empezar a recibir pedidos reales hoy.
+*Configuración → Pagos → Métodos de pago manuales → Crear método de pago
+personalizado*
 
-*Configuración → Pagos → Métodos de pago manuales → Crear método personalizado*
+**Nombre del método de pago** (lo ve el cliente en el checkout):
 
-- **Nombre**: `Transferencia bancaria / DeUna`
-- **Instrucciones adicionales**: banco, tipo de cuenta, número, titular, RUC/CI,
-  y que envíen el comprobante al WhatsApp o correo de Biothree.
+```
+PayPhone, DeUna o transferencia
+```
 
-Flujo: el cliente hace el pedido → Shopify lo crea como *pago pendiente* y
-reserva inventario → confirmas la transferencia → marcas el pedido como pagado.
+**Instrucciones adicionales** (se muestran en el checkout y en el correo de
+confirmación; rellena los corchetes):
 
-Costo 0%. La contra es que es manual y tienes que conciliar a mano.
+```
+Tu pedido queda reservado por 24 horas. Elige cómo pagar:
 
-### 3b. PayPhone (tarjetas)
+1) PayPhone (tarjeta de crédito o débito)
+   En unos minutos recibirás por correo un enlace de pago de PayPhone.
+   Ábrelo desde el celular y paga con tu tarjeta. No necesitas tener la app.
 
-La pasarela local más fácil: se instala desde la Shopify App Store, no exige
-certificación PCI ni cuota mensual. Tarifa publicada ≈ **5% + IVA** por
-transacción — cara por venta, pero sin costo fijo, así que para volumen bajo
-sale a cuenta.
+2) DeUna
+   Escanea o paga al número [NÚMERO DEUNA] a nombre de [TITULAR].
 
-1. Abrir cuenta de comercio en PayPhone (RUC, datos bancarios).
-2. Instalar la app de PayPhone desde la Shopify App Store.
-3. Conectar credenciales y activarla en *Configuración → Pagos*.
-4. Hacer un pedido de prueba de $1 y reembolsarlo.
+3) Transferencia bancaria
+   Banco: [BANCO]
+   Tipo de cuenta: [AHORROS/CORRIENTE]
+   Número: [NÚMERO DE CUENTA]
+   Titular: [RAZÓN SOCIAL]
+   RUC: [RUC]
 
-No soporta pagos recurrentes ni de un clic. Solo USD (que es lo que se necesita).
+Envía el comprobante (DeUna o transferencia) por WhatsApp al [NÚMERO] o a
+[CORREO] indicando tu número de pedido. Despachamos apenas confirmamos el pago.
+```
 
-### Cuándo cambiar
+**Instrucciones de pago** (campo opcional que ve solo el equipo): deja
+`Enlace PayPhone → WhatsApp + correo → marcar como pagado`.
 
-- **Kushki** ≈ 2.95% + $0.25 — más barato por transacción, pero exige contrato
-  y onboarding. Vale la pena cuando el volumen haga que el 5% duela.
-- **Datafast** — respaldo bancario tradicional, más papeleo, sin app nativa de
-  Shopify.
-- **Place to Pay** — orientado a corporativo; el onboarding más pesado de todos.
-  No es el camino para lanzar.
+Guardar y activar. Con esto "Finalizar compra" ya deja completar pedidos.
 
-Cambiar de pasarela después **no toca este repo**: se activa la nueva en
-*Pagos* y el checkout la muestra.
+### 3b. Flujo por pedido
+
+Con la automatización de `payphone-automation.md` configurada:
+
+1. Llega el pedido como **Pago pendiente**; Shopify reserva el inventario.
+2. El sitio crea el enlace de PayPhone y se lo envía al cliente por correo
+   solo. El pedido queda con la etiqueta `payphone-link`.
+3. Cuando el cliente paga, el pedido pasa a **Pagado** solo (por la
+   notificación de PayPhone o, como máximo, 15 minutos después por la
+   conciliación). Etiqueta `payphone-paid`.
+4. **DeUna / transferencia** siguen siendo manuales: al recibir el
+   comprobante, abre el pedido y pulsa **Marcar como pagado**.
+5. Si a las 24 h no hay pago, cancela el pedido para liberar el stock.
+
+Mientras la automatización no esté configurada, el paso 2 se hace a mano en
+PayPhone Business (*enlace de pago* con el total y el número de pedido como
+referencia) y el paso 3 con *Marcar como pagado*.
+
+Costo: PayPhone cobra su tarifa por cobro (≈ 5% + IVA publicado; confírmalo en
+tu contrato). DeUna y transferencia: 0%. Shopify no cobra comisión por métodos
+manuales.
+
+### 3c. Automatización
+
+Está construida: ver `docs/payphone-automation.md` para la puesta en marcha
+(app personalizada, webhook, credenciales de PayPhone, variables en Oxygen y
+el workflow de conciliación).
+
+Alternativas descartadas y por qué:
+
+- **Payphone by CartDNA** (app de Shopify): gratis y se integra al checkout,
+  pero es de un tercero (Nabeyond Ltd), lanzada en enero de 2026 y sin reseñas.
+  Vale la pena reevaluarla cuando tenga historial.
+- **Cajita de pagos de PayPhone** dentro del sitio: implica reemplazar el
+  checkout de Shopify (dirección, envío, IVA, descuentos, facturación) por uno
+  propio. Semanas de trabajo para una tienda de un producto.
+- **Kushki** ≈ 2.95% + $0.25, con contrato y onboarding. Reconsiderar cuando el
+  volumen haga que la tarifa de PayPhone duela.
+- **Datafast** y **Place to Pay**: onboarding bancario/corporativo pesado.
+
+Cambiar de método después **no toca este repo**: se activa el nuevo en *Pagos*
+y el checkout lo muestra.
 
 ---
 
@@ -207,7 +253,7 @@ Cambiar de pasarela después **no toca este repo**: se activa la nueva en
 - [ ] `/productos` muestra precio y "Agregar al carrito" (no el CTA de Instagram)
 - [ ] Agregar al carrito abre el panel lateral y el contador del header sube
 - [ ] "Finalizar compra" lleva al checkout de Shopify
-- [ ] Al menos un método de pago activo
+- [ ] Método manual "PayPhone, DeUna o transferencia" activo con datos reales
 - [ ] Zona de envío Ecuador configurada
 - [ ] Pedido de prueba completo, de principio a fin
 - [ ] Facturación SRI resuelta
