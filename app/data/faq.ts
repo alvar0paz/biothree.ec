@@ -30,6 +30,11 @@ export const faqs: Faq[] = [
       'No. Biothree no reemplaza una alimentación equilibrada. La acompaña.',
   },
   {
+    question: '¿Cómo pago mi pedido?',
+    answer:
+      'Al finalizar la compra eliges "PayPhone, DeUna o transferencia". Te enviamos un enlace de pago de PayPhone para pagar con tarjeta desde el celular, o puedes hacer una transferencia o pago con DeUna. Apenas confirmamos el pago, despachamos.',
+  },
+  {
     question: '¿Quién debería consultar antes de tomarlo?',
     answer:
       'Personas embarazadas, lactantes, con condiciones médicas o que toman medicamentos deberían consultar con un profesional de salud antes de usarlo.',

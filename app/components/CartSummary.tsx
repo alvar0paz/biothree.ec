@@ -32,7 +32,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       {/* Shipping and taxes are calculated by Shopify at checkout — saying so
           here prevents the "why did the total change?" drop-off. */}
       <p className="bt-note pb-3 text-muted">
-        Envío e impuestos se calculan al finalizar la compra.
+        Envío e impuestos se calculan al finalizar la compra. Pagas con
+        PayPhone, DeUna o transferencia.
       </p>
       <CartDiscounts discountCodes={cart?.discountCodes} layout={layout} />
       {/* Gift cards aren't sold here, so the drawer skips the field. The full
