@@ -12,6 +12,7 @@
     "preview:mock": "vite --config vite.local-preview.config.ts --mode mock",
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "react-router typegen && tsc --noEmit",
+    "test": "vitest run",
     "codegen": "shopify hydrogen codegen && react-router typegen"
   },
   "prettier": "@shopify/prettier-config",
@@ -60,7 +61,8 @@
     "tailwindcss": "^4.3.0",
     "typescript": "^5.9.2",
     "vite": "^6.2.4",
-    "vite-tsconfig-paths": "^4.3.1"
+    "vite-tsconfig-paths": "^4.3.1",
+    "vitest": "^3.2.7"
   },
   "engines": {
     "node": ">=18.0.0"

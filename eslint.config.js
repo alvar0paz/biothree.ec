@@ -230,6 +230,11 @@ export default [
     plugins: {
       jest,
     },
+    // Tests run on vitest, whose API the jest rules understand. The plugin
+    // otherwise tries to read the installed jest version and aborts.
+    settings: {
+      jest: {version: 29},
+    },
     languageOptions: {
       globals: {
         ...globals.node,

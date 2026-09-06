@@ -1,0 +1,31 @@
+# Safety net for PayPhone payments: every 15 minutes, ask the storefront to
+# check pending orders against PayPhone and mark the paid ones. Needed because
+# PayPhone's own notification is opt-in and unsigned. See
+# docs/payphone-automation.md for the two secrets this expects.
+name: PayPhone reconcile
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Reconcile pending PayPhone orders
+        env:
+          RECONCILE_URL: ${{ secrets.PAYPHONE_RECONCILE_URL }}
+          RECONCILE_SECRET: ${{ secrets.PAYPHONE_RECONCILE_SECRET }}
+        run: |
+          if [ -z "$RECONCILE_URL" ] || [ -z "$RECONCILE_SECRET" ]; then
+            echo "PAYPHONE_RECONCILE_URL / PAYPHONE_RECONCILE_SECRET not set; skipping."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error \
+            -X POST "$RECONCILE_URL" \
+            -H "Authorization: Bearer $RECONCILE_SECRET" \
+            -H "Content-Type: application/json"
