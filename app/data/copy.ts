@@ -14,8 +14,8 @@ import probioticCells from '~/assets/biothree/probiotic-cells.png';
 import iconDigestion from '~/assets/biothree/icon-digestion.png';
 import iconRoutine from '~/assets/biothree/icon-routine.png';
 import iconBalance from '~/assets/biothree/icon-balance.png';
-import iconBlister from '~/assets/biothree/icon-blister.png';
-import iconSachet from '~/assets/biothree/icon-sachet.png';
+import productTabletas from '~/assets/biothree/tabletas.png';
+import productSobres from '~/assets/biothree/sobres.png';
 import scienceBg from '~/assets/biothree/science-bg.webp';
 
 export const ASSETS = {
@@ -25,8 +25,8 @@ export const ASSETS = {
   iconDigestion,
   iconRoutine,
   iconBalance,
-  iconBlister,
-  iconSachet,
+  productTabletas,
+  productSobres,
   scienceBg,
 } as const;
 

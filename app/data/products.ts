@@ -37,7 +37,7 @@ export const products: Product[] = [
     description: 'Para una rutina diaria simple y práctica.',
     bullets: ['Uso diario', 'Fácil de llevar', 'Ideal para una rutina constante'],
     // Presentation imagery: blister for tablets, sachet for sobres.
-    image: ASSETS.iconBlister,
+    image: ASSETS.productTabletas,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Tabletas',
     idealFor: 'Una rutina constante y fácil de llevar',
@@ -54,7 +54,7 @@ export const products: Product[] = [
       'Fácil de incorporar',
       'Pensada para el día a día',
     ],
-    image: ASSETS.iconSachet,
+    image: ASSETS.productSobres,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Sobres',
     idealFor: 'Quienes prefieren mezclarlo o un formato individual',

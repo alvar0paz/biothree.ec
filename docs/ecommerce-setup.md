@@ -34,12 +34,16 @@ npm run dev
 
 ### Si la tienda responde "Unavailable Shop" (HTTP 402)
 
-Al 6 de septiembre de 2026, `xzey91-tr.myshopify.com` devuelve **402 /
-"Unavailable Shop"** tanto en la tienda pública como en la Admin API y la
-Storefront API. Eso significa que Shopify pausó la tienda: prueba vencida sin
-plan elegido, o factura pendiente. Ningún código lo arregla. Se resuelve en
-*admin.shopify.com → Configuración → Plan* eligiendo/pagando un plan. Hasta
-entonces `hydrogen env pull` falla y el storefront no puede consultar nada.
+Pasó el 6 de septiembre de 2026 y se resolvió el mismo día al activar el plan
+Basic. Si vuelve a aparecer: `xzey91-tr.myshopify.com` devuelve **402 /
+"Unavailable Shop"** en la tienda pública, la Admin API y la Storefront API
+cuando Shopify pausa la tienda (prueba vencida sin plan, o factura pendiente).
+Ningún código lo arregla. Se resuelve en *admin.shopify.com → Configuración →
+Plan* eligiendo/pagando un plan; revisa también *Facturación* por si hay un
+cobro pendiente. Tras reactivar, el admin puede mostrar "This feature is
+unavailable on your plan" y ocultar *Productos* durante un rato; cerrar sesión
+y volver a entrar suele bastar. Hasta entonces `hydrogen env pull` falla y el
+storefront no puede consultar nada.
 
 ### Probar el flujo de compra sin la tienda (mock.shop)
 
@@ -120,7 +124,12 @@ aparecen precio, stock y "Agregar al carrito" solos.
   "Quedan N unidades".
 - `quantityAvailable` requiere que el token del storefront tenga el permiso
   `unauthenticated_read_product_inventory`. Si llega `null`, la tarjeta muestra
-  "En stock" sin número — no se rompe.
+  "En stock" sin número — no se rompe, pero Hydrogen registra un
+  `GraphQLError: Access denied for quantityAvailable` en cada carga. Para
+  otorgarlo: *Canales de venta → Hydrogen → biothree.ec → Storefront API
+  permissions → Editar*, marcar *Read product inventory* y guardar. No hace
+  falta volver a hacer `env pull`: el token es el mismo, solo cambian sus
+  permisos.
 
 ---
 
