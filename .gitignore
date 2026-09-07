@@ -13,3 +13,4 @@ node_modules
 package-lock.json
 # PayPhone automation secrets pushed to Oxygen with `hydrogen env push`
 .env.payphone
+tsconfig.tsbuildinfo
