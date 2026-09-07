@@ -18,7 +18,11 @@ declare global {
      * them in the Hydrogen storefront's environment variables on Oxygen. See
      * docs/payphone-automation.md.
      */
+    SHOPIFY_CLIENT_ID?: string;
+    SHOPIFY_CLIENT_SECRET?: string;
+    /** Legacy alternative to client id/secret. */
     SHOPIFY_ADMIN_API_TOKEN?: string;
+    /** Only needed when the webhook is created in the admin instead of by the app. */
     SHOPIFY_WEBHOOK_SECRET?: string;
     PAYPHONE_API_TOKEN?: string;
     PAYPHONE_STORE_ID?: string;

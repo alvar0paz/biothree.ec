@@ -1,5 +1,5 @@
-// Shopify → us. Configured under Settings → Notifications → Webhooks with the
-// event "Order creation", JSON format, pointing at
+// Shopify → us. The subscription is created by `scripts/shopify-webhook.mjs`
+// (app-owned, signed with the app's client secret) and points at
 // https://<store domain>/api/webhooks/shopify/orders-create.
 //
 // Shopify retries on any non-2xx, so we answer 200 for everything we chose to
@@ -7,7 +7,12 @@
 
 import type {Route} from './+types/api.webhooks.shopify.orders-create';
 import {verifyShopifyWebhookHmac} from '~/lib/shopify-webhook';
-import {getFlowEnv, handleOrderCreated, type OrderCreatedPayload} from '~/lib/payphone-flow';
+import {
+  getFlowEnv,
+  getWebhookSecret,
+  handleOrderCreated,
+  type OrderCreatedPayload,
+} from '~/lib/payphone-flow';
 
 export async function loader() {
   return Response.json({error: 'Method not allowed'}, {status: 405});
@@ -20,7 +25,8 @@ export async function action({request, context}: Route.ActionArgs) {
 
   const env = context.env;
   const flowEnv = getFlowEnv(env);
-  if (!flowEnv || !env.SHOPIFY_WEBHOOK_SECRET) {
+  const webhookSecret = getWebhookSecret(env);
+  if (!flowEnv || !webhookSecret) {
     return Response.json({error: 'PayPhone automation not configured'}, {status: 503});
   }
 
@@ -28,7 +34,7 @@ export async function action({request, context}: Route.ActionArgs) {
   const valid = await verifyShopifyWebhookHmac(
     rawBody,
     request.headers.get('X-Shopify-Hmac-Sha256'),
-    env.SHOPIFY_WEBHOOK_SECRET,
+    webhookSecret,
   );
   if (!valid) return Response.json({error: 'Invalid signature'}, {status: 401});
 

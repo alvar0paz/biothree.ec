@@ -1,9 +1,13 @@
 // Minimal Admin GraphQL client for the payment-link flow. Server-only.
 //
-// Needs a custom app (Settings → Apps → Develop apps) with `read_orders` and
-// `write_orders`; the token goes in SHOPIFY_ADMIN_API_TOKEN. Everything the
-// flow persists lives on the order itself (metafields + tags), so there is no
-// database to keep in sync.
+// Auth: a Dev Dashboard app (dev.shopify.com) installed on the store, with
+// `read_orders` and `write_orders`. Its Client ID + Client Secret are
+// exchanged for a 24h Admin API token via the client-credentials grant and
+// cached in memory. A static SHOPIFY_ADMIN_API_TOKEN is also accepted for
+// legacy admin-created custom apps.
+//
+// Everything the flow persists lives on the order itself (metafields + tags),
+// so there is no database to keep in sync.
 
 export const ADMIN_API_VERSION = '2025-07';
 
@@ -15,7 +19,11 @@ export const TAG_PAID = 'payphone-paid';
 
 export type AdminEnv = {
   PUBLIC_STORE_DOMAIN: string;
-  SHOPIFY_ADMIN_API_TOKEN: string;
+  /** Dev Dashboard app credentials (preferred). */
+  SHOPIFY_CLIENT_ID?: string;
+  SHOPIFY_CLIENT_SECRET?: string;
+  /** Static token from a legacy admin-created custom app. */
+  SHOPIFY_ADMIN_API_TOKEN?: string;
 };
 
 export class ShopifyAdminError extends Error {
@@ -23,6 +31,66 @@ export class ShopifyAdminError extends Error {
     super(message);
     this.name = 'ShopifyAdminError';
   }
+}
+
+/** True when the env holds enough to authenticate against the Admin API. */
+export function hasAdminCredentials(env: Partial<AdminEnv>): boolean {
+  return Boolean(
+    env.PUBLIC_STORE_DOMAIN &&
+      (env.SHOPIFY_ADMIN_API_TOKEN || (env.SHOPIFY_CLIENT_ID && env.SHOPIFY_CLIENT_SECRET)),
+  );
+}
+
+type CachedToken = {key: string; token: string; expiresAt: number};
+let cachedToken: CachedToken | null = null;
+
+/** Test hook: forget the cached client-credentials token. */
+export function resetAdminTokenCache() {
+  cachedToken = null;
+}
+
+/**
+ * Resolves an Admin API access token. Client-credentials tokens live 24h;
+ * we refresh a minute early and keep one per store+client in module memory,
+ * which on Oxygen means "per warm worker" — cheap and good enough.
+ */
+export async function getAdminAccessToken(env: AdminEnv): Promise<string> {
+  if (env.SHOPIFY_ADMIN_API_TOKEN) return env.SHOPIFY_ADMIN_API_TOKEN;
+  if (!env.SHOPIFY_CLIENT_ID || !env.SHOPIFY_CLIENT_SECRET) {
+    throw new ShopifyAdminError(
+      'Missing SHOPIFY_CLIENT_ID/SHOPIFY_CLIENT_SECRET (or SHOPIFY_ADMIN_API_TOKEN)',
+    );
+  }
+
+  const key = `${env.PUBLIC_STORE_DOMAIN}:${env.SHOPIFY_CLIENT_ID}`;
+  if (cachedToken && cachedToken.key === key && Date.now() < cachedToken.expiresAt - 60_000) {
+    return cachedToken.token;
+  }
+
+  const response = await fetch(`https://${env.PUBLIC_STORE_DOMAIN}/admin/oauth/access_token`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: env.SHOPIFY_CLIENT_ID,
+      client_secret: env.SHOPIFY_CLIENT_SECRET,
+    }),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new ShopifyAdminError(
+      `Client credentials grant ${response.status}: ${text.slice(0, 300)}`,
+    );
+  }
+  const json = (await response.json()) as {access_token?: string; expires_in?: number};
+  if (!json.access_token) throw new ShopifyAdminError('Client credentials grant returned no token');
+
+  cachedToken = {
+    key,
+    token: json.access_token,
+    expiresAt: Date.now() + (json.expires_in ?? 3600) * 1000,
+  };
+  return json.access_token;
 }
 
 type Money = {amount: string; currencyCode: string};
@@ -103,17 +171,22 @@ export async function adminRequest<T>(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<T> {
-  const response = await fetch(
-    `https://${env.PUBLIC_STORE_DOMAIN}/admin/api/${ADMIN_API_VERSION}/graphql.json`,
-    {
+  const send = async (token: string) =>
+    fetch(`https://${env.PUBLIC_STORE_DOMAIN}/admin/api/${ADMIN_API_VERSION}/graphql.json`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Access-Token': env.SHOPIFY_ADMIN_API_TOKEN,
+        'X-Shopify-Access-Token': token,
       },
       body: JSON.stringify({query, variables}),
-    },
-  );
+    });
+
+  let response = await send(await getAdminAccessToken(env));
+  if (response.status === 401 && !env.SHOPIFY_ADMIN_API_TOKEN) {
+    // Cached token revoked or expired early: mint a fresh one and retry once.
+    resetAdminTokenCache();
+    response = await send(await getAdminAccessToken(env));
+  }
   if (!response.ok) {
     const text = await response.text();
     throw new ShopifyAdminError(`Admin API ${response.status}: ${text.slice(0, 300)}`);

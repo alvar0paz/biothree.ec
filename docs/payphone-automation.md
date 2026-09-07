@@ -42,8 +42,8 @@ probar en una rama). Ninguna lleva prefijo `PUBLIC_`.
 
 | Variable | Origen |
 |---|---|
-| `SHOPIFY_ADMIN_API_TOKEN` | Token de la app personalizada (paso 1) |
-| `SHOPIFY_WEBHOOK_SECRET` | Secreto de firma de webhooks (paso 2) |
+| `SHOPIFY_CLIENT_ID` | App del Dev Dashboard → Settings → Client ID (paso 1) |
+| `SHOPIFY_CLIENT_SECRET` | Ídem, Client secret. También firma el webhook (paso 2) |
 | `PAYPHONE_API_TOKEN` | Token de la aplicación en PayPhone Developer (paso 3) |
 | `PAYPHONE_STORE_ID` | StoreId de la sucursal en PayPhone Developer (paso 3). Opcional si la cuenta tiene una sola tienda |
 | `PAYPHONE_LINK_EXPIRE_HOURS` | Opcional, horas de vigencia del enlace. Por defecto 24 |
@@ -52,32 +52,44 @@ probar en una rama). Ninguna lleva prefijo `PUBLIC_`.
 
 Para generar secretos: `openssl rand -hex 32`.
 
-Sin `SHOPIFY_ADMIN_API_TOKEN` o `PAYPHONE_API_TOKEN` las rutas responden 503
-y no hacen nada; el sitio sigue funcionando.
+Sin credenciales de Shopify o sin `PAYPHONE_API_TOKEN` las rutas responden
+503 y no hacen nada; el sitio sigue funcionando. (`SHOPIFY_ADMIN_API_TOKEN` y
+`SHOPIFY_WEBHOOK_SECRET` siguen aceptados para una app personalizada antigua
+creada en el admin, hoy descontinuadas por Shopify.)
 
 ## Puesta en marcha
 
-### 1. App personalizada de Shopify (Admin API)
+### 1. App en el Dev Dashboard de Shopify (Admin API)
 
-*Configuración → Aplicaciones y canales de venta → Desarrollar aplicaciones →
-Crear una aplicación*. Nombre: `Biothree PayPhone`.
+Shopify descontinuó las apps personalizadas del admin el 1 de enero de 2026;
+ahora se crean en https://dev.shopify.com con la organización de la tienda.
 
-- *Configuración de la API de administrador* → permisos: `read_orders`,
-  `write_orders`. Nada más.
-- Instalar la app y copiar el **token de acceso de la API de administrador**
-  (`shpat_…`). Se muestra una sola vez → `SHOPIFY_ADMIN_API_TOKEN`.
+1. *Apps → Create app*. Nombre `Biothree PayPhone`.
+2. En la versión (*Versions → Create version*): App URL `https://biothree.ec`
+   (la app no tiene interfaz; el campo solo debe ser válido), desmarcar
+   *Embed app in Shopify admin*. En *API access* marcar `read_orders` y
+   `write_orders`. Pulsar **Release**.
+3. Instalar la app en la tienda *Bio Three Ecuador* (desde la página de la
+   app, *Install* / elegir tienda). Sin este paso el intercambio de
+   credenciales falla.
+4. *Settings* de la app → copiar **Client ID** y **Client secret** →
+   `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET`.
+
+El código intercambia esas credenciales por un token de Admin API de 24 h
+(*client credentials grant*) y lo renueva solo.
 
 ### 2. Webhook de Shopify
 
-*Configuración → Notificaciones → Webhooks → Crear webhook*:
+Lo crea la propia app (así queda firmado con el Client secret):
 
-- Evento: **Creación de pedido** (`orders/create`)
-- Formato: JSON
-- URL: `https://<dominio del sitio>/api/webhooks/shopify/orders-create`
-- Versión de API: `2025-07`
+```bash
+node scripts/shopify-webhook.mjs          # crea orders/create → /api/webhooks/shopify/orders-create
+node scripts/shopify-webhook.mjs --list   # verificar
+```
 
-Al pie de esa misma página está el texto "Todos tus webhooks se firmarán con
-…": ese valor es `SHOPIFY_WEBHOOK_SECRET`.
+Lee `.env` y `.env.payphone`. Si prefieres crearlo a mano en *Configuración →
+Notificaciones → Webhooks*, carga además `SHOPIFY_WEBHOOK_SECRET` con el
+secreto de firma que aparece al pie de esa página.
 
 ### 3. Aplicación en PayPhone Developer
 

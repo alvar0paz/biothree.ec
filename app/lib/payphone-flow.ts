@@ -12,6 +12,7 @@ import {
   addOrderTags,
   findPendingPayphoneOrders,
   getOrder,
+  hasAdminCredentials,
   markOrderPaid,
   orderGid,
   savePaymentLink,
@@ -38,17 +39,30 @@ export type FlowEnv = AdminEnv & PayphoneEnv;
 
 /** Null when any required secret is missing, so routes can answer 503. */
 export function getFlowEnv(env: Partial<Record<keyof FlowEnv, string | undefined>>): FlowEnv | null {
-  const {PUBLIC_STORE_DOMAIN, SHOPIFY_ADMIN_API_TOKEN, PAYPHONE_API_TOKEN} = env;
-  if (!PUBLIC_STORE_DOMAIN || !SHOPIFY_ADMIN_API_TOKEN || !PAYPHONE_API_TOKEN) {
+  const {PUBLIC_STORE_DOMAIN, PAYPHONE_API_TOKEN} = env;
+  if (!PUBLIC_STORE_DOMAIN || !PAYPHONE_API_TOKEN || !hasAdminCredentials(env)) {
     return null;
   }
   return {
     PUBLIC_STORE_DOMAIN,
-    SHOPIFY_ADMIN_API_TOKEN,
+    SHOPIFY_CLIENT_ID: env.SHOPIFY_CLIENT_ID,
+    SHOPIFY_CLIENT_SECRET: env.SHOPIFY_CLIENT_SECRET,
+    SHOPIFY_ADMIN_API_TOKEN: env.SHOPIFY_ADMIN_API_TOKEN,
     PAYPHONE_API_TOKEN,
     PAYPHONE_STORE_ID: env.PAYPHONE_STORE_ID,
     PAYPHONE_LINK_EXPIRE_HOURS: env.PAYPHONE_LINK_EXPIRE_HOURS,
   };
+}
+
+/**
+ * Secret that signs incoming Shopify webhooks. App-owned subscriptions are
+ * signed with the app's client secret; admin-created ones with the store's
+ * webhook signing secret. SHOPIFY_WEBHOOK_SECRET wins when set.
+ */
+export function getWebhookSecret(
+  env: Partial<Record<'SHOPIFY_WEBHOOK_SECRET' | 'SHOPIFY_CLIENT_SECRET', string | undefined>>,
+): string | undefined {
+  return env.SHOPIFY_WEBHOOK_SECRET || env.SHOPIFY_CLIENT_SECRET || undefined;
 }
 
 /** The two fields we read from Shopify's `orders/create` payload. */
