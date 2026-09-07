@@ -11,3 +11,5 @@ node_modules
 .claude
 .cursor
 package-lock.json
+# PayPhone automation secrets pushed to Oxygen with `hydrogen env push`
+.env.payphone

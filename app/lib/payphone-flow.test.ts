@@ -147,6 +147,14 @@ describe('handleOrderCreated', () => {
     expect(email.customMessage).toContain('https://payp.page.link/abc123');
   });
 
+  it('omits storeId from the link when the account has none configured', async () => {
+    const {calls} = mockFetch({order: () => rawOrder()});
+    const {PAYPHONE_STORE_ID: _unused, ...envWithoutStore} = env;
+    await handleOrderCreated({admin_graphql_api_id: ORDER_GID, financial_status: 'pending'}, envWithoutStore);
+    const linkCall = calls.find((call) => call.url.endsWith('/api/Links'));
+    expect(linkCall?.body).not.toHaveProperty('storeId');
+  });
+
   it('skips paid orders without calling PayPhone', async () => {
     const {calls} = mockFetch({order: () => rawOrder({displayFinancialStatus: 'PAID'})});
     const result = await handleOrderCreated({admin_graphql_api_id: ORDER_GID, financial_status: 'paid'}, env);

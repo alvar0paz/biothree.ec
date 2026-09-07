@@ -19,7 +19,8 @@ export const DEFAULT_LINK_EXPIRE_HOURS = 24;
 
 export type PayphoneEnv = {
   PAYPHONE_API_TOKEN: string;
-  PAYPHONE_STORE_ID: string;
+  /** Optional per PayPhone's docs; accounts with one store can omit it. */
+  PAYPHONE_STORE_ID?: string;
   PAYPHONE_LINK_EXPIRE_HOURS?: string;
 };
 
@@ -161,10 +162,11 @@ export async function createPaymentLink(
     oneTime?: boolean;
   },
 ): Promise<string> {
+  const storeId = env.PAYPHONE_STORE_ID?.trim();
   const body = {
     ...input.amounts,
     clientTransactionId: input.clientTransactionId,
-    storeId: env.PAYPHONE_STORE_ID,
+    ...(storeId ? {storeId} : {}),
     currency: 'USD',
     reference: input.reference.slice(0, 100),
     oneTime: input.oneTime ?? true,

@@ -45,15 +45,15 @@ probar en una rama). Ninguna lleva prefijo `PUBLIC_`.
 | `SHOPIFY_ADMIN_API_TOKEN` | Token de la app personalizada (paso 1) |
 | `SHOPIFY_WEBHOOK_SECRET` | Secreto de firma de webhooks (paso 2) |
 | `PAYPHONE_API_TOKEN` | Token de la aplicación en PayPhone Developer (paso 3) |
-| `PAYPHONE_STORE_ID` | StoreId de la sucursal en PayPhone Developer (paso 3) |
+| `PAYPHONE_STORE_ID` | StoreId de la sucursal en PayPhone Developer (paso 3). Opcional si la cuenta tiene una sola tienda |
 | `PAYPHONE_LINK_EXPIRE_HOURS` | Opcional, horas de vigencia del enlace. Por defecto 24 |
 | `PAYPHONE_WEBHOOK_KEY` | Cadena aleatoria larga que tú inventas (paso 4) |
 | `PAYPHONE_RECONCILE_SECRET` | Otra cadena aleatoria larga (paso 5) |
 
 Para generar secretos: `openssl rand -hex 32`.
 
-Sin `SHOPIFY_ADMIN_API_TOKEN`, `PAYPHONE_API_TOKEN` o `PAYPHONE_STORE_ID` las
-rutas responden 503 y no hacen nada; el sitio sigue funcionando.
+Sin `SHOPIFY_ADMIN_API_TOKEN` o `PAYPHONE_API_TOKEN` las rutas responden 503
+y no hacen nada; el sitio sigue funcionando.
 
 ## Puesta en marcha
 

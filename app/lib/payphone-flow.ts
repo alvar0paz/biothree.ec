@@ -38,15 +38,15 @@ export type FlowEnv = AdminEnv & PayphoneEnv;
 
 /** Null when any required secret is missing, so routes can answer 503. */
 export function getFlowEnv(env: Partial<Record<keyof FlowEnv, string | undefined>>): FlowEnv | null {
-  const {PUBLIC_STORE_DOMAIN, SHOPIFY_ADMIN_API_TOKEN, PAYPHONE_API_TOKEN, PAYPHONE_STORE_ID} = env;
-  if (!PUBLIC_STORE_DOMAIN || !SHOPIFY_ADMIN_API_TOKEN || !PAYPHONE_API_TOKEN || !PAYPHONE_STORE_ID) {
+  const {PUBLIC_STORE_DOMAIN, SHOPIFY_ADMIN_API_TOKEN, PAYPHONE_API_TOKEN} = env;
+  if (!PUBLIC_STORE_DOMAIN || !SHOPIFY_ADMIN_API_TOKEN || !PAYPHONE_API_TOKEN) {
     return null;
   }
   return {
     PUBLIC_STORE_DOMAIN,
     SHOPIFY_ADMIN_API_TOKEN,
     PAYPHONE_API_TOKEN,
-    PAYPHONE_STORE_ID,
+    PAYPHONE_STORE_ID: env.PAYPHONE_STORE_ID,
     PAYPHONE_LINK_EXPIRE_HOURS: env.PAYPHONE_LINK_EXPIRE_HOURS,
   };
 }
