@@ -205,21 +205,54 @@ describe('settleTransaction', () => {
   it('marks the order paid when PayPhone confirms an approved, matching sale', async () => {
     const {calls} = mockFetch({
       order: () => rawOrder({payphoneClientTx: {value: ORDER_ID}}),
-      sale: (path) => (path === '/api/Sale/45441137' ? approvedSale : null),
+      sale: (path) => (path === `/api/Sale/client/${ORDER_ID}` ? approvedSale : null),
     });
-    const result = await settleTransaction({transactionId: 45441137}, env);
+    const result = await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
     expect(result).toEqual({status: 'paid', order: '#1001', transactionId: 45441137});
     expect(adminOps(calls)).toEqual(['PaymentOrder', 'MarkPaid', 'AddTags']);
   });
 
-  it('looks up by clientTransactionId when that is all we have', async () => {
+  it('prefers the by-client lookup and never calls the by-id endpoint when both ids are given', async () => {
     const {calls} = mockFetch({
       order: () => rawOrder(),
       sale: (path) => (path === `/api/Sale/client/${ORDER_ID}` ? approvedSale : null),
     });
-    const result = await settleTransaction({clientTransactionId: ORDER_ID}, env);
+    await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
+    expect(calls.some((call) => call.url.endsWith('/api/Sale/45441137'))).toBe(false);
+  });
+
+  it('falls back to the by-id lookup when only transactionId is known', async () => {
+    const {calls} = mockFetch({
+      order: () => rawOrder(),
+      sale: (path) => (path === '/api/Sale/45441137' ? approvedSale : null),
+    });
+    const result = await settleTransaction({transactionId: 45441137}, env);
     expect(result.status).toBe('paid');
-    expect(calls.some((call) => call.url.endsWith(`/api/Sale/client/${ORDER_ID}`))).toBe(true);
+    expect(calls.some((call) => call.url.endsWith('/api/Sale/45441137'))).toBe(true);
+  });
+
+  it('treats a 401 on the by-id endpoint as not found instead of failing', async () => {
+    mockFetch({order: () => rawOrder(), sale: () => null});
+    const fetchMock = vi.mocked(fetch);
+    const original = fetchMock.getMockImplementation()!;
+    fetchMock.mockImplementation(async (input, init) => {
+      if (String(input).endsWith('/api/Sale/1')) {
+        return new Response('{"message":"Su aplicación no esta autorizada"}', {status: 401});
+      }
+      return original(input, init);
+    });
+    const result = await settleTransaction({transactionId: 1}, env);
+    expect(result).toMatchObject({status: 'skipped', reason: 'sale-not-found'});
+  });
+
+  it('rejects a notification whose transactionId disagrees with PayPhone', async () => {
+    const {calls} = mockFetch({
+      order: () => rawOrder(),
+      sale: (path) => (path === `/api/Sale/client/${ORDER_ID}` ? approvedSale : null),
+    });
+    const result = await settleTransaction({transactionId: 999, clientTransactionId: ORDER_ID}, env);
+    expect(result).toMatchObject({status: 'skipped', reason: 'transaction-id-mismatch'});
+    expect(adminOps(calls)).not.toContain('MarkPaid');
   });
 
   it('never marks paid on a forged or mismatched notification', async () => {
@@ -234,7 +267,7 @@ describe('settleTransaction', () => {
     ];
     for (const testCase of cases) {
       const {calls} = mockFetch({order: () => rawOrder(testCase.order), sale: () => testCase.sale});
-      const result = await settleTransaction({transactionId: 45441137}, env);
+      const result = await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
       expect(result, testCase.reason).toMatchObject({status: 'skipped', reason: testCase.reason});
       expect(adminOps(calls), testCase.reason).not.toContain('MarkPaid');
     }
@@ -242,7 +275,7 @@ describe('settleTransaction', () => {
 
   it('skips when the order no longer exists', async () => {
     mockFetch({order: () => null, sale: () => approvedSale});
-    const result = await settleTransaction({transactionId: 45441137}, env);
+    const result = await settleTransaction({clientTransactionId: ORDER_ID}, env);
     expect(result).toMatchObject({status: 'skipped', reason: 'order-not-found'});
   });
 });

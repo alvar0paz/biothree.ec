@@ -88,6 +88,7 @@ export type SettleResult =
         | 'order-not-found'
         | 'already-paid'
         | 'client-tx-mismatch'
+        | 'transaction-id-mismatch'
         | 'amount-mismatch';
       detail?: string;
     };
@@ -169,18 +170,31 @@ export async function handleOrderCreated(
 /**
  * Marks the matching Shopify order paid if PayPhone confirms the transaction
  * is approved and the amount matches what the order still owes.
+ *
+ * Looks the sale up by our clientTransactionId first (the reliable endpoint)
+ * and only by PayPhone's transactionId when that is all we have. When both
+ * are given they must agree.
  */
 export async function settleTransaction(
   ref: {transactionId?: number | string | null; clientTransactionId?: string | null},
   env: FlowEnv,
 ): Promise<SettleResult> {
+  const hasTransactionId = ref.transactionId != null && ref.transactionId !== '';
   let sale: PayphoneSale | null = null;
-  if (ref.transactionId != null && ref.transactionId !== '') {
-    sale = await getSaleByTransactionId(env, ref.transactionId);
-  } else if (ref.clientTransactionId) {
+  if (ref.clientTransactionId) {
     sale = await getSaleByClientTransactionId(env, ref.clientTransactionId);
+  } else if (hasTransactionId) {
+    sale = await getSaleByTransactionId(env, ref.transactionId as number | string);
   }
   if (!sale) return {status: 'skipped', order: null, reason: 'sale-not-found'};
+  if (hasTransactionId && String(sale.transactionId) !== String(ref.transactionId)) {
+    return {
+      status: 'skipped',
+      order: null,
+      reason: 'transaction-id-mismatch',
+      detail: `notified ${String(ref.transactionId)}, PayPhone has ${sale.transactionId}`,
+    };
+  }
   if (!isApproved(sale)) {
     return {
       status: 'skipped',

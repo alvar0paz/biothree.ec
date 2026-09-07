@@ -193,12 +193,20 @@ export async function createPaymentLink(
   return link;
 }
 
-async function getSale(env: PayphoneEnv, path: string): Promise<PayphoneSale | null> {
+async function getSale(
+  env: PayphoneEnv,
+  path: string,
+  {treat401AsMissing = false}: {treat401AsMissing?: boolean} = {},
+): Promise<PayphoneSale | null> {
   const response = await fetch(`${PAYPHONE_API_BASE}${path}`, {
     method: 'GET',
     headers: authHeaders(env),
   });
   if (response.status === 404) return null;
+  // GET /api/Sale/{id} answers 401 ("no autorizada para acceder a este
+  // recurso") for ids outside this app's scope, so for that endpoint a 401 is
+  // "not ours", not "bad token". The by-client lookup keeps 401 as an error.
+  if (response.status === 401 && treat401AsMissing) return null;
   const text = await response.text();
   if (!response.ok) {
     throw new PayphoneError(`Sale API ${response.status}: ${text.slice(0, 300)}`);
@@ -216,9 +224,15 @@ async function getSale(env: PayphoneEnv, path: string): Promise<PayphoneSale | n
   return sale as PayphoneSale;
 }
 
-/** GET /api/Sale/{transactionId} — PayPhone's own id. */
+/**
+ * GET /api/Sale/{transactionId} — PayPhone's own id. Less reliable than the
+ * by-client lookup: PayPhone hides transactions outside the app's scope
+ * behind a 401, which is mapped to null here.
+ */
 export function getSaleByTransactionId(env: PayphoneEnv, transactionId: number | string) {
-  return getSale(env, `/api/Sale/${encodeURIComponent(String(transactionId))}`);
+  return getSale(env, `/api/Sale/${encodeURIComponent(String(transactionId))}`, {
+    treat401AsMissing: true,
+  });
 }
 
 /** GET /api/Sale/client/{clientTransactionId} — our id. */
