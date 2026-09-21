@@ -2,7 +2,7 @@ import type {StockState} from '~/lib/biothree';
 
 // Renders live Shopify inventory as a small pill. Deliberately quiet: stock is
 // reassurance, not the loudest thing on the card. `unavailable` renders nothing
-// so the card can fall back to its Instagram CTA without a dangling badge.
+// because missing product data does not indicate whether it is in stock.
 export function StockBadge({stock}: {stock: StockState}) {
   let dot: string;
   let text: string;

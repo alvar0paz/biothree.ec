@@ -1,9 +1,11 @@
 import {Money} from '@shopify/hydrogen';
+import {Link} from 'react-router';
 import {Button, buttonClasses} from './Button';
 import {StockBadge} from './StockBadge';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {productPreview} from '~/data/copy';
+import {shipping} from '~/data/shipping';
 import {getStockState, type Presentation} from '~/lib/biothree';
 
 type ProductCardProps = {
@@ -51,8 +53,7 @@ export function ProductCard({presentation}: ProductCardProps) {
       <h3 className="bt-h3 mb-2 text-ink">{presentation.name}</h3>
       <p className="bt-p mb-4 text-muted">{presentation.description}</p>
 
-      {/* Price row only renders once the variant exists in Shopify — an empty
-          admin shows the card exactly as it looked before commerce landed. */}
+      {/* Only show prices returned by Shopify. */}
       {variant && (
         <div className="mb-4 flex items-baseline justify-between gap-3">
           <span className="flex items-baseline gap-2">
@@ -76,6 +77,12 @@ export function ProductCard({presentation}: ProductCardProps) {
         <SpecRow label="Uso sugerido" value={presentation.usage} />
         <SpecRow label="Ideal para" value={presentation.idealFor} />
       </dl>
+      <Link
+        to="/productos#uso-sugerido"
+        className="bt-focus mb-5 text-sm text-purple underline underline-offset-4"
+      >
+        Ver uso sugerido e indicaciones
+      </Link>
 
       {/* Bottom-aligned so both cards' CTAs line up regardless of copy length. */}
       <div className="mt-auto flex flex-col gap-2.5">
@@ -85,7 +92,10 @@ export function ProductCard({presentation}: ProductCardProps) {
               <button
                 type="button"
                 disabled
-                className={buttonClasses({variant: 'soft', className: 'w-full'})}
+                className={buttonClasses({
+                  variant: 'soft',
+                  className: 'w-full',
+                })}
               >
                 Agotado
               </button>
@@ -134,6 +144,12 @@ export function ProductCard({presentation}: ProductCardProps) {
           </>
         )}
       </div>
+      <Link
+        to="/productos#envios"
+        className="bt-focus bt-note mt-4 text-center text-purple underline underline-offset-4"
+      >
+        {shipping.promotion}
+      </Link>
     </div>
   );
 }

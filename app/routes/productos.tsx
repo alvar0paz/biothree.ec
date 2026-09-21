@@ -1,6 +1,8 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/productos';
 import {ProductGrid} from '~/components/marketing/ProductGrid';
+import {ProductDetails} from '~/components/marketing/ProductDetails';
+import {ShippingInfo} from '~/components/marketing/ShippingInfo';
 import {SectionLabel} from '~/components/marketing/SectionLabel';
 import {Reveal} from '~/components/marketing/Reveal';
 import {ASSETS, productosPage} from '~/data/copy';
@@ -20,7 +22,9 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({context}: Route.LoaderArgs) {
   // Live price + stock for the two presentations. Never throws: an empty
   // Shopify admin yields variant: null and the cards fall back to Instagram.
-  return {presentations: await loadPresentations(context.storefront, context.env)};
+  return {
+    presentations: await loadPresentations(context.storefront, context.env),
+  };
 }
 
 export default function Productos() {
@@ -139,6 +143,9 @@ export default function Productos() {
           </div>
         </div>
       </section>
+
+      <ProductDetails />
+      <ShippingInfo />
 
       {/* Disclaimer */}
       <section>

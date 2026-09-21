@@ -151,9 +151,7 @@ export function Header({cart}: HeaderProps) {
 
         {/* Actions (right) */}
         <div className="flex items-center justify-end gap-1">
-          {/* "Comprar" now lands on /productos, where the presentations carry
-              real prices and add-to-cart (or the Instagram fallback until the
-              Shopify product exists). */}
+          {/* All purchase links lead to the shared storefront cards. */}
           <div className="hidden md:block">
             <Button href="/productos" variant="primary">
               Comprar

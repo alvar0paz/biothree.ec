@@ -3,7 +3,7 @@
 // bienestar digestivo / rutina diaria / equilibrio intestinal / microbiota.
 // Avoid: cura, trata, previene enfermedades, desinflama, etc.
 
-// All purchase CTAs point here until Shopify checkout is integrated.
+// Social/contact links and fallback when Shopify product data is unavailable.
 export const INSTAGRAM_URL = 'https://instagram.com/biothree.ec';
 
 // Assets live in app/assets/biothree and are bundled through Vite, so they get
@@ -76,7 +76,7 @@ export const benefits = {
     },
     {
       title: 'Rutina simple',
-      description: 'Una toma diaria, fácil de integrar a tu día.',
+      description: 'Junto con tus comidas, fácil de integrar a tu día.',
       icon: ASSETS.iconRoutine,
     },
   ],
@@ -95,9 +95,9 @@ export const howItWorks = {
   steps: [
     {
       number: '1',
-      title: 'Tómalo una vez al día',
+      title: 'Tómalo junto con los alimentos',
       description:
-        'Hazlo parte de una rutina que ya existe: desayuno, almuerzo o noche.',
+        'Consulta el uso sugerido según la fase y la recomendación de tu profesional de la salud.',
     },
     {
       number: '2',
@@ -130,7 +130,7 @@ export const faqPreview = {
 
 export const finalCta = {
   title: 'Empieza con una rutina simple para tu bienestar digestivo.',
-  cta: 'Consultar por Instagram',
+  cta: 'Comprar Biothree',
   note: 'Disponible en tabletas y sobres',
 };
 
@@ -182,6 +182,7 @@ export const footer = {
       title: 'Producto',
       links: [
         {label: 'Productos', href: '/productos'},
+        {label: 'Envíos', href: '/productos#envios'},
         {label: 'Ciencia', href: '/ciencia'},
         {label: 'Preguntas', href: '/ciencia#faq'},
       ],
@@ -203,5 +204,8 @@ export const footer = {
     'La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud',
   ],
   importer: 'BIOSCIENCE TRADING EC',
-  legalLine2: ['Ecuador', '© 2026 Biothree Ecuador. Todos los derechos reservados.'],
+  legalLine2: [
+    'Ecuador',
+    '© 2026 Biothree Ecuador. Todos los derechos reservados.',
+  ],
 };

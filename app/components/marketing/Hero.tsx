@@ -2,7 +2,7 @@ import {Fragment, useEffect, useState} from 'react';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import {Button} from './Button';
 import {SectionLabel} from './SectionLabel';
-import {ASSETS, hero, heroBacteria, INSTAGRAM_URL} from '~/data/copy';
+import {ASSETS, hero, heroBacteria} from '~/data/copy';
 
 export function Hero() {
   const [index, setIndex] = useState(0);
@@ -27,7 +27,7 @@ export function Hero() {
           <h1 className="bt-h1 max-w-[780px] text-ink">{hero.title}</h1>
           <p className="bt-lead max-w-[520px] text-muted">{hero.subtitle}</p>
           <div className="mt-1 flex flex-wrap items-center gap-3">
-            <Button href={INSTAGRAM_URL} variant="primary" size="lg">
+            <Button href="/productos" variant="primary" size="lg">
               {hero.primaryCta}
             </Button>
             <Button href="#como-funciona" variant="secondary" size="lg">

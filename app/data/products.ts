@@ -35,14 +35,18 @@ export const products: Product[] = [
     name: 'Biothree Tabletas',
     tagline: 'Tabletas',
     description: 'Para una rutina diaria simple y práctica.',
-    bullets: ['Uso diario', 'Fácil de llevar', 'Ideal para una rutina constante'],
+    bullets: [
+      'Uso diario',
+      'Fácil de llevar',
+      'Ideal para una rutina constante',
+    ],
     // Presentation imagery: blister for tablets, sachet for sobres.
     image: ASSETS.productTabletas,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Tabletas',
     idealFor: 'Una rutina constante y fácil de llevar',
-    usage: '1 vez al día',
-    format: 'Tabletas',
+    usage: 'Con alimentos, según la fase de uso',
+    format: 'Blíster de alta barrera',
   },
   {
     id: 'biothree-sobres',
@@ -57,8 +61,8 @@ export const products: Product[] = [
     image: ASSETS.productSobres,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Sobres',
-    idealFor: 'Quienes prefieren mezclarlo o un formato individual',
-    usage: '1 vez al día',
-    format: 'Sobres',
+    idealFor: 'Personas con dificultad para deglutir',
+    usage: 'Con alimentos, según la fase de uso',
+    format: 'Sachets de polvo oral biosoluble',
   },
 ];

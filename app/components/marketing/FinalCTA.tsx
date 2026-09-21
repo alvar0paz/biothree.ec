@@ -1,5 +1,5 @@
 import {Button} from './Button';
-import {ASSETS, finalCta, INSTAGRAM_URL} from '~/data/copy';
+import {ASSETS, finalCta} from '~/data/copy';
 
 export function FinalCTA() {
   return (
@@ -28,7 +28,7 @@ export function FinalCTA() {
           <div className="relative z-10 mx-auto flex max-w-[600px] flex-col items-center gap-6">
             <h2 className="bt-h2 text-purple-dark">{finalCta.title}</h2>
             <div className="flex flex-col items-center gap-2.5">
-              <Button href={INSTAGRAM_URL} variant="primary" size="lg">
+              <Button href="/productos" variant="primary" size="lg">
                 {finalCta.cta}
               </Button>
               <p className="bt-note text-purple-dark/70">{finalCta.note}</p>
