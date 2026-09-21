@@ -14,6 +14,9 @@ export default {
         './*.{ts,tsx,js,jsx}',
         './app/**/*.{ts,tsx,js,jsx}',
         '!./app/graphql/**/*.{ts,tsx,js,jsx}',
+        // This standalone, manually typed client calls the Admin API, not
+        // Storefront. Its operations cannot be validated with this schema.
+        '!./app/lib/shopify-admin.ts',
       ],
     },
 
