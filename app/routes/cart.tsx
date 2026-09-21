@@ -26,7 +26,14 @@ export async function action({request, context}: Route.ActionArgs) {
 
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
-      result = await cart.addLines(inputs.lines);
+      try {
+        result = await cart.addLines(inputs.lines);
+      } catch {
+        return data(
+          {cart: null, errors: [{message: 'No se pudo agregar el producto.'}]},
+          {status: 503},
+        );
+      }
       break;
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);

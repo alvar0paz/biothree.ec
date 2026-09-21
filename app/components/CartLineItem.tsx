@@ -10,7 +10,7 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
 const stepperButton =
-  'inline-flex h-8 w-8 items-center justify-center rounded-full border ' +
+  'inline-flex h-11 w-11 items-center justify-center rounded-control border ' +
   'border-line bg-surface text-ink transition-colors hover:bg-ink/5 ' +
   'disabled:opacity-40 disabled:pointer-events-none';
 
@@ -40,7 +40,7 @@ export function CartLineItem({
           height={80}
           loading="lazy"
           width={80}
-          className="rounded-[14px] border border-line/70 bg-cream/40"
+          className="rounded-control border border-line/70 bg-cream/40"
         />
       )}
 
@@ -153,7 +153,7 @@ function CartLineRemoveButton({
       <button
         disabled={disabled}
         type="submit"
-        className="ml-1 text-sm text-muted underline underline-offset-2 transition-colors hover:text-ink disabled:opacity-40"
+        className="ml-1 min-h-11 text-sm text-muted underline underline-offset-2 transition-colors hover:text-ink disabled:opacity-40"
       >
         Quitar
       </button>

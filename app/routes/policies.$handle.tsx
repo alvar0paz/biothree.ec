@@ -45,15 +45,17 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
+    <div className="biothree">
+      <div className="bt-container-narrow bt-section">
+        <Link className="bt-nav-link mb-6" to="/policies">
+          ← Volver a políticas
+        </Link>
+        <h1 className="bt-h2 mb-8">{policy.title}</h1>
+        <div
+          className="bt-prose"
+          dangerouslySetInnerHTML={{__html: policy.body}}
+        />
       </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
     </div>
   );
 }

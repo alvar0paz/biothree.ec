@@ -1,39 +1,16 @@
 import {Button} from './Button';
-import {ASSETS, finalCta} from '~/data/copy';
+import {finalCta} from '~/data/copy';
 
 export function FinalCTA() {
   return (
-    <section>
-      <div className="bt-container bt-section-compact">
-        <div className="relative overflow-hidden rounded-card border border-line bg-purple-soft px-6 py-14 text-center sm:px-12">
-          {/* Subtle decorative visuals — kept low-opacity so text stays readable.
-              The drift animation is disabled under reduced motion via CSS. */}
-          <img
-            src={ASSETS.probioticCells}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="bt-drift pointer-events-none absolute -left-10 -top-10 w-36 select-none opacity-20 sm:w-48"
-          />
-          <img
-            src={ASSETS.probioticRods}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            className="bt-drift-slow pointer-events-none absolute -bottom-12 -right-8 w-36 select-none opacity-20 sm:w-48"
-          />
-
-          <div className="relative z-10 mx-auto flex max-w-[600px] flex-col items-center gap-6">
-            <h2 className="bt-h2 text-purple-dark">{finalCta.title}</h2>
-            <div className="flex flex-col items-center gap-2.5">
-              <Button href="/productos" variant="primary" size="lg">
-                {finalCta.cta}
-              </Button>
-              <p className="bt-note text-purple-dark/70">{finalCta.note}</p>
-            </div>
-          </div>
+    <section className="bt-section-divided">
+      <div className="bt-container bt-section grid items-center gap-8 md:grid-cols-[1.5fr_1fr] md:gap-24">
+        <h2 className="bt-h2 text-ink">{finalCta.title}</h2>
+        <div className="flex flex-col items-start gap-4 md:items-end">
+          <Button href="/productos" size="lg">
+            {finalCta.cta}
+          </Button>
+          <p className="bt-note text-muted">{finalCta.note}</p>
         </div>
       </div>
     </section>

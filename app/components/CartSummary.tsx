@@ -16,12 +16,10 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
   return (
-    <div aria-labelledby="cart-summary" className={className}>
+    <div aria-label="Resumen del carrito" className={className}>
       <dl className="cart-subtotal flex items-baseline justify-between gap-4">
-        <dt className="bt-eyebrow font-mono text-[0.7rem] text-muted">
-          Subtotal
-        </dt>
-        <dd className="bt-h3 text-ink">
+        <dt className="bt-eyebrow font-mono text-xs text-muted">Subtotal</dt>
+        <dd className="bt-price text-ink">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart?.cost?.subtotalAmount} />
           ) : (
@@ -80,11 +78,11 @@ function CartDiscounts({
   const form = (
     <UpdateDiscountForm discountCodes={codes}>
       <div className="flex items-center gap-2 py-2">
-        <label htmlFor="cart-discount-code" className="sr-only">
+        <label htmlFor={`cart-discount-code-${layout}`} className="sr-only">
           Código de descuento
         </label>
         <input
-          id="cart-discount-code"
+          id={`cart-discount-code-${layout}`}
           type="text"
           name="discountCode"
           placeholder="Código de descuento"
@@ -105,11 +103,11 @@ function CartDiscounts({
       {codes.length > 0 && (
         <dl>
           <div className="flex items-center justify-between gap-4 py-1">
-            <dt className="bt-eyebrow font-mono text-[0.7rem] text-muted">
+            <dt className="bt-eyebrow font-mono text-xs text-muted">
               Descuento
             </dt>
             <UpdateDiscountForm>
-              <dd className="cart-discount flex items-center gap-2 !mt-0">
+              <dd className="cart-discount flex items-center gap-2 mt-0">
                 <code className="text-sm text-ink">{codes.join(', ')}</code>
                 <button
                   type="submit"
@@ -188,7 +186,7 @@ function CartGiftCard({
       {/* Display applied gift cards with individual remove buttons */}
       {giftCardCodes && giftCardCodes.length > 0 && (
         <dl>
-          <dt className="bt-eyebrow font-mono text-[0.7rem] text-muted">
+          <dt className="bt-eyebrow font-mono text-xs text-muted">
             Tarjetas de regalo
           </dt>
           {giftCardCodes.map((giftCard) => (

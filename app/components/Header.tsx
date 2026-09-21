@@ -1,4 +1,4 @@
-import {Suspense, useState} from 'react';
+import {Suspense, useEffect, useRef, useState} from 'react';
 import {Await, Link, NavLink} from 'react-router';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
@@ -64,7 +64,9 @@ function CartButton({cart}: {cart: HeaderProps['cart']}) {
   const {open} = useAside();
 
   return (
-    <Suspense fallback={<CartButtonView count={0} onClick={() => open('cart')} />}>
+    <Suspense
+      fallback={<CartButtonView count={0} onClick={() => open('cart')} />}
+    >
       <Await resolve={cart} errorElement={null}>
         {(resolved) => (
           <CartButtonView
@@ -88,7 +90,7 @@ function CartButtonView({
     <button
       type="button"
       onClick={onClick}
-      className="relative -mr-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5"
+      className="relative -mr-1 inline-flex h-11 w-11 items-center justify-center rounded-control text-ink transition-colors hover:bg-ink/5"
       aria-label={
         count > 0
           ? `Abrir carrito, ${count} ${count === 1 ? 'artículo' : 'artículos'}`
@@ -99,7 +101,7 @@ function CartButtonView({
       {count > 0 && (
         <span
           aria-hidden="true"
-          className="absolute -right-0.5 -top-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-purple px-1 text-[0.65rem] font-semibold leading-none text-white"
+          className="absolute -right-0.5 -top-0.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-purple px-1 text-xs font-semibold leading-none text-white"
         >
           {count > 99 ? '99+' : count}
         </span>
@@ -110,22 +112,38 @@ function CartButtonView({
 
 export function Header({cart}: HeaderProps) {
   const [open, setOpen] = useState(false);
+  const menuToggle = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        menuToggle.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [open]);
   // Header renders outside PageLayout's <MotionConfig>, so reduced motion has
   // to be honored manually for the mobile menu animation.
   const reduceMotion = useReducedMotion();
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-line bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 h-16 border-b border-line bg-background">
       <div className="bt-container grid h-16 grid-cols-[auto_1fr_auto] items-center">
         {/* Logo + grouped nav (left) */}
         <div className="flex items-center">
           <Link
             to="/"
             prefetch="intent"
-            className="flex items-center"
+            className="flex min-h-11 items-center"
             onClick={() => setOpen(false)}
           >
-            <img src={biothreeLogo} alt="Biothree" className="h-[30px] w-auto" />
+            <img
+              src={biothreeLogo}
+              alt="Biothree"
+              className="h-[30px] w-auto"
+            />
           </Link>
 
           <nav className="ml-12 hidden items-center gap-8 md:flex">
@@ -163,10 +181,11 @@ export function Header({cart}: HeaderProps) {
           {/* Mobile toggle */}
           <button
             type="button"
-            className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-ink/5 md:hidden"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-control text-ink hover:bg-ink/5 md:hidden"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
             aria-controls="mobile-menu"
+            ref={menuToggle}
             onClick={() => setOpen((v) => !v)}
           >
             <MenuIcon open={open} />
@@ -179,11 +198,11 @@ export function Header({cart}: HeaderProps) {
         {open && (
           <motion.nav
             id="mobile-menu"
-            className="overflow-hidden border-t border-line bg-background/95 shadow-[0_18px_30px_-22px_rgba(17,17,17,0.25)] backdrop-blur-md md:hidden"
+            className="overflow-hidden border-t border-line bg-background md:hidden"
             initial={reduceMotion ? false : {opacity: 0, y: -6}}
             animate={{opacity: 1, y: 0}}
             exit={reduceMotion ? {opacity: 1} : {opacity: 0, y: -6}}
-            transition={{duration: 0.18, ease: 'easeOut'}}
+            transition={{duration: 0.24, ease: [0.2, 0.7, 0.3, 1]}}
           >
             <div className="bt-container flex flex-col gap-1 py-4">
               {NAV.map((item) => (
@@ -192,7 +211,7 @@ export function Header({cart}: HeaderProps) {
                   to={item.href}
                   prefetch="intent"
                   onClick={() => setOpen(false)}
-                  className="bt-nav-link rounded-xl px-3 py-3 text-base font-medium hover:bg-ink/5"
+                  className="bt-nav-link rounded-control px-3 py-3 text-base font-medium hover:bg-ink/5"
                 >
                   {item.label}
                 </Link>
@@ -202,6 +221,7 @@ export function Header({cart}: HeaderProps) {
                 variant="primary"
                 size="lg"
                 className="mt-2 w-full"
+                onClick={() => setOpen(false)}
               >
                 Comprar
               </Button>

@@ -30,7 +30,9 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({context}: Route.LoaderArgs) {
   // Live price + stock for the two presentations. Never throws: an empty
   // Shopify admin yields variant: null and the cards fall back to Instagram.
-  return {presentations: await loadPresentations(context.storefront, context.env)};
+  return {
+    presentations: await loadPresentations(context.storefront, context.env),
+  };
 }
 
 export default function Homepage() {
@@ -41,21 +43,19 @@ export default function Homepage() {
       <Hero />
 
       {/* Benefits — framed as benefits of the same single formula */}
-      <section className="bg-cream/50">
-        <div className="bt-container bt-section">
+      <section className="bt-section-divided">
+        <div className="bt-container bt-section bt-benefits">
           <Reveal>
             <h2 className="bt-h2 max-w-[700px] text-ink">{benefits.title}</h2>
           </Reveal>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {benefits.cards.map((card, i) => (
-              <Reveal key={card.title} delay={i * 0.08} className="h-full">
-                <BenefitCard
-                  title={card.title}
-                  description={card.description}
-                  icon={card.icon}
-                  index={i}
-                />
-              </Reveal>
+          <div className="flex flex-col">
+            {benefits.cards.map((card) => (
+              <BenefitCard
+                key={card.title}
+                title={card.title}
+                description={card.description}
+                icon={card.icon}
+              />
             ))}
           </div>
         </div>

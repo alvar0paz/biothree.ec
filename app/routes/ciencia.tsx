@@ -2,7 +2,7 @@ import type {Route} from './+types/ciencia';
 import {SectionLabel} from '~/components/marketing/SectionLabel';
 import {FAQAccordion} from '~/components/marketing/FAQAccordion';
 import {Reveal} from '~/components/marketing/Reveal';
-import {ASSETS, cienciaPage} from '~/data/copy';
+import {cienciaPage} from '~/data/copy';
 import {faqs} from '~/data/faq';
 
 export const meta: Route.MetaFunction = () => {
@@ -25,13 +25,6 @@ export default function Ciencia() {
     <div className="biothree">
       {/* Hero with science background */}
       <section className="relative overflow-hidden bg-background">
-        <img
-          src={ASSETS.scienceBg}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover opacity-70"
-        />
-        <div className="absolute inset-0 bg-background/70" aria-hidden="true" />
         <div className="bt-container bt-hero relative z-10">
           <div className="flex max-w-[720px] flex-col items-start gap-4">
             <SectionLabel>{cienciaPage.eyebrow}</SectionLabel>
@@ -39,7 +32,7 @@ export default function Ciencia() {
             <p className="bt-lead max-w-[600px] text-muted">
               {cienciaPage.heroSubtitle}
             </p>
-            <span className="bt-note inline-flex rounded-full border border-line bg-surface/80 px-3.5 py-1.5 text-muted">
+            <span className="bt-note border-t border-line pt-4 text-muted">
               Información educativa · No es un medicamento
             </span>
           </div>
@@ -52,7 +45,7 @@ export default function Ciencia() {
         <div className="bt-container-narrow bt-section flex flex-col gap-6">
           {cienciaPage.sections.map((s) => (
             <Reveal key={s.title}>
-              <div className="bt-card-hover flex flex-col gap-5 rounded-card border border-line bg-surface/60 p-6 sm:flex-row sm:items-center sm:gap-8 sm:p-7">
+              <div className="bt-rule-block flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-8">
                 <div className="bt-science-icon">
                   <img
                     src={s.image}
@@ -73,7 +66,7 @@ export default function Ciencia() {
       </section>
 
       {/* Full FAQ */}
-      <section id="faq" className="scroll-mt-24 bg-cream/50">
+      <section id="faq" className="bt-section-divided scroll-mt-24">
         <div className="bt-container-narrow bt-section">
           <Reveal>
             <div className="flex flex-col items-start gap-3">

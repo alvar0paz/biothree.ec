@@ -13,7 +13,6 @@ import {
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import normalizeStyles from 'normalize.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindStyles from '~/styles/tailwind.css?url';
@@ -176,10 +175,9 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={normalizeStyles}></link>
+        <link rel="stylesheet" href={tailwindStyles}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
-        <link rel="stylesheet" href={tailwindStyles}></link>
         <Meta />
         <Links />
       </head>

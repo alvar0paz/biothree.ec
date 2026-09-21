@@ -2,6 +2,9 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useCallback,
+  useId,
+  useRef,
   useEffect,
   useState,
 } from 'react';
@@ -35,41 +38,81 @@ export function Aside({
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
 
-  useEffect(() => {
-    const abortController = new AbortController();
+  const headingId = useId();
+  const panel = useRef<HTMLElement>(null);
 
-    if (expanded) {
-      document.addEventListener(
-        'keydown',
-        function handler(event: KeyboardEvent) {
-          if (event.key === 'Escape') {
-            close();
-          }
-        },
-        {signal: abortController.signal},
-      );
-    }
-    return () => abortController.abort();
+  useEffect(() => {
+    if (!expanded || !panel.current) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    const element = panel.current;
+    const focusable = () =>
+      Array.from(
+        element.querySelectorAll<HTMLElement>(
+          'a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select, textarea, summary, [tabindex="0"]',
+        ),
+      ).filter((item) => item.getClientRects().length > 0);
+    focusable()[0]?.focus();
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+      if (event.key !== 'Tab') return;
+      const items = focusable();
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first) {
+        event.preventDefault();
+        element.focus();
+        return;
+      }
+      if (
+        event.shiftKey &&
+        (document.activeElement === first ||
+          !element.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last ||
+          !element.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+      document.documentElement.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
   }, [close, expanded]);
 
   return (
     <div
-      aria-modal
+      aria-modal={expanded}
+      aria-hidden={!expanded}
+      aria-labelledby={headingId}
       className={`overlay ${expanded ? 'expanded' : ''}`}
       role="dialog"
     >
-      <button className="close-outside" onClick={close} aria-label="Cerrar" />
-      {/* `biothree` opts the drawer into the marketing theme (font, border-box
-          sizing, colours); without it the Shopify reset's content-box inputs
-          overflow the panel's right edge. */}
-      <aside className="biothree">
+      <button
+        tabIndex={-1}
+        className="close-outside"
+        onClick={close}
+        aria-label="Cerrar"
+      />
+      <aside ref={panel} tabIndex={-1} className="biothree">
         <header>
-          <h3 className="bt-h3 text-ink">{heading}</h3>
+          <h2 id={headingId} className="bt-h3 text-ink">
+            {heading}
+          </h2>
           <button className="close reset" onClick={close} aria-label="Cerrar">
             &times;
           </button>
         </header>
-        <main>{children}</main>
+        <div className="bt-aside-body">{children}</div>
       </aside>
     </div>
   );
@@ -79,13 +122,14 @@ const AsideContext = createContext<AsideContextValue | null>(null);
 
 Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
   const [type, setType] = useState<AsideType>('closed');
+  const close = useCallback(() => setType('closed'), []);
 
   return (
     <AsideContext.Provider
       value={{
         type,
         open: setType,
-        close: () => setType('closed'),
+        close,
       }}
     >
       {children}

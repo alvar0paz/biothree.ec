@@ -5,7 +5,7 @@ import {ProductDetails} from '~/components/marketing/ProductDetails';
 import {ShippingInfo} from '~/components/marketing/ShippingInfo';
 import {SectionLabel} from '~/components/marketing/SectionLabel';
 import {Reveal} from '~/components/marketing/Reveal';
-import {ASSETS, productosPage} from '~/data/copy';
+import {productosPage} from '~/data/copy';
 import {loadPresentations} from '~/lib/biothree';
 
 export const meta: Route.MetaFunction = () => {
@@ -34,12 +34,6 @@ export default function Productos() {
     <div className="biothree">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <img
-          src={ASSETS.probioticChain}
-          alt=""
-          aria-hidden="true"
-          className="bt-drift pointer-events-none absolute -right-16 -top-10 w-64 select-none opacity-20 sm:w-80"
-        />
         <div className="bt-container bt-hero relative z-10">
           <div className="flex max-w-[720px] flex-col items-start gap-4">
             <SectionLabel>{productosPage.eyebrow}</SectionLabel>
@@ -51,27 +45,26 @@ export default function Productos() {
         </div>
       </section>
 
-      {/* Two presentations. !pt-0 because the unlayered .bt-section-compact
-          padding would otherwise beat a plain pt-0 utility. */}
+      {/* Shared purchase presentations. */}
       <section>
-        <div className="bt-container bt-section-compact !pt-0">
+        <div className="bt-container bt-section-compact pt-0">
           <h2 className="sr-only">Presentaciones</h2>
           <ProductGrid presentations={presentations} />
         </div>
       </section>
 
       {/* Comparison of the two presentations */}
-      <section className="bg-cream/50">
+      <section className="bt-section-divided">
         <div className="bt-container bt-section">
           <Reveal>
             <h2 className="bt-h2 text-ink">{productosPage.comparisonTitle}</h2>
           </Reveal>
 
           {/* Desktop table */}
-          <div className="mt-8 hidden overflow-hidden rounded-card border border-line bg-surface/70 md:block">
+          <div className="mt-8 hidden border-y border-line md:block">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-line bg-purple-soft/50">
+                <tr className="border-b border-line">
                   {productosPage.comparisonHeaders.map((header) => (
                     <th
                       key={header}
@@ -107,33 +100,30 @@ export default function Productos() {
           {/* Mobile stacked cards */}
           <div className="mt-8 flex flex-col gap-4 md:hidden">
             {presentations.map((product) => (
-              <div
-                key={product.id}
-                className="bt-card border border-line bg-surface/70"
-              >
+              <div key={product.id} className="bt-rule-block">
                 <h3 className="bt-h3 text-ink">{product.name}</h3>
                 <dl className="pt-3 flex flex-col gap-2.5">
-                  <div className="flex justify-between gap-4">
-                    <dt className="bt-eyebrow font-mono text-[0.7rem] text-purple">
+                  <div className="bt-spec-row">
+                    <dt className="bt-eyebrow font-mono text-xs text-purple">
                       Ideal para
                     </dt>
-                    <dd className="bt-p text-right text-muted">
+                    <dd className="bt-p text-left text-muted">
                       {product.idealFor}
                     </dd>
                   </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="bt-eyebrow font-mono text-[0.7rem] text-purple">
+                  <div className="bt-spec-row">
+                    <dt className="bt-eyebrow font-mono text-xs text-purple">
                       Uso
                     </dt>
-                    <dd className="bt-p text-right text-muted">
+                    <dd className="bt-p text-left text-muted">
                       {product.usage}
                     </dd>
                   </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="bt-eyebrow font-mono text-[0.7rem] text-purple">
+                  <div className="bt-spec-row">
+                    <dt className="bt-eyebrow font-mono text-xs text-purple">
                       Formato
                     </dt>
-                    <dd className="bt-p text-right text-muted">
+                    <dd className="bt-p text-left text-muted">
                       {product.format}
                     </dd>
                   </div>

@@ -54,7 +54,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="bt-nav-link transition-colors"
+                className="bt-nav-link min-w-11 transition-colors"
               >
                 <InstagramIcon />
               </a>
@@ -62,12 +62,16 @@ export function Footer() {
           </div>
 
           {footer.columns.map((column) => (
-            <div key={column.title} className="flex flex-col gap-3">
+            <div key={column.title} className="flex flex-col gap-1">
               <span className="bt-eyebrow font-mono text-xs text-ink">
                 {column.title}
               </span>
               {column.links.map((link) => (
-                <FooterLink key={link.label} href={link.href} label={link.label} />
+                <FooterLink
+                  key={link.label}
+                  href={link.href}
+                  label={link.label}
+                />
               ))}
             </div>
           ))}

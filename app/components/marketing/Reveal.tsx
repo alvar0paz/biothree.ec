@@ -1,25 +1,8 @@
-import {motion} from 'framer-motion';
 import type {ReactNode} from 'react';
 
-type RevealProps = {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-};
+type RevealProps = {children: ReactNode; className?: string; delay?: number};
 
-// Gentle fade + small rise when the element scrolls into view.
-// PageLayout wraps routes in <MotionConfig reducedMotion="user">, which drops
-// the transform for users who prefer reduced motion.
-export function Reveal({children, className, delay = 0}: RevealProps) {
-  return (
-    <motion.div
-      className={className}
-      initial={{opacity: 0, y: 12}}
-      whileInView={{opacity: 1, y: 0}}
-      viewport={{once: true, margin: '-60px'}}
-      transition={{duration: 0.5, ease: 'easeOut', delay}}
-    >
-      {children}
-    </motion.div>
-  );
+// Reading sections remain visible from the server render onward.
+export function Reveal({children, className}: RevealProps) {
+  return <div className={className}>{children}</div>;
 }

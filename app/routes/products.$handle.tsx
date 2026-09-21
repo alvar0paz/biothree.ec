@@ -98,27 +98,25 @@ export default function Product() {
   const {title, descriptionHtml} = product;
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
+    <div className="biothree">
+      <div className="bt-container bt-section bt-product-detail">
+        <ProductImage image={selectedVariant?.image} />
+        <div className="flex min-w-0 flex-col gap-6">
+          <h1 className="bt-h2">{title}</h1>
+          <ProductPrice
+            price={selectedVariant?.price}
+            compareAtPrice={selectedVariant?.compareAtPrice}
+          />
+          <ProductForm
+            productOptions={productOptions}
+            selectedVariant={selectedVariant}
+          />
+          <h2 className="bt-h3 border-t border-line pt-6">Descripción</h2>
+          <div
+            className="bt-prose"
+            dangerouslySetInnerHTML={{__html: descriptionHtml}}
+          />
+        </div>
       </div>
       <Analytics.ProductView
         data={{

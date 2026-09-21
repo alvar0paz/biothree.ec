@@ -1,10 +1,8 @@
+@layer reset, theme, base, legacy, components, utilities;
 @import 'tailwindcss';
 
-/* ==========================================================================
-   Biothree marketing design tokens
-   ========================================================================== */
 @theme {
-  --color-background: #faf8f3;
+  --color-background: #ffffff;
   --color-surface: #ffffff;
   --color-ink: #111111;
   --color-muted: #5f5f5f;
@@ -13,500 +11,493 @@
   --color-purple-dark: #240b85;
   --color-purple-soft: #ece8ff;
   --color-cream: #fff9ec;
-
   --font-sans: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
   --font-tight: 'Inter Tight', 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
-
-  --radius-card: 24px;
+  --radius-detail: 6px;
+  --radius-control: 10px;
+  --radius-card: 16px;
 }
-
-/* Base layer: marketing pages opt in via the `.biothree` wrapper so the rest
-   of the Shopify storefront keeps its existing styles untouched. */
-@layer base {
+:root {
+  --bt-space-1: 4px;
+  --bt-space-2: 8px;
+  --bt-space-3: 12px;
+  --bt-space-4: 16px;
+  --bt-space-6: 24px;
+  --bt-space-8: 32px;
+  --bt-space-12: 48px;
+  --bt-space-16: 64px;
+  --bt-space-24: 96px;
+  --bt-control-duration: 160ms;
+  --bt-panel-duration: 240ms;
+  --bt-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@layer components {
   .biothree {
-    background-color: var(--color-background);
+    background: var(--color-background);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    /* Tighter global tracking — the page should read compact, not airy. */
-    letter-spacing: -0.01em;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
   }
-
-  .biothree *,
-  .biothree *::before,
-  .biothree *::after {
-    box-sizing: border-box;
+  .bt-container {
+    width: min(100% - 48px, 1160px);
+    margin-inline: auto;
   }
-}
-
-/* The shared Shopify reset.css (unlayered) adds a grey body background and
-   padding around <main>/<section>. These overrides must also be unlayered to
-   win the cascade, so marketing pages render full-bleed. Sections carry their
-   own padding on an inner wrapper, so zeroing the <section> element is safe. */
-body:has(.biothree) {
-  background: var(--color-background);
-}
-main:has(.biothree) {
-  padding: 0;
-}
-.biothree section {
-  padding-block: 0;
-}
-/* reset.css also adds li/dl margins that double up with flex `gap` spacing
-   inside cards (product bullets, comparison cards). */
-.biothree li {
-  margin: 0;
-}
-.biothree dl {
-  margin: 0;
-}
-.biothree dd {
-  margin: 0;
-}
-
-/* ==========================================================================
-   Layout + type system — one consistent rhythm across every section.
-   Defined unlayered so they win over utility classes they pair with.
-   ========================================================================== */
-
-/* Containers */
-.bt-container {
-  width: min(100% - 40px, 1160px);
-  margin-inline: auto;
-}
-.bt-container-narrow {
-  width: min(100% - 40px, 760px);
-  margin-inline: auto;
-}
-
-/* Section padding — compact, deliberate, less floating whitespace */
-.bt-section {
-  padding-block: clamp(48px, 6vw, 88px);
-}
-.bt-section-compact {
-  padding-block: clamp(40px, 5vw, 72px);
-}
-.bt-hero {
-  padding-top: clamp(56px, 7vw, 96px);
-  padding-bottom: clamp(48px, 6vw, 80px);
-}
-
-/* Consistent science explainer icon panel */
-.bt-science-icon {
-  width: 144px;
-  height: 144px;
-  border-radius: 28px;
-  background: #fbf6ea;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.bt-science-icon img {
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-}
-
-/* Headings — editorial, tight tracking, compact leading.
-   margin: 0 beats reset.css's unlayered h1/h2 margins, which would otherwise
-   leak into the flex `gap` rhythm of every section. */
-.bt-h1 {
-  font-family: var(--font-tight);
-  font-size: clamp(2.6rem, 5vw, 4.75rem);
-  line-height: 0.95;
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  margin: 0;
-}
-.bt-h2 {
-  font-family: var(--font-tight);
-  font-size: clamp(2rem, 3.5vw, 3.25rem);
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  margin: 0;
-}
-.bt-h3 {
-  font-family: var(--font-tight);
-  font-size: 1.125rem;
-  line-height: 1.2;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-/* Body copy — calmer and more compact */
-.bt-p {
-  font-size: 1rem;
-  line-height: 1.55;
-  letter-spacing: -0.01em;
-  margin: 0;
-}
-.bt-lead {
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  letter-spacing: -0.015em;
-  margin: 0;
-}
-
-/* Eyebrow / kicker labels — the only place wide tracking is allowed */
-.bt-eyebrow {
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Text inputs in the cart. Unlayered on purpose: reset.css styles bare
-   `input` (navy border, margins) outside any layer, which beats Tailwind's
-   layered utilities no matter the order. */
-.bt-input {
-  appearance: none;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
-  border-radius: 999px;
-  color: var(--color-ink);
-  font: inherit;
-  font-size: 0.9375rem;
-  line-height: 1.2;
-  margin: 0;
-  min-height: 44px;
-  min-width: 0;
-  padding: 0 1rem;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-  width: 100%;
-}
-.bt-input::placeholder {
-  color: var(--color-muted);
-}
-.bt-input:focus-visible {
-  border-color: var(--color-purple);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-purple) 18%, transparent);
-  outline: none;
-}
-
-/* Collapsible "¿Tienes un código?" row in the cart. */
-.bt-disclosure > summary {
-  cursor: pointer;
-  list-style: none;
-}
-.bt-disclosure > summary::-webkit-details-marker {
-  display: none;
-}
-.bt-disclosure > summary::after {
-  content: '+';
-  margin-left: 0.5rem;
-}
-.bt-disclosure[open] > summary::after {
-  content: '\2212';
-}
-
-/* ==========================================================================
-   Surfaces, dividers and decorative layers
-   ========================================================================== */
-
-/* Soft lavender wash for alternating section backgrounds. */
-.bt-wash {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-purple-soft) 38%, var(--color-background)) 0%,
-    var(--color-background) 100%
-  );
-}
-
-/* Subtle gradient hairline at the top of a section — softer than a border. */
-.bt-section-divided {
-  position: relative;
-}
-.bt-section-divided::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100% - 40px, 1160px);
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--color-line) 18%,
-    var(--color-line) 82%,
-    transparent
-  );
-}
-
-/* Soft radial glow behind the hero illustration. */
-.bt-hero-glow {
-  position: absolute;
-  inset: -14%;
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in srgb, var(--color-purple) 10%, var(--color-cream)) 0%,
-    color-mix(in srgb, var(--color-purple-soft) 55%, transparent) 55%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-/* Soft purple stage behind product/visual imagery inside cards. */
-.bt-stage {
-  background: linear-gradient(
-    160deg,
-    var(--color-purple-soft) 0%,
-    color-mix(in srgb, var(--color-purple-soft) 40%, var(--color-cream)) 100%
-  );
-}
-
-/* ==========================================================================
-   Card + icon polish
-   ========================================================================== */
-
-/* Hover: card lifts 2px, border tints purple, shadow deepens. */
-.bt-card-hover {
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-.bt-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-purple) 24%, var(--color-line));
-  box-shadow: 0 18px 44px -24px rgba(36, 11, 133, 0.28);
-}
-
-/* Consistent badge container for line icons; background shifts on card hover. */
-.bt-icon-badge {
-  display: flex;
-  width: 48px;
-  height: 48px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background-color: var(--color-purple-soft);
-  border: 1px solid color-mix(in srgb, var(--color-purple) 10%, transparent);
-  transition: background-color 0.25s ease;
-}
-.bt-card-hover:hover .bt-icon-badge {
-  background-color: color-mix(in srgb, var(--color-purple-soft) 84%, var(--color-purple));
-}
-
-/* Numbered card labels (01, 02, 03). */
-.bt-card-number {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  color: color-mix(in srgb, var(--color-muted) 70%, var(--color-line));
-}
-
-/* ==========================================================================
-   Small text treatments
-   ========================================================================== */
-
-/* Hero trust strip — quiet, mono, uppercase. */
-.bt-trust-strip {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-/* Small contextual note (e.g. "Disponible por Instagram"). Unlayered so it
-   beats reset.css `p { font-size: 1rem }`. Color comes from utilities so each
-   surface can tint it. */
-.bt-note {
-  font-size: 0.75rem;
-  line-height: 1.5;
-  letter-spacing: 0;
-  margin: 0;
-}
-
-/* Page-level legal/disclaimer note. */
-.bt-legal-note {
-  font-size: 0.8125rem;
-  line-height: 1.65;
-  color: var(--color-muted);
-  margin: 0;
-}
-
-/* ==========================================================================
-   FAQ accordion — animated open/close without JS measurement
-   ========================================================================== */
-.bt-acc-panel {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s ease;
-}
-.bt-acc-panel[data-open='true'] {
-  grid-template-rows: 1fr;
-}
-.bt-acc-panel > div {
-  overflow: hidden;
-  /* visibility flips at the end of the transition, keeping closed answers out
-     of the accessibility tree without blocking the height animation. */
-  visibility: hidden;
-  transition: visibility 0.25s;
-}
-.bt-acc-panel[data-open='true'] > div {
-  visibility: visible;
-}
-.bt-faq-answer {
-  font-size: 1rem;
-  line-height: 1.65;
-  letter-spacing: -0.005em;
-  margin: 0;
-}
-
-/* Strong, consistent focus ring for keyboard navigation. reset.css and
-   normalize.css strip outlines, so this must be unlayered. */
-.bt-focus:focus-visible,
-.bt-nav-link:focus-visible,
-.bt-footer-link:focus-visible {
-  outline: 2px solid var(--color-purple);
-  outline-offset: 3px;
-  border-radius: 8px;
-}
-
-/* ==========================================================================
-   Decorative motion — CSS keyframes so the global reduced-motion rule below
-   disables them automatically.
-   ========================================================================== */
-@keyframes bt-drift {
-  0%,
-  100% {
-    transform: translateY(0);
+  .bt-container-narrow {
+    width: min(100% - 48px, 760px);
+    margin-inline: auto;
   }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-.bt-drift {
-  animation: bt-drift 7s ease-in-out infinite;
-}
-.bt-drift-slow {
-  animation: bt-drift 9.5s ease-in-out infinite;
-  animation-delay: 1.4s;
-}
-
-/* Footer legal strip — unlayered so it beats reset.css `p { font-size: 1rem }`. */
-.bt-legal p {
-  font-size: 12px;
-  line-height: 1.6;
-}
-@media (max-width: 768px) {
-  .bt-legal p {
-    font-size: 11px;
-  }
-}
-
-/* Cards */
-.bt-card {
-  padding: clamp(20px, 3vw, 32px);
-  border-radius: var(--radius-card);
-}
-
-/* Button colors — unlayered so they beat normalize.css `a { background }` and
-   reset.css `a { color }`, which otherwise strip the fill/text color from
-   anchor-rendered buttons. Layout (padding, radius, flex) stays in the component. */
-.bt-btn-primary {
-  background-color: var(--color-ink);
-  color: #ffffff;
-}
-.bt-btn-secondary {
-  background-color: transparent;
-  color: var(--color-ink);
-  border: 1px solid color-mix(in srgb, var(--color-ink) 80%, transparent);
-}
-.bt-btn-secondary:hover {
-  background-color: var(--color-ink);
-  color: #ffffff;
-}
-/* Subtle: lighter Biothree purple background, darker purple text. */
-.bt-btn-soft {
-  background-color: var(--color-purple-soft);
-  color: var(--color-purple-dark);
-}
-.bt-btn-soft:hover {
-  background-color: color-mix(in srgb, var(--color-purple-soft) 86%, var(--color-purple));
-}
-/* reset.css's `a:hover { text-decoration: underline }` would underline
-   anchor-rendered pill buttons on hover. */
-.bt-btn-primary:hover,
-.bt-btn-secondary:hover,
-.bt-btn-soft:hover {
-  text-decoration: none;
-}
-
-/* Header/footer chrome links — color must live in unlayered classes because
-   reset.css's `a { color: #052137 }` beats Tailwind text-color utilities,
-   silently repainting nav/footer links dark blue and killing hover colors. */
-.bt-nav-link {
-  color: var(--color-ink);
-}
-.bt-nav-link:hover {
-  color: var(--color-purple);
-  text-decoration: none;
-}
-.bt-nav-link-active {
-  color: var(--color-purple);
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 7px;
-  text-decoration-color: color-mix(in srgb, var(--color-purple) 45%, transparent);
-}
-.bt-nav-link-active:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--color-purple);
-}
-.bt-footer-link {
-  color: var(--color-muted);
-}
-.bt-footer-link:hover {
-  color: var(--color-ink);
-  text-decoration: none;
-}
-
-@media (max-width: 768px) {
   .bt-section {
-    padding-block: 48px;
+    padding-block: clamp(64px, 7vw, 96px);
   }
   .bt-section-compact {
-    padding-block: 40px;
+    padding-block: clamp(48px, 5vw, 64px);
   }
   .bt-hero {
-    padding-top: 48px;
-    padding-bottom: 44px;
+    padding-block: clamp(48px, 7vw, 96px);
+  }
+  .bt-h1,
+  .bt-h2,
+  .bt-h3,
+  .bt-product-title {
+    font-family: var(--font-tight);
+    font-weight: 500;
+    margin: 0;
   }
   .bt-h1 {
-    font-size: clamp(2.35rem, 12vw, 3.25rem);
-    line-height: 0.98;
+    font-size: clamp(2.5rem, 5.3vw, 4.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
   }
   .bt-h2 {
-    font-size: clamp(1.85rem, 9vw, 2.5rem);
+    font-size: clamp(1.875rem, 3.4vw, 3rem);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .bt-h3,
+  .bt-product-title {
+    font-size: clamp(1.375rem, 2vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .bt-price {
+    font-family: var(--font-tight);
+    font-size: clamp(1.5rem, 2vw, 1.75rem);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .bt-p {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .bt-lead {
+    font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+    line-height: 1.6;
+    max-width: 60ch;
+  }
+  .bt-eyebrow {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    letter-spacing: 0.025em;
+  }
+  .bt-note,
+  .bt-legal-note,
+  .bt-legal p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .bt-legal-note {
+    color: var(--color-muted);
+  }
+  .bt-trust-strip {
+    font-size: 0.75rem;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .bt-card-number {
+    font: 0.8125rem var(--font-mono);
+    color: var(--color-purple);
+  }
+  .bt-section-divided {
+    border-top: 1px solid var(--color-line);
   }
   .bt-card {
-    padding: 22px;
+    padding: var(--bt-space-6);
+    border-radius: var(--radius-card);
   }
-  /* Science rows stack vertically on mobile — keep the icon panel compact. */
+  .bt-rule-block {
+    border-top: 1px solid var(--color-line);
+    padding-block: var(--bt-space-6);
+  }
+  .bt-icon-badge {
+    display: flex;
+    align-items: center;
+    width: 48px;
+    height: 48px;
+  }
   .bt-science-icon {
-    width: 104px;
-    height: 104px;
-    border-radius: 22px;
+    width: 96px;
+    height: 96px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
   }
   .bt-science-icon img {
-    width: 56px;
-    height: 56px;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+  .bt-hero-art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 440px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .bt-hero-art img {
+    width: 100%;
+    height: 420px;
+    object-fit: contain;
+  }
+  .bt-hero-art::before {
+    content: '';
+    position: absolute;
+    inset: 24px 0;
+    border-left: 1px solid var(--color-line);
+  }
+  .bt-product-grid {
+    display: grid;
+    gap: var(--bt-space-8);
+  }
+  .bt-product-card {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    min-width: 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .bt-product-stage {
+    position: relative;
+    background: var(--color-surface);
+    border-radius: var(--radius-card);
+    margin-block: var(--bt-space-6);
+    height: 380px;
+    display: grid;
+    place-items: center;
+  }
+  .bt-product-stage img {
+    width: 90%;
+    height: 340px;
+    object-fit: contain;
+  }
+  .bt-product-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: var(--bt-space-6);
+  }
+  .bt-product-price-slot {
+    min-height: 34px;
+  }
+  .bt-product-purchase {
+    border-top: 1px solid var(--color-line);
+    padding-top: var(--bt-space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-space-4);
+  }
+  .bt-product-specs {
+    margin-top: var(--bt-space-6);
+  }
+  .bt-spec-row {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: var(--bt-space-4);
+    border-bottom: 1px solid var(--color-line);
+    padding-block: 12px;
+  }
+  .bt-spec-row dt {
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+  .bt-spec-row dd {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .bt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    border-radius: var(--radius-control);
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    transition:
+      background-color var(--bt-control-duration) var(--bt-ease),
+      color var(--bt-control-duration) var(--bt-ease),
+      border-color var(--bt-control-duration) var(--bt-ease),
+      transform var(--bt-control-duration) var(--bt-ease);
+  }
+  .bt-btn:hover {
+    text-decoration: none;
+  }
+  .bt-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .bt-btn:disabled {
+    opacity: 0.5;
+  }
+  .bt-btn[aria-busy='true'] {
+    opacity: 0.75;
+    cursor: progress;
+  }
+  .bt-btn-primary {
+    background: var(--color-purple);
+    color: var(--color-surface);
+    border: 1px solid var(--color-purple);
+  }
+  .bt-btn-primary:hover:not(:disabled) {
+    background: var(--color-purple-dark);
+    border-color: var(--color-purple-dark);
+  }
+  .bt-btn-secondary {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
+  }
+  .bt-btn-secondary:hover {
+    border-color: var(--color-ink);
+  }
+  .bt-btn-soft {
+    background: var(--color-purple-soft);
+    color: var(--color-purple-dark);
+    border: 1px solid transparent;
+  }
+  .bt-btn-soft:hover {
+    border-color: var(--color-purple);
+  }
+  .bt-input {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-control);
+    min-height: 48px;
+    padding: 8px 16px;
+  }
+  .bt-nav-link,
+  .bt-footer-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    transition: color var(--bt-control-duration) var(--bt-ease);
+  }
+  .bt-footer-link {
+    color: var(--color-muted);
+  }
+  .bt-nav-link:hover,
+  .bt-footer-link:hover,
+  .bt-nav-link-active {
+    color: var(--color-purple);
+  }
+  .bt-nav-link-active {
+    text-decoration: underline;
+    text-underline-offset: 8px;
+  }
+  .bt-disclosure > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    list-style: none;
+  }
+  .bt-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .bt-disclosure > summary::after {
+    content: '+';
+    margin-left: auto;
+  }
+  .bt-disclosure[open] > summary::after {
+    content: '−';
+  }
+  .bt-acc-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--bt-panel-duration) var(--bt-ease);
+  }
+  .bt-acc-panel[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+  .bt-acc-panel > div {
+    overflow: hidden;
+    visibility: hidden;
+    transition: visibility var(--bt-panel-duration);
+  }
+  .bt-acc-panel[data-open='true'] > div {
+    visibility: visible;
+  }
+  .bt-faq-answer {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .bt-benefits {
+    display: grid;
+    gap: var(--bt-space-12);
+  }
+  .bt-steps {
+    display: grid;
+    gap: var(--bt-space-12);
+  }
+  .bt-step {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: var(--bt-space-4);
+    padding-block: var(--bt-space-6);
+    border-top: 1px solid var(--color-line);
+  }
+  .bt-detail {
+    display: grid;
+    gap: var(--bt-space-12);
+    padding-top: 32px;
+    border-top: 1px solid var(--color-line);
+  }
+  .bt-product-detail {
+    display: grid;
+    gap: var(--bt-space-12);
+  }
+  .bt-product-detail .product-image {
+    background: var(--color-surface);
+    border-radius: var(--radius-card);
+    align-self: start;
+  }
+  .bt-product-detail .product-image img {
+    object-fit: contain;
+  }
+  .bt-product-detail .product-price {
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .bt-product-detail .product-price s {
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+  .product-options-item {
+    min-height: 48px;
+    padding: 8px 20px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-control);
+  }
+  .product-options-item[aria-pressed='true'],
+  .product-options-item[aria-current='true'] {
+    border-color: var(--color-purple);
+    color: var(--color-purple);
+    background: var(--color-purple-soft);
+  }
+  .product-options-item:disabled {
+    opacity: 0.5;
+  }
+  .bt-prose {
+    max-width: 65ch;
+  }
+  .bt-prose > * + * {
+    margin-top: var(--bt-space-6);
+  }
+  .bt-prose ul {
+    list-style: disc;
+    padding-left: 24px;
+  }
+  .bt-prose a {
+    color: var(--color-purple);
+    text-decoration: underline;
+  }
+  .bt-prose h2,
+  .bt-prose h3 {
+    margin-top: 32px;
+  }
+  aside {
+    transition: transform var(--bt-panel-duration) var(--bt-ease);
+    box-shadow: -8px 0 24px rgb(17 17 17 / 0.08);
+  }
+  aside header .close {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-control);
+    transition: background-color var(--bt-control-duration) var(--bt-ease);
+  }
+  .overlay {
+    transition:
+      opacity var(--bt-panel-duration) var(--bt-ease),
+      visibility var(--bt-panel-duration);
+  }
+  .cart-summary-page {
+    border-radius: var(--radius-card);
+  }
+  .cart-line img {
+    object-fit: contain;
+  }
+  @media (min-width: 768px) {
+    .bt-product-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 0;
+    }
+    .bt-product-card {
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+    }
+    .bt-benefits {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--bt-space-24);
+    }
+    .bt-steps {
+      grid-template-columns: 1fr 1.2fr;
+      gap: var(--bt-space-24);
+    }
+    .bt-detail {
+      grid-template-columns: 1fr 1fr;
+    }
+    .bt-product-detail {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 767px) {
+    .bt-h1 {
+      font-size: clamp(2.375rem, 10.5vw, 2.75rem);
+      line-height: 1.08;
+    }
+    .bt-h2 {
+      font-size: clamp(1.75rem, 8vw, 2.125rem);
+    }
+    .bt-hero-art {
+      min-height: 260px;
+    }
+    .bt-hero-art img {
+      height: 260px;
+    }
+    .bt-hero-art::before {
+      display: none;
+    }
+    .bt-product-stage {
+      height: 280px;
+    }
+    .bt-product-stage img {
+      height: 240px;
+    }
+    .bt-product-grid {
+      gap: var(--bt-space-12);
+    }
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .biothree * {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

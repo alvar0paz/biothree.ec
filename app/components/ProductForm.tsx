@@ -1,3 +1,4 @@
+import {buttonClasses} from './marketing/Button';
 import {Link, useNavigate} from 'react-router';
 import {type MappedProductOptions} from '@shopify/hydrogen';
 import type {
@@ -25,7 +26,7 @@ export function ProductForm({
 
         return (
           <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
+            <h2 className="mb-3 text-base font-medium">{option.name}</h2>
             <div className="product-options-grid">
               {option.optionValues.map((value) => {
                 const {
@@ -52,12 +53,8 @@ export function ProductForm({
                       preventScrollReset
                       replace
                       to={`/products/${handle}?${variantUriQuery}`}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      aria-current={selected ? true : undefined}
+                      style={{opacity: available ? 1 : 0.5}}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
@@ -75,12 +72,8 @@ export function ProductForm({
                         exists && !selected ? ' link' : ''
                       }`}
                       key={option.name + name}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      aria-pressed={selected}
+                      style={{opacity: available ? 1 : 0.5}}
                       disabled={!exists}
                       onClick={() => {
                         if (!selected) {
@@ -102,8 +95,10 @@ export function ProductForm({
         );
       })}
       <AddToCartButton
+        key={selectedVariant?.id}
+        className={buttonClasses({className: 'w-full'})}
         disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
+        onSuccess={() => {
           open('cart');
         }}
         lines={
@@ -118,7 +113,7 @@ export function ProductForm({
             : []
         }
       >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+        {selectedVariant?.availableForSale ? 'Agregar al carrito' : 'Agotado'}
       </AddToCartButton>
     </div>
   );

@@ -1,4 +1,5 @@
 @import './tokens/tokens.css';
+@layer legacy {
 
 img {
   border-radius: 4px;
@@ -83,7 +84,7 @@ aside header h2 {
   margin-top: 0;
 }
 
-aside main {
+aside .bt-aside-body {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -1249,3 +1250,5 @@ button.reset:hover:not(:has(> *)) {
   text-decoration: underline;
 }
 
+
+}

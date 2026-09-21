@@ -35,7 +35,7 @@ function FAQItem({faq}: {faq: Faq}) {
           aria-controls={`${id}-panel`}
           id={`${id}-button`}
           onClick={() => setOpen((v) => !v)}
-          className="bt-h3 bt-focus flex w-full items-center justify-between gap-4 py-5 text-left text-ink transition-colors hover:text-purple"
+          className="font-tight text-xl leading-snug bt-focus flex w-full items-center justify-between gap-4 py-5 text-left text-ink transition-colors duration-150 hover:text-purple"
         >
           {faq.question}
           <ChevronIcon open={open} />
@@ -62,7 +62,7 @@ function FAQItem({faq}: {faq: Faq}) {
 
 export function FAQAccordion({items}: {items: Faq[]}) {
   return (
-    <div className="bt-card border border-line bg-surface/60 !py-1">
+    <div className="border-t border-line">
       {items.map((faq) => (
         <FAQItem key={faq.question} faq={faq} />
       ))}

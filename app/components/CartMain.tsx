@@ -30,10 +30,13 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
       <CartEmpty hidden={linesCount} layout={layout} />
       <div className="cart-details">
         <div className="cart-lines">
-          <h2 id="cart-lines" className="sr-only">
+          <h2 id={`cart-lines-${layout}`} className="sr-only">
             Productos en el carrito
           </h2>
-          <ul className="flex flex-col" aria-labelledby="cart-lines">
+          <ul
+            className="flex flex-col"
+            aria-labelledby={`cart-lines-${layout}`}
+          >
             {(cart?.lines?.nodes ?? []).map((line) => (
               <CartLineItem key={line.id} line={line} layout={layout} />
             ))}

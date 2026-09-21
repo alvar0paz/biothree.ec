@@ -25,14 +25,18 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
-      <h1>Policies</h1>
-      <div>
-        {policies.map((policy) => (
-          <fieldset key={policy.id}>
-            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-          </fieldset>
-        ))}
+    <div className="biothree">
+      <div className="bt-container-narrow bt-section">
+        <h1 className="bt-h1 mb-8">Políticas</h1>
+        <div>
+          {policies.map((policy) => (
+            <div className="bt-rule-block" key={policy.id}>
+              <Link className="bt-nav-link" to={`/policies/${policy.handle}`}>
+                {policy.title}
+              </Link>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

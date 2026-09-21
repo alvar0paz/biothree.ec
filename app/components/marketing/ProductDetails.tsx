@@ -68,7 +68,7 @@ export function ProductDetails() {
             {formats.map((format) => (
               <div
                 key={format.title}
-                className="bt-card flex flex-col gap-3 border border-line bg-surface/70"
+                className="bt-rule-block flex flex-col gap-4"
               >
                 <h3 className="bt-h3 text-ink">{format.title}</h3>
                 <p className="bt-p text-muted">{format.description}</p>
@@ -78,7 +78,7 @@ export function ProductDetails() {
         </div>
       </section>
 
-      <section id="uso-sugerido" className="bt-wash scroll-mt-24">
+      <section id="uso-sugerido" className="bt-section-divided scroll-mt-24">
         <div className="bt-container bt-section">
           <div className="flex max-w-3xl flex-col items-start gap-4">
             <SectionLabel>Protocolo Clínico Oficial</SectionLabel>
@@ -91,7 +91,7 @@ export function ProductDetails() {
             </p>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <div className="bt-card flex flex-col gap-4 border border-line bg-surface/80">
+            <div className="bt-rule-block flex flex-col gap-4">
               <h3 className="bt-h3 text-ink">
                 Fase Terapéutica y de Reparación
               </h3>
@@ -104,7 +104,7 @@ export function ProductDetails() {
                 con cada una de las tres comidas principales del día (desayuno,
                 almuerzo y cena).
               </p>
-              <p className="bt-p border-t border-line !pt-4 text-muted">
+              <p className="bt-p border-t border-line pt-4 text-muted">
                 <em className="text-ink">Nota clínica:</em> En caso de estar
                 bajo tratamiento con antibióticos, administrar la dosis
                 correspondiente con{' '}
@@ -112,7 +112,7 @@ export function ProductDetails() {
                 fármaco para garantizar la máxima resiliencia de las cepas.
               </p>
             </div>
-            <div className="bt-card flex flex-col gap-4 border border-line bg-surface/80">
+            <div className="bt-rule-block flex flex-col gap-4">
               <h3 className="bt-h3 text-ink">
                 Fase Preventiva y de Mantenimiento
               </h3>
@@ -137,17 +137,19 @@ export function ProductDetails() {
             {approaches.map((approach) => (
               <div
                 key={approach.title}
-                className="bt-card flex flex-col gap-3 border border-line bg-surface/70"
+                className="bt-rule-block flex flex-col gap-4"
               >
                 <SectionLabel>{approach.subtitle}</SectionLabel>
                 <h3 className="bt-h3 text-ink">{approach.title}</h3>
-                <ul className="flex list-none flex-col gap-5 !p-0">
+                <ul className="flex list-none flex-col gap-5 p-0">
                   {approach.benefits.map((benefit) => (
                     <li
                       key={benefit.title}
                       className="flex flex-col gap-2 border-t border-line pt-5"
                     >
-                      <h4 className="bt-h3 text-ink">{benefit.title}</h4>
+                      <h4 className="font-medium text-lg text-ink">
+                        {benefit.title}
+                      </h4>
                       <p className="bt-p text-muted">{benefit.description}</p>
                     </li>
                   ))}
