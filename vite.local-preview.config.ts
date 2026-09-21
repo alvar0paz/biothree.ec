@@ -16,6 +16,7 @@ import {oxygen} from '@shopify/mini-oxygen/vite';
 import {reactRouter} from '@react-router/dev/vite';
 import tailwindcss from '@tailwindcss/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import {onBuildWarning} from './vite-warnings';
 
 export default defineConfig(({mode}) => {
   // '' prefix loads every var in .env, not just VITE_-prefixed ones.
@@ -31,6 +32,7 @@ export default defineConfig(({mode}) => {
     ],
     build: {
       assetsInlineLimit: 0,
+      rollupOptions: {onwarn: onBuildWarning},
     },
     ssr: {
       optimizeDeps: {

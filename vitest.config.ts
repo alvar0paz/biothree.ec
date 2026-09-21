@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['app/**/*.test.ts'],
+    include: ['app/**/*.test.ts', 'vite-warnings.test.ts'],
     // Keep Hydrogen and app components on the same React Router context.
     server: {deps: {inline: ['@shopify/hydrogen']}},
   },
