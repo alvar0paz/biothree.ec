@@ -44,18 +44,17 @@ export const NAV = [
 ] as const;
 
 export const hero = {
-  eyebrow: 'Fórmula japonesa · Bienestar intestinal · Uso diario',
   title: 'Probióticos japoneses para tu rutina diaria.',
   subtitle:
     'Biothree combina probióticos seleccionados en una fórmula simple, pensada para acompañar tu bienestar digestivo todos los días.',
   primaryCta: 'Comprar Biothree',
   secondaryCta: 'Ver cómo funciona',
-  // Quiet trust strip rendered below the hero CTAs.
-  trust: [
-    'Fórmula japonesa',
-    'Uso diario',
-    'Importado por BIOSCIENCE TRADING EC',
-    'Ecuador',
+  // Spec-sheet entries under the hero CTAs (label + value), instead of a
+  // generic dotted strip. The importer stays in the footer's legal line.
+  facts: [
+    {label: 'Origen', value: 'Fórmula japonesa'},
+    {label: 'Uso', value: 'Diario, con las comidas'},
+    {label: 'Presentaciones', value: 'Tabletas y sobres'},
   ],
 };
 
@@ -175,37 +174,19 @@ export const cienciaPage = {
 };
 
 export const footer = {
-  tagline:
-    'Probióticos japoneses para acompañar tu bienestar digestivo todos los días.',
-  columns: [
-    {
-      title: 'Producto',
-      links: [
-        {label: 'Productos', href: '/productos'},
-        {label: 'Envíos', href: '/productos#envios'},
-        {label: 'Ciencia', href: '/ciencia'},
-        {label: 'Preguntas', href: '/ciencia#faq'},
-      ],
-    },
-    {
-      title: 'Biothree',
-      links: [
-        {label: 'Consultar por Instagram', href: INSTAGRAM_URL},
-        {label: 'Contacto', href: 'mailto:info@biothree.ec'},
-      ],
-    },
+  tagline: 'Probióticos japoneses para tu rutina diaria.',
+  // One flat row of links; the footer no longer has column headings.
+  links: [
+    {label: 'Productos', href: '/productos'},
+    {label: 'Envíos', href: '/productos#envios'},
+    {label: 'Ciencia', href: '/ciencia'},
+    {label: 'Preguntas', href: '/ciencia#faq'},
+    {label: 'Instagram', href: INSTAGRAM_URL},
+    {label: 'Contacto', href: 'mailto:info@biothree.ec'},
   ],
-  // Bottom legal strip. The "·" separators are rendered inline on desktop and
-  // wrap naturally on mobile. Company legal name is the only all-caps element.
-  legalLine1: [
-    'Biothree es un suplemento alimenticio',
-    'No es un medicamento',
-    'Consulta siempre las indicaciones del empaque',
-    'La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud',
-  ],
+  disclaimer:
+    'Biothree es un suplemento alimenticio, no un medicamento. Consulta siempre las indicaciones del empaque. La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud.',
+  // Company legal name is the only all-caps element.
   importer: 'BIOSCIENCE TRADING EC',
-  legalLine2: [
-    'Ecuador',
-    '© 2026 Biothree Ecuador. Todos los derechos reservados.',
-  ],
+  copyright: '© 2026 Biothree Ecuador. Todos los derechos reservados.',
 };

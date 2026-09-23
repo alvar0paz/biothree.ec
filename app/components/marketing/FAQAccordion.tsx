@@ -27,7 +27,7 @@ function FAQItem({faq}: {faq: Faq}) {
   const id = useId();
 
   return (
-    <div className="border-b border-line last:border-0">
+    <div className="border-b border-hairline last:border-0">
       <h3>
         <button
           type="button"
@@ -62,7 +62,7 @@ function FAQItem({faq}: {faq: Faq}) {
 
 export function FAQAccordion({items}: {items: Faq[]}) {
   return (
-    <div className="border-t border-line">
+    <div className="border-t border-hairline">
       {items.map((faq) => (
         <FAQItem key={faq.question} faq={faq} />
       ))}

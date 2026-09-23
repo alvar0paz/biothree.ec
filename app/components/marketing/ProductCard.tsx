@@ -27,9 +27,7 @@ export function ProductCard({presentation}: {presentation: Presentation}) {
       aria-labelledby={`product-${presentation.id}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3 pt-5">
-        <span className="bt-eyebrow font-mono text-muted">
-          Presentación · {presentation.tagline}
-        </span>
+        <span className="bt-index-label">Presentación · {presentation.tagline}</span>
         <StockBadge stock={stock} />
       </div>
       <div className="bt-product-stage">

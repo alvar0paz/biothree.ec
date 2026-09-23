@@ -72,7 +72,7 @@ export function PaymentStatus({
           </span>
           <div className="flex flex-col gap-3">
             {eyebrow && (
-              <p className="bt-eyebrow font-mono text-xs uppercase text-muted">{eyebrow}</p>
+              <p className="bt-index-label">{eyebrow}</p>
             )}
             <h1 className="bt-h2 text-ink">{title}</h1>
           </div>

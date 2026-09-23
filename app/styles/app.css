@@ -258,45 +258,6 @@ button.reset:hover:not(:has(> *)) {
 
 /*
 * --------------------------------------------------
-* components/Footer
-* --------------------------------------------------
-*/
-.footer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 24px 16px;
-  margin-top: auto;
-  background: #F0F0F0;
-}
-
-.footer-social {
-  display: flex;
-  gap: 16px;
-}
-
-.footer-social a {
-  color: #052137;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-
-.footer-social a:hover {
-  opacity: 1;
-}
-
-.footer-text {
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  color: #052137;
-  opacity: 0.6;
-}
-
-/*
-* --------------------------------------------------
 * routes/test
 * --------------------------------------------------
 */

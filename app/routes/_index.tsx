@@ -43,10 +43,13 @@ export default function Homepage() {
       <Hero />
 
       {/* Benefits — framed as benefits of the same single formula */}
-      <section className="bt-section-divided">
+      <section>
         <div className="bt-container bt-section bt-benefits">
           <Reveal>
-            <h2 className="bt-h2 max-w-[700px] text-ink">{benefits.title}</h2>
+            <div className="flex flex-col items-start gap-4">
+              <SectionLabel index="01">Beneficios</SectionLabel>
+              <h2 className="bt-h2 max-w-[700px] text-ink">{benefits.title}</h2>
+            </div>
           </Reveal>
           <div className="flex flex-col">
             {benefits.cards.map((card) => (
@@ -61,12 +64,13 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* Product — one formula, two presentations */}
-      <section className="bt-section-divided">
+      {/* Product — one formula, two presentations. The warm band marks
+          the purchase surface; the cards sit on it as white panels. */}
+      <section className="bt-band">
         <div className="bt-container bt-section">
           <Reveal>
-            <div className="flex flex-col items-start gap-3">
-              <SectionLabel>{productPreview.eyebrow}</SectionLabel>
+            <div className="flex flex-col items-start gap-4">
+              <SectionLabel index="02">{productPreview.eyebrow}</SectionLabel>
               <h2 className="bt-h2 max-w-[700px] text-ink">
                 {productPreview.title}
               </h2>
@@ -86,11 +90,11 @@ export default function Homepage() {
       <ScienceTeaser />
 
       {/* FAQ preview */}
-      <section className="bt-section-divided">
+      <section>
         <div className="bt-container-narrow bt-section">
           <Reveal>
-            <div className="flex flex-col items-start gap-3">
-              <SectionLabel>Preguntas</SectionLabel>
+            <div className="flex flex-col items-start gap-4">
+              <SectionLabel index="05">Preguntas</SectionLabel>
               <h2 className="bt-h2 text-ink">{faqPreview.title}</h2>
             </div>
           </Reveal>

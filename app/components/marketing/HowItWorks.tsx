@@ -3,10 +3,10 @@ import {howItWorks} from '~/data/copy';
 
 export function HowItWorks() {
   return (
-    <section id="como-funciona" className="bt-section-divided">
+    <section id="como-funciona" className="scroll-mt-24">
       <div className="bt-container bt-section bt-steps">
         <div className="flex flex-col items-start gap-4">
-          <SectionLabel>Cómo funciona</SectionLabel>
+          <SectionLabel index="03">Cómo funciona</SectionLabel>
           <h2 className="bt-h2 text-ink">{howItWorks.title}</h2>
         </div>
         <div>

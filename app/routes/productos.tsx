@@ -45,31 +45,31 @@ export default function Productos() {
         </div>
       </section>
 
-      {/* Shared purchase presentations. */}
-      <section>
-        <div className="bt-container bt-section-compact pt-0">
+      {/* Shared purchase presentations, on the warm band. */}
+      <section className="bt-band">
+        <div className="bt-container bt-section-compact">
           <h2 className="sr-only">Presentaciones</h2>
           <ProductGrid presentations={presentations} />
         </div>
       </section>
 
       {/* Comparison of the two presentations */}
-      <section className="bt-section-divided">
+      <section>
         <div className="bt-container bt-section">
           <Reveal>
-            <h2 className="bt-h2 text-ink">{productosPage.comparisonTitle}</h2>
+            <div className="flex flex-col items-start gap-4">
+              <SectionLabel index="01">Comparativa</SectionLabel>
+              <h2 className="bt-h2 text-ink">{productosPage.comparisonTitle}</h2>
+            </div>
           </Reveal>
 
           {/* Desktop table */}
-          <div className="mt-8 hidden border-y border-line md:block">
+          <div className="mt-8 hidden border-y border-hairline md:block">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-line">
+                <tr className="border-b border-hairline">
                   {productosPage.comparisonHeaders.map((header) => (
-                    <th
-                      key={header}
-                      className="bt-eyebrow px-6 py-4 font-mono text-xs text-purple-dark"
-                    >
+                    <th key={header} className="bt-index-label px-6 py-4">
                       {header}
                     </th>
                   ))}
@@ -79,7 +79,7 @@ export default function Productos() {
                 {presentations.map((product) => (
                   <tr
                     key={product.id}
-                    className="border-b border-line last:border-0"
+                    className="border-b border-hairline last:border-0"
                   >
                     <td className="bt-h3 px-6 py-5 text-ink">{product.name}</td>
                     <td className="bt-p px-6 py-5 text-muted">
@@ -104,7 +104,7 @@ export default function Productos() {
                 <h3 className="bt-h3 text-ink">{product.name}</h3>
                 <dl className="pt-3 flex flex-col gap-2.5">
                   <div className="bt-spec-row">
-                    <dt className="bt-eyebrow font-mono text-xs text-purple">
+                    <dt className="bt-index-label">
                       Ideal para
                     </dt>
                     <dd className="bt-p text-left text-muted">
@@ -112,7 +112,7 @@ export default function Productos() {
                     </dd>
                   </div>
                   <div className="bt-spec-row">
-                    <dt className="bt-eyebrow font-mono text-xs text-purple">
+                    <dt className="bt-index-label">
                       Uso
                     </dt>
                     <dd className="bt-p text-left text-muted">
@@ -120,7 +120,7 @@ export default function Productos() {
                     </dd>
                   </div>
                   <div className="bt-spec-row">
-                    <dt className="bt-eyebrow font-mono text-xs text-purple">
+                    <dt className="bt-index-label">
                       Formato
                     </dt>
                     <dd className="bt-p text-left text-muted">
@@ -140,7 +140,7 @@ export default function Productos() {
       {/* Disclaimer */}
       <section>
         <div className="bt-container-narrow py-12">
-          <p className="bt-legal-note border-t border-line pt-6 text-center">
+          <p className="bt-legal-note mx-auto max-w-[64ch] text-center">
             {productosPage.disclaimer}
           </p>
         </div>

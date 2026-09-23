@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {AnimatePresence, motion, useReducedMotion} from 'framer-motion';
 import {Button} from './Button';
-import {SectionLabel} from './SectionLabel';
 import {hero, heroBacteria} from '~/data/copy';
 
 export function Hero() {
@@ -23,7 +22,6 @@ export function Hero() {
     <section>
       <div className="bt-container bt-hero grid items-center gap-10 md:grid-cols-[1.15fr_1fr] md:gap-12">
         <div className="flex flex-col items-start gap-6">
-          <SectionLabel>{hero.eyebrow}</SectionLabel>
           <h1 className="bt-h1 text-ink">{hero.title}</h1>
           <p className="bt-lead text-muted">{hero.subtitle}</p>
           <div className="flex flex-wrap items-center gap-3">
@@ -34,9 +32,16 @@ export function Hero() {
               {hero.secondaryCta}
             </Button>
           </div>
-          <p className="bt-trust-strip mt-2 border-t border-line pt-6">
-            {hero.trust.join(' · ')}
-          </p>
+          {/* The product's spec sheet in three entries; it replaces the
+              generic "a · b · c" strip and needs no rule to separate it. */}
+          <dl className="bt-facts mt-4">
+            {hero.facts.map((fact) => (
+              <div key={fact.label} className="bt-fact">
+                <dt className="bt-index-label">{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
         <div className="bt-hero-art" aria-hidden="true">
           {reduceMotion ? (
