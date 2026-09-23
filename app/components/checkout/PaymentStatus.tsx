@@ -1,4 +1,5 @@
-import {Form, Link} from 'react-router';
+import {useState} from 'react';
+import {Link} from 'react-router';
 import {buttonClasses} from '~/components/marketing/Button';
 
 type Tone = 'success' | 'warning' | 'error' | 'info';
@@ -83,22 +84,33 @@ export function PaymentStatus({
   );
 }
 
-/** "Pagar con PayPhone" for an existing pending order: POSTs to /pagar/:id. */
+/**
+ * "Pagar con PayPhone" for an existing pending order: a plain document POST
+ * to /pagar/:id. Deliberately not a client-side <Form>: the action answers
+ * with a redirect to PayPhone, and letting the browser follow it natively
+ * keeps the Referer (PayPhone's domain check) and any Set-Cookie intact.
+ */
 export function RetryPaymentButton({
   orderLegacyId,
   children = 'Intentar el pago de nuevo',
-  busy = false,
+  size,
 }: {
   orderLegacyId: string;
   children?: React.ReactNode;
-  busy?: boolean;
+  size?: 'md' | 'lg';
 }) {
+  const [busy, setBusy] = useState(false);
   return (
-    <Form method="post" action={`/pagar/${orderLegacyId}`}>
-      <button type="submit" className={buttonClasses()} disabled={busy} aria-busy={busy}>
+    <form
+      method="post"
+      action={`/pagar/${orderLegacyId}`}
+      // Deferred so the browser serialises the form before the button is disabled.
+      onSubmit={() => setTimeout(() => setBusy(true), 0)}
+    >
+      <button type="submit" className={buttonClasses({size})} disabled={busy} aria-busy={busy}>
         {busy ? 'Redirigiendo a PayPhone…' : children}
       </button>
-    </Form>
+    </form>
   );
 }
 

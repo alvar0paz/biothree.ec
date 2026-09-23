@@ -25,6 +25,9 @@ export const PAYPHONE_API_BASE = 'https://pay.payphonetodoesposible.com';
 /** PayPhone caps `clientTransactionId` at 15 characters on the Links API. */
 export const CLIENT_TX_MAX_LENGTH = 15;
 
+/** The button (Prepare) API accepts up to 50; verified on 2026-09-22. */
+export const BUTTON_CLIENT_TX_MAX_LENGTH = 50;
+
 /** Links stop working after this many hours unless overridden via env. */
 export const DEFAULT_LINK_EXPIRE_HOURS = 24;
 
@@ -151,11 +154,13 @@ export function splitAmounts({
  * The Shopify order's numeric id doubles as PayPhone's clientTransactionId,
  * so settling a payment needs no lookup table. Every further attempt (expired
  * link, cancelled or rejected card payment) gets a `-N` suffix, because
- * PayPhone refuses to reuse an id. Nine attempts fit in 15 characters.
+ * PayPhone refuses to reuse an id. `maxLength` is the Links API cap by
+ * default; button attempts pass the larger button cap.
  */
 export function buildClientTransactionId(
   orderLegacyId: string | number,
   attempt = 1,
+  maxLength = CLIENT_TX_MAX_LENGTH,
 ): string {
   const base = String(orderLegacyId).trim();
   if (!/^\d+$/.test(base)) {
@@ -165,7 +170,7 @@ export function buildClientTransactionId(
     throw new PayphoneError(`Invalid attempt number: ${attempt}`);
   }
   const id = attempt > 1 ? `${base}-${attempt}` : base;
-  if (id.length > CLIENT_TX_MAX_LENGTH) {
+  if (id.length > maxLength) {
     throw new PayphoneError(`clientTransactionId too long: ${id}`);
   }
   return id;
@@ -187,9 +192,9 @@ export function attemptFromClientTransactionId(clientTransactionId: string): num
 }
 
 /**
- * The id for the next payment attempt of an order, given the last one stored
- * on it (or null for a first attempt). Ids from a different order are ignored
- * rather than trusted.
+ * The id for the next button payment attempt of an order, given the last one
+ * stored on it (or null for a first attempt). Ids from a different order are
+ * ignored rather than trusted.
  */
 export function nextClientTransactionId(
   orderLegacyId: string | number,
@@ -200,7 +205,7 @@ export function nextClientTransactionId(
     previous && orderIdFromClientTransactionId(previous) === base
       ? attemptFromClientTransactionId(previous) + 1
       : 1;
-  return buildClientTransactionId(base, attempt);
+  return buildClientTransactionId(base, attempt, BUTTON_CLIENT_TX_MAX_LENGTH);
 }
 
 function authHeaders(env: PayphoneEnv): HeadersInit {

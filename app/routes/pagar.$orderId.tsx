@@ -7,11 +7,14 @@
 // attempt and redirects to the hosted card form. The page reveals nothing
 // beyond the order number and the outstanding amount.
 
-import {data, Form, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
+import {data, redirect, useActionData, useLoaderData} from 'react-router';
 import type {Route} from './+types/pagar.$orderId';
 import {Money} from '@shopify/hydrogen';
-import {buttonClasses} from '~/components/marketing/Button';
-import {BackToStoreLink, PaymentStatus} from '~/components/checkout/PaymentStatus';
+import {
+  BackToStoreLink,
+  PaymentStatus,
+  RetryPaymentButton,
+} from '~/components/checkout/PaymentStatus';
 import {getFlowEnv, payphoneReturnUrls, startPayphonePayment} from '~/lib/payphone-flow';
 import {getOrder, isOrderPaid, orderGid} from '~/lib/shopify-admin';
 
@@ -67,8 +70,6 @@ export async function action({params, context, request}: Route.ActionArgs) {
 export default function PayOrderPage() {
   const {order, error} = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const navigation = useNavigation();
-  const busy = navigation.state !== 'idle';
   const message = actionData?.error ?? error;
 
   if (order.paid) {
@@ -94,17 +95,15 @@ export default function PayOrderPage() {
       title="Completa tu pago con PayPhone"
       actions={
         <>
-          <Form method="post">
-            <button type="submit" className={buttonClasses({size: 'lg'})} disabled={busy} aria-busy={busy}>
-              {busy ? 'Redirigiendo a PayPhone…' : 'Pagar con PayPhone'}
-            </button>
-          </Form>
+          <RetryPaymentButton orderLegacyId={order.legacyResourceId} size="lg">
+            Pagar con PayPhone
+          </RetryPaymentButton>
           <BackToStoreLink />
         </>
       }
     >
       <p className="bt-price text-ink">
-        <Money data={order.amount as {amount: string; currencyCode: 'USD'}} />
+        <Money as="span" data={order.amount as {amount: string; currencyCode: 'USD'}} />
       </p>
       <p className="bt-p text-muted">
         Te llevamos a la página segura de PayPhone para pagar con tarjeta de

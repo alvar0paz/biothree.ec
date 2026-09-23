@@ -6,6 +6,7 @@
 // Two steps, one route: step 1 posts `intent=quote`, step 2 carries the same
 // fields as hidden inputs and posts `intent=pay`. No client state to lose.
 
+import {useState} from 'react';
 import {data, Form, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
 import type {Route} from './+types/checkout';
 import {Money} from '@shopify/hydrogen';
@@ -200,6 +201,7 @@ export default function CheckoutPage() {
   const step = actionData?.step ?? 'details';
   const values: CheckoutFormValues = actionData?.values ?? {...EMPTY_CHECKOUT_VALUES, ...prefill};
   const quote = actionData?.step === 'review' ? actionData.quote : null;
+  const stepError = actionData?.formError;
 
   return (
     <div className="biothree">
@@ -215,12 +217,12 @@ export default function CheckoutPage() {
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-16">
           <div className="min-w-0">
-            {actionData?.formError && (
+            {stepError && (
               <p
                 role="alert"
                 className="mb-6 rounded-control border border-red-200 bg-red-50 px-4 py-3 bt-note text-red-800"
               >
-                {actionData.formError}
+                {stepError}
               </p>
             )}
             {step === 'details' ? (
@@ -252,8 +254,6 @@ export default function CheckoutPage() {
                   values={values}
                   quote={actionData.quote}
                   shippingRateHandle={actionData.shippingRateHandle}
-                  busy={busy}
-                  submitting={typeof submitting === 'string' ? submitting : null}
                 />
               )
             )}
@@ -267,19 +267,23 @@ export default function CheckoutPage() {
   );
 }
 
+/**
+ * Step 2. A plain document form, not React Router's <Form>: the "pay"
+ * submit answers with a redirect to PayPhone, and letting the browser follow
+ * that 302 natively keeps the Referer (PayPhone's domain check) and the
+ * cart-clearing cookie intact, with no client router in between.
+ */
 function ReviewStep({
   values,
   quote,
   shippingRateHandle,
-  busy,
-  submitting,
 }: {
   values: CheckoutFormValues;
   quote: CheckoutQuote;
   shippingRateHandle: string;
-  busy: boolean;
-  submitting: string | null;
 }) {
+  const [submitting, setSubmitting] = useState<string | null>(null);
+  const busy = submitting !== null;
   const address = formatAddress({
     firstName: values.firstName,
     lastName: values.lastName,
@@ -292,7 +296,17 @@ function ReviewStep({
   });
 
   return (
-    <Form method="post" className="flex flex-col gap-8">
+    <form
+      method="post"
+      className="flex flex-col gap-8"
+      onSubmit={(event) => {
+        const submitter = (event.nativeEvent as SubmitEvent).submitter;
+        const intent = submitter instanceof HTMLButtonElement ? submitter.value : 'pay';
+        // Only after the browser has serialised the form: a button disabled
+        // during the submit event loses its name/value (the intent).
+        setTimeout(() => setSubmitting(intent), 0);
+      }}
+    >
       {Object.entries(values).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
@@ -346,7 +360,7 @@ function ReviewStep({
               {Number(rate.price.amount) === 0 ? (
                 'Gratis'
               ) : (
-                <Money data={rate.price as {amount: string; currencyCode: 'USD'}} />
+                <Money as="span" data={rate.price as {amount: string; currencyCode: 'USD'}} />
               )}
             </span>
           </label>
@@ -384,13 +398,13 @@ function ReviewStep({
           disabled={busy}
           aria-busy={busy && submitting === 'pay'}
         >
-          {busy && submitting === 'pay' ? 'Creando tu pedido…' : 'Pagar con PayPhone'}
+          {submitting === 'pay' ? 'Creando tu pedido…' : 'Pagar con PayPhone'}
         </button>
         <p className="bt-note text-muted">
           Tu pedido queda reservado mientras pagas. Si cancelas en PayPhone,
           podrás volver a intentarlo.
         </p>
       </section>
-    </Form>
+    </form>
   );
 }

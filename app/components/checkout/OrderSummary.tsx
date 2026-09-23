@@ -83,7 +83,7 @@ export function OrderSummary({
                 </p>
               </div>
               <span className="bt-note tabular-nums text-ink">
-                <Money data={line.cost.totalAmount} />
+                <Money as="span" data={line.cost.totalAmount} />
               </span>
             </li>
           );
@@ -94,15 +94,15 @@ export function OrderSummary({
         {quote ? (
           <>
             <Row label="Subtotal">
-              <Money data={money(quote.subtotal)} />
+              <Money as="span" data={money(quote.subtotal)} />
             </Row>
             {!isZero(quote.discounts) && (
               <Row label={codes.length ? `Descuento (${codes.join(', ')})` : 'Descuento'}>
-                −<Money data={money(quote.discounts)} />
+                −<Money as="span" data={money(quote.discounts)} />
               </Row>
             )}
             <Row label={quote.shippingLine ? `Envío · ${quote.shippingLine.title}` : 'Envío'}>
-              {isZero(quote.shipping) ? 'Gratis' : <Money data={money(quote.shipping)} />}
+              {isZero(quote.shipping) ? 'Gratis' : <Money as="span" data={money(quote.shipping)} />}
             </Row>
             {quote.taxLines.length ? (
               quote.taxLines.map((tax) => (
@@ -110,22 +110,22 @@ export function OrderSummary({
                   key={`${tax.title}-${tax.rate}`}
                   label={`${tax.title === 'VAT' ? 'IVA' : tax.title} ${Math.round(tax.rate * 100)}%`}
                 >
-                  <Money data={money(tax.amount)} />
+                  <Money as="span" data={money(tax.amount)} />
                 </Row>
               ))
             ) : (
               <Row label="Impuestos">
-                <Money data={money(quote.tax)} />
+                <Money as="span" data={money(quote.tax)} />
               </Row>
             )}
             <Row label="Total" strong>
-              <Money data={money(quote.total)} />
+              <Money as="span" data={money(quote.total)} />
             </Row>
           </>
         ) : (
           <>
             <Row label="Subtotal">
-              <Money data={cart.cost.subtotalAmount} />
+              <Money as="span" data={cart.cost.subtotalAmount} />
             </Row>
             {codes.length > 0 && (
               <Row label="Código aplicado">

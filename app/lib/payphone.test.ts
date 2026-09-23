@@ -108,7 +108,10 @@ describe('payment attempts', () => {
     expect(nextClientTransactionId('6123456789012', '6123456789012-2')).toBe('6123456789012-3');
     // An id from another order (or garbage) is not trusted as "previous".
     expect(nextClientTransactionId('6123456789012', '7000000000001-4')).toBe('6123456789012');
-    expect(() => nextClientTransactionId('6123456789012', '6123456789012-9')).toThrow(/too long/);
+    // Button attempts get the Prepare API's 50-character cap, not the Links one.
+    expect(nextClientTransactionId('6123456789012', '6123456789012-9')).toBe('6123456789012-10');
+    expect(nextClientTransactionId('1'.repeat(48), '1'.repeat(48))).toHaveLength(50);
+    expect(() => nextClientTransactionId('1'.repeat(49), '1'.repeat(49))).toThrow(/too long/);
   });
 });
 

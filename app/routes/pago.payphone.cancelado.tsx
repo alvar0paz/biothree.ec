@@ -3,7 +3,7 @@
 // `pedido` is added to the cancellation URL by us so the retry button knows
 // which order to pay.
 
-import {useLoaderData, useNavigation} from 'react-router';
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pago.payphone.cancelado';
 import {
   BackToStoreLink,
@@ -23,7 +23,6 @@ export async function loader({request}: Route.LoaderArgs) {
 
 export default function PayphoneCancelledPage() {
   const {orderLegacyId} = useLoaderData<typeof loader>();
-  const navigation = useNavigation();
 
   return (
     <PaymentStatus
@@ -31,9 +30,7 @@ export default function PayphoneCancelledPage() {
       title="Pago cancelado"
       actions={
         <>
-          {orderLegacyId && (
-            <RetryPaymentButton orderLegacyId={orderLegacyId} busy={navigation.state !== 'idle'} />
-          )}
+          {orderLegacyId && <RetryPaymentButton orderLegacyId={orderLegacyId} />}
           <BackToStoreLink />
         </>
       }
