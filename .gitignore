@@ -14,3 +14,6 @@ package-lock.json
 # PayPhone automation secrets pushed to Oxygen with `hydrogen env push`
 .env.payphone
 tsconfig.tsbuildinfo
+# Local-only overrides (e.g. a PayPhone test app token in .env.payphone.local)
+.env.*.local
+.env.local
