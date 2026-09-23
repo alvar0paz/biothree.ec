@@ -32,7 +32,7 @@ export const faqs: Faq[] = [
   {
     question: '¿Cómo pago mi pedido?',
     answer:
-      'Al finalizar la compra eliges "PayPhone, DeUna o transferencia". Te enviamos un enlace de pago de PayPhone para pagar con tarjeta desde el celular, o puedes hacer una transferencia o pago con DeUna. Los pedidos confirmados antes de las 14:00 hrs en días hábiles se despachan el mismo día. Operamos de lunes a viernes, excepto feriados nacionales.',
+      'Con tarjeta de crédito o débito a través de PayPhone: al finalizar la compra te llevamos a su página segura y, apenas apruebe el pago, vuelves a biothree.ec con la confirmación de tu pedido. No necesitas tener la app de PayPhone. Los pedidos confirmados antes de las 14:00 hrs en días hábiles se despachan el mismo día. Operamos de lunes a viernes, excepto feriados nacionales.',
   },
   {
     question: '¿Quién debería consultar antes de tomarlo?',

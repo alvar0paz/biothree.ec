@@ -2,7 +2,7 @@ import {redirect} from 'react-router';
 import type {Route} from './+types/cart.$lines';
 
 /**
- * Automatically creates a new cart based on the URL and redirects straight to checkout.
+ * Automatically creates a new cart based on the URL and redirects straight to /checkout.
  * Expected URL structure:
  * ```js
  * /cart/<variant_id>:<quantity>
@@ -57,12 +57,9 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
   // Update cart id in cookie
   const headers = cart.setCartId(cartResult.id);
 
-  // redirect to checkout
-  if (cartResult.checkoutUrl) {
-    return redirect(cartResult.checkoutUrl, {headers});
-  } else {
-    throw new Error('No checkout URL found');
-  }
+  // Straight to the storefront checkout (which itself falls back to
+  // Shopify's hosted checkout when payments aren't configured).
+  return redirect('/checkout', {headers});
 }
 
 export default function Component() {

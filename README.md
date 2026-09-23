@@ -28,7 +28,12 @@ yarn build
 
 The build generates GraphQL types using `.graphqlrc.ts`. Storefront queries
 and Customer Account queries are validated against their respective schemas.
-`app/lib/shopify-admin.ts` is a separate, manually typed Admin API client and
-is excluded from Storefront codegen; its payment-flow behavior is covered by
-the Admin client and payment-flow tests. New Admin operations should stay in
-that client unless a separate Admin schema/codegen project is configured.
+`app/lib/shopify-admin.ts` and `app/lib/shopify-checkout.ts` are separate,
+manually typed Admin API clients and are excluded from Storefront codegen;
+their behavior is covered by unit tests. New Admin operations should stay in
+those modules unless a separate Admin schema/codegen project is configured.
+
+## Payments
+
+Checkout lives in the storefront (`/checkout`) and charges cards through
+PayPhone's hosted payment button; see `docs/payphone-automation.md`.

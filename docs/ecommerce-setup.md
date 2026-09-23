@@ -11,10 +11,11 @@ hacer y qué no:
   (`availableForSale`, `quantityAvailable`) y lo muestra como "En stock" /
   "Quedan N unidades" / "Agotado". Un inventario paralelo en código se
   desincronizaría en la primera venta.
-- **El pago no se programa.** Hydrogen entrega el carrito al **checkout alojado
-  de Shopify** vía `cart.checkoutUrl`. Las pasarelas se activan en
-  *Configuración → Pagos*. Da igual cuál elijas: este repo no lleva código de
-  pagos.
+- **El pago sí se programa, pero poco.** Shopify Payments no opera en
+  Ecuador, así que el sitio tiene su propio checkout (`/checkout`) que crea el
+  pedido en Shopify y cobra con tarjeta a través de **PayPhone** (ver
+  `payphone-automation.md`). Envíos, IVA y descuentos los sigue calculando
+  Shopify: se configuran en el admin, no en el código.
 
 ---
 
@@ -65,12 +66,14 @@ mediante `PREVIEW_PRODUCT_HANDLE` / `PREVIEW_OPTION_NAME` /
   unidades"; la otra "En stock".
 - Agregar al carrito abre el panel lateral y sube el contador del header.
 - `/cart` lista las líneas, permite cambiar cantidades y muestra el subtotal.
-- "Finalizar compra" redirige al checkout de la tienda.
+- "Finalizar compra" lleva a `/checkout`, que sin credenciales de PayPhone
+  redirige al checkout de la tienda.
 
-Lo que **no** se puede verificar ahí: el checkout en sí. mock.shop aterriza a
-propósito en "Checkout unavailable", así que los métodos de pago
-(transferencia/DeUna, PayPhone) solo se prueban con la tienda real activa. Los
-precios salen en CAD; es la moneda de la demo, no un bug.
+Lo que **no** se puede verificar ahí: el checkout propio ni el pago. mock.shop
+aterriza a propósito en "Checkout unavailable"; el cobro con PayPhone solo se
+prueba con la tienda real (`npm run preview:payphone`, ver
+`payphone-automation.md`). Los precios salen en CAD; es la moneda de la demo,
+no un bug.
 
 Para ver el estado "Agotado", cambia en `.env.mock`
 `PREVIEW_PRODUCT_HANDLE=soft-cotton-hoodie-in-clay` (todas sus variantes están
@@ -136,95 +139,67 @@ aparecen precio, stock y "Agregar al carrito" solos.
 ## 3. Pagos
 
 Shopify Payments **no opera en Ecuador**, y PayPhone **no tiene integración
-oficial con Shopify** (su "Cajita de pagos" es para sitios a medida; sus
-plugins oficiales son WooCommerce y Prestashop). Decisión tomada el 6 de
-septiembre de 2026: **un solo método de pago manual** que cubre PayPhone, DeUna
-y transferencia, con enlaces de pago de PayPhone enviados a mano por pedido.
-Cero código, cero comisión de Shopify, y sirve para medir volumen antes de
-automatizar nada.
+oficial con Shopify** (su "Cajita de pagos" y su "Botón de pago" son para
+sitios a medida; sus plugins oficiales son WooCommerce y Prestashop).
 
-### 3a. Crear el método manual (una sola vez)
+Decisión del 22 de septiembre de 2026: **checkout propio en biothree.ec con
+el Botón de pago de PayPhone**. El cliente llena sus datos en el sitio, el
+sitio crea el pedido en Shopify (pendiente de pago, inventario reservado) y
+lo manda directo al formulario de tarjeta de PayPhone; al pagar vuelve al
+sitio con la confirmación y el pedido queda **Pagado** solo. Reemplaza la
+decisión del 6 de septiembre (método manual + enlace por correo), que exigía
+esperar un correo para pagar. Cómo funciona y cómo se configura:
+`payphone-automation.md`.
 
-*Configuración → Pagos → Métodos de pago manuales → Crear método de pago
-personalizado*
+### 3a. Qué configurar en el admin
 
-**Nombre del método de pago** (lo ve el cliente en el checkout):
-
-```
-PayPhone, DeUna o transferencia
-```
-
-**Instrucciones adicionales** (se muestran en el checkout y en el correo de
-confirmación; rellena los corchetes):
-
-```
-Tu pedido queda reservado por 24 horas. Elige cómo pagar:
-
-1) PayPhone (tarjeta de crédito o débito)
-   En unos minutos recibirás por correo un enlace de pago de PayPhone.
-   Ábrelo desde el celular y paga con tu tarjeta. No necesitas tener la app.
-
-2) DeUna
-   Escanea o paga al número [NÚMERO DEUNA] a nombre de [TITULAR].
-
-3) Transferencia bancaria
-   Banco: [BANCO]
-   Tipo de cuenta: [AHORROS/CORRIENTE]
-   Número: [NÚMERO DE CUENTA]
-   Titular: [RAZÓN SOCIAL]
-   RUC: [RUC]
-
-Envía el comprobante (DeUna o transferencia) por WhatsApp al [NÚMERO] o a
-[CORREO] indicando tu número de pedido. Despachamos apenas confirmamos el pago.
-```
-
-**Instrucciones de pago** (campo opcional que ve solo el equipo): deja
-`Enlace PayPhone → WhatsApp + correo → marcar como pagado`.
-
-Guardar y activar. Con esto "Finalizar compra" ya deja completar pedidos.
+- **Envíos** — *Configuración → Envíos*: zona Ecuador con sus tarifas. El
+  checkout muestra exactamente esas tarifas (hoy: *Standard*, gratis).
+- **Impuestos** — *Configuración → Impuestos*: IVA de Ecuador. El checkout
+  cobra la tasa configurada (hoy 12 %; revisa que sea la vigente).
+- **Método de pago manual** (*Configuración → Pagos*): ya no lo ve ningún
+  cliente, porque el sitio no enlaza al checkout de Shopify. Puedes dejarlo
+  activo como respaldo (si faltan credenciales, `/checkout` cae ahí) o
+  desactivarlo. Si lo dejas, cambia sus instrucciones para que no prometan un
+  correo con el enlace.
 
 ### 3b. Flujo por pedido
 
-Con la automatización de `payphone-automation.md` configurada:
-
-1. Llega el pedido como **Pago pendiente**; Shopify reserva el inventario.
-2. El sitio crea el enlace de PayPhone y se lo envía al cliente por correo
-   solo. El pedido queda con la etiqueta `payphone-link`.
-3. Cuando el cliente paga, el pedido pasa a **Pagado** solo (por la
-   notificación de PayPhone o, como máximo, 15 minutos después por la
-   conciliación). Etiqueta `payphone-paid`.
-4. **DeUna / transferencia** siguen siendo manuales: al recibir el
-   comprobante, abre el pedido y pulsa **Marcar como pagado**.
-5. Si a las 24 h no hay pago, cancela el pedido para liberar el stock.
-
-Mientras la automatización no esté configurada, el paso 2 se hace a mano en
-PayPhone Business (*enlace de pago* con el total y el número de pedido como
-referencia) y el paso 3 con *Marcar como pagado*.
+1. Llega el pedido como **Pago pendiente** con la etiqueta
+   `payphone-checkout`; Shopify reserva el inventario. El cliente ya está en
+   PayPhone.
+2. Cuando paga, el pedido pasa a **Pagado** solo (por la vuelta del cliente
+   al sitio o, como máximo, 15 minutos después por la conciliación). Etiqueta
+   `payphone-paid`.
+3. Si a las 24 h sigue pendiente (cerró PayPhone y no volvió), cancela el
+   pedido para liberar el stock o mándale por WhatsApp
+   `https://biothree.ec/pagar/<id numérico del pedido>`.
+4. **Transferencia o DeUna** ya no se ofrecen en el sitio. Si un cliente lo
+   pide, crea el pedido a mano en el admin (*Pedidos → Crear pedido → Pago
+   pendiente*) y márcalo pagado al recibir el comprobante.
 
 Costo: PayPhone cobra su tarifa por cobro (≈ 5% + IVA publicado; confírmalo en
-tu contrato). DeUna y transferencia: 0%. Shopify no cobra comisión por métodos
-manuales.
+tu contrato). Shopify no cobra comisión por pedidos creados por la API.
 
-### 3c. Automatización
+### 3c. Alternativas descartadas y por qué
 
-Está construida: ver `docs/payphone-automation.md` para la puesta en marcha
-(app personalizada, webhook, credenciales de PayPhone, variables en Oxygen y
-el workflow de conciliación).
-
-Alternativas descartadas y por qué:
-
+- **Método manual + enlace de PayPhone por correo** (implementación del 6 de
+  septiembre de 2026): funcionaba, pero el cliente tenía que esperar un correo
+  y pagar desde ahí, sin volver al sitio. El código sigue en
+  `app/lib/payphone-flow.ts` (`handleOrderCreated`) para los pedidos que
+  entren por el checkout de Shopify.
+- **Enlaces de pago (API Links) con redirección**: la API de enlaces no
+  devuelve al cliente al sitio (confirmado en la documentación de PayPhone).
+- **Extensión de Shopify en la página "Gracias"**: permitiría un botón hacia
+  PayPhone después del checkout de Shopify, pero exige desplegar una app con
+  extensiones y activarla en el editor de checkout, y el cliente igual tendría
+  que hacer clic ahí. El checkout propio lo evita.
 - **Payphone by CartDNA** (app de Shopify): gratis y se integra al checkout,
   pero es de un tercero (Nabeyond Ltd), lanzada en enero de 2026 y sin reseñas.
   Vale la pena reevaluarla cuando tenga historial.
-- **Cajita de pagos de PayPhone** dentro del sitio: implica reemplazar el
-  checkout de Shopify (dirección, envío, IVA, descuentos, facturación) por uno
-  propio. Semanas de trabajo para una tienda de un producto.
 - **Kushki** ≈ 2.95% + $0.25, con contrato y onboarding. Reconsiderar cuando el
   volumen haga que la tarifa de PayPhone duela.
 - **Datafast** y **Place to Pay**: onboarding bancario/corporativo pesado.
-
-Cambiar de método después **no toca este repo**: se activa el nuevo en *Pagos*
-y el checkout lo muestra.
 
 ---
 
@@ -232,7 +207,8 @@ y el checkout lo muestra.
 
 - **Facturación SRI** — Shopify **no** emite comprobantes autorizados por el
   SRI. Hace falta una app de terceros (p. ej. Facturec, ≈ $9.99/mes) que
-  capture cédula/RUC en el checkout y genere la factura al pagarse el pedido.
+  genere la factura al pagarse el pedido. El checkout propio ya guarda la
+  cédula/RUC del cliente como atributo del pedido (`Cédula / RUC`).
   Resuélvelo antes de la primera venta, no después.
 - **Envíos** — *Configuración → Envíos*: crear zona Ecuador con tarifas
   (Quito/Guayaquil vs. resto del país, o envío gratis sobre cierto monto).
@@ -252,9 +228,10 @@ y el checkout lo muestra.
 - [ ] Precio, SKU y stock cargados en ambas variantes
 - [ ] `/productos` muestra precio y "Agregar al carrito" (no el CTA de Instagram)
 - [ ] Agregar al carrito abre el panel lateral y el contador del header sube
-- [ ] "Finalizar compra" lleva al checkout de Shopify
-- [ ] Método manual "PayPhone, DeUna o transferencia" activo con datos reales
+- [ ] "Finalizar compra" lleva a `/checkout` y muestra envío, IVA y total
+- [ ] Variables de PayPhone y de la app de Shopify cargadas en Oxygen (Production)
 - [ ] Zona de envío Ecuador configurada
-- [ ] Pedido de prueba completo, de principio a fin
+- [ ] Pedido de prueba completo, de principio a fin: pagar en PayPhone y volver
+      al sitio con "¡Pago confirmado!" y el pedido en **Pagado**
 - [ ] Facturación SRI resuelta
 - [ ] Poner una variante en stock 0 y confirmar que muestra "Agotado"

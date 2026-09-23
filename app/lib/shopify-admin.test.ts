@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {adminRequest, getAdminAccessToken, resetAdminTokenCache, type AdminEnv} from './shopify-admin';
+import {adminRequest, getAdminAccessToken, getAdminScopes, resetAdminTokenCache, type AdminEnv} from './shopify-admin';
 
 const env: AdminEnv = {
   PUBLIC_STORE_DOMAIN: 'test.myshopify.com',
@@ -66,6 +66,12 @@ describe('getAdminAccessToken', () => {
       'shpat_static',
     );
     expect(calls).toHaveLength(0);
+  });
+
+  it('reports the granted scopes, or null for a static token', async () => {
+    mockFetch();
+    expect(await getAdminScopes(env)).toEqual(['read_orders', 'write_orders']);
+    expect(await getAdminScopes({PUBLIC_STORE_DOMAIN: 'x', SHOPIFY_ADMIN_API_TOKEN: 'shpat'})).toBeNull();
   });
 
   it('fails clearly without any credentials', async () => {

@@ -10,6 +10,7 @@
     "preview": "shopify hydrogen preview --build",
     "preview:local": "vite --config vite.local-preview.config.ts",
     "preview:mock": "vite --config vite.local-preview.config.ts --mode mock",
+    "preview:payphone": "vite --config vite.local-preview.config.ts --mode payphone",
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "react-router typegen && tsc --noEmit",
     "test": "vitest run",

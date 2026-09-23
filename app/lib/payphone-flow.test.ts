@@ -1,5 +1,14 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {handleOrderCreated, reconcilePendingOrders, settleTransaction, type FlowEnv} from './payphone-flow';
+import {
+  confirmPayphonePayment,
+  handleOrderCreated,
+  payphoneReturnUrls,
+  reconcilePendingOrders,
+  settleTransaction,
+  startPayphonePayment,
+  type FlowEnv,
+} from './payphone-flow';
+import {normalizeOrder} from './shopify-admin';
 
 const env: FlowEnv = {
   PUBLIC_STORE_DOMAIN: 'test.myshopify.com',
@@ -10,6 +19,7 @@ const env: FlowEnv = {
 
 const ORDER_ID = '6123456789012';
 const ORDER_GID = `gid://shopify/Order/${ORDER_ID}`;
+const CARD_URL = 'https://pay.payphonetodoesposible.com/Anonymous/Index?paymentId=GCjd4uI8';
 
 function rawOrder(overrides: Record<string, unknown> = {}) {
   return {
@@ -17,6 +27,8 @@ function rawOrder(overrides: Record<string, unknown> = {}) {
     legacyResourceId: ORDER_ID,
     name: '#1001',
     email: 'cliente@example.com',
+    phone: '+593991234567',
+    customAttributes: [],
     displayFinancialStatus: 'PENDING',
     taxesIncluded: true,
     totalPriceSet: {shopMoney: {amount: '28.95', currencyCode: 'USD'}},
@@ -30,6 +42,13 @@ function rawOrder(overrides: Record<string, unknown> = {}) {
   };
 }
 
+const checkoutOrder = (overrides: Record<string, unknown> = {}) =>
+  rawOrder({
+    tags: ['payphone-checkout'],
+    customAttributes: [{key: 'Cédula / RUC', value: '1710034065'}],
+    ...overrides,
+  });
+
 type AdminBody = {query: string; variables: Record<string, any>};
 type Call = {url: string; method: string; body: any};
 
@@ -41,6 +60,8 @@ function mockFetch(handlers: {
   order?: () => unknown;
   orders?: () => unknown[];
   sale?: (path: string) => unknown | null;
+  confirm?: (body: {id: number; clientTxId: string}) => unknown | null;
+  prepare?: (body: Record<string, unknown>) => Response | Record<string, unknown>;
   linksStatus?: number;
   linksBody?: string;
 }) {
@@ -80,6 +101,18 @@ function mockFetch(handlers: {
         status: handlers.linksStatus ?? 200,
       });
     }
+    if (url.endsWith('/api/button/Prepare')) {
+      const answer = handlers.prepare
+        ? handlers.prepare(body as Record<string, unknown>)
+        : {paymentId: 'GCjd4uI8', payWithCard: CARD_URL, payWithPayPhone: CARD_URL};
+      return answer instanceof Response ? answer : Response.json(answer);
+    }
+    if (url.endsWith('/api/button/V2/Confirm')) {
+      const sale = handlers.confirm ? handlers.confirm(body as {id: number; clientTxId: string}) : null;
+      return sale
+        ? Response.json(sale)
+        : new Response('{"message":"La transacción no existe","errorCode":20}', {status: 404});
+    }
     if (url.includes('/api/Sale/')) {
       const sale = handlers.sale ? handlers.sale(new URL(url).pathname) : null;
       return sale ? Response.json(sale) : new Response('', {status: 404});
@@ -94,6 +127,9 @@ const adminOps = (calls: Call[]) =>
   calls
     .filter((call) => call.url.includes('/admin/api/'))
     .map((call) => /(query|mutation) (\w+)/.exec((call.body as AdminBody).query)?.[2]);
+
+const payphoneCalls = (calls: Call[]) =>
+  calls.filter((call) => call.url.includes('payphonetodoesposible')).map((call) => new URL(call.url).pathname);
 
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -162,6 +198,24 @@ describe('handleOrderCreated', () => {
     expect(calls).toHaveLength(0);
   });
 
+  it('leaves storefront-checkout orders to the button flow (no link, no email)', async () => {
+    // Tag visible in the webhook payload: not even an Admin call.
+    const first = mockFetch({order: () => checkoutOrder()});
+    const fromPayload = await handleOrderCreated(
+      {admin_graphql_api_id: ORDER_GID, financial_status: 'pending', tags: 'vip, payphone-checkout'},
+      env,
+    );
+    expect(fromPayload).toMatchObject({status: 'skipped', reason: 'checkout-order'});
+    expect(first.calls).toHaveLength(0);
+
+    // Tag only on the re-read order (payload without tags).
+    const second = mockFetch({order: () => checkoutOrder()});
+    const fromOrder = await handleOrderCreated({admin_graphql_api_id: ORDER_GID, financial_status: 'pending'}, env);
+    expect(fromOrder).toMatchObject({status: 'skipped', reason: 'checkout-order'});
+    expect(second.calls.some((call) => call.url.endsWith('/api/Links'))).toBe(false);
+    expect(adminOps(second.calls)).toEqual(['PaymentOrder']);
+  });
+
   it('is idempotent: a retry finds the stored link and stops', async () => {
     const {calls} = mockFetch({
       order: () => rawOrder({payphoneLink: {value: 'https://payp.page.link/old'}, payphoneClientTx: {value: ORDER_ID}}),
@@ -192,6 +246,175 @@ describe('handleOrderCreated', () => {
   });
 });
 
+describe('payphoneReturnUrls', () => {
+  it('builds the response and cancellation URLs on the request origin', () => {
+    expect(payphoneReturnUrls('https://biothree.ec', ORDER_ID)).toEqual({
+      responseUrl: 'https://biothree.ec/pago/payphone/respuesta',
+      cancellationUrl: `https://biothree.ec/pago/payphone/cancelado?pedido=${ORDER_ID}`,
+    });
+  });
+});
+
+describe('startPayphonePayment', () => {
+  const urls = payphoneReturnUrls('https://biothree.ec', ORDER_ID);
+
+  it('prepares the payment for the outstanding amount and records the attempt', async () => {
+    const {calls} = mockFetch({});
+    const order = normalizeOrder(checkoutOrder());
+
+    const result = await startPayphonePayment(order, env, urls);
+
+    expect(result).toEqual({url: CARD_URL, clientTransactionId: ORDER_ID});
+    const prepare = calls.find((call) => call.url.endsWith('/api/button/Prepare'));
+    expect(prepare?.body).toMatchObject({
+      amount: 2895,
+      tax: 378,
+      amountWithTax: 2517,
+      amountWithoutTax: 0,
+      service: 0,
+      tip: 0,
+      clientTransactionId: ORDER_ID,
+      reference: 'Biothree #1001',
+      responseUrl: urls.responseUrl,
+      cancellationUrl: urls.cancellationUrl,
+      email: 'cliente@example.com',
+      phoneNumber: '+593991234567',
+      documentId: '1710034065',
+    });
+    expect(adminOps(calls)).toEqual(['SavePaymentLink']);
+    const save = calls.find((call) => (call.body as AdminBody | null)?.query?.includes('SavePaymentLink'));
+    const metafields = (save?.body as AdminBody).variables.metafields as Array<{key: string; value: string}>;
+    expect(metafields).toEqual([
+      expect.objectContaining({key: 'payphone_link', value: CARD_URL}),
+      expect.objectContaining({key: 'payphone_client_tx', value: ORDER_ID}),
+    ]);
+  });
+
+  it('uses a fresh attempt id after a previous attempt', async () => {
+    const {calls} = mockFetch({});
+    const order = normalizeOrder(checkoutOrder({payphoneClientTx: {value: `${ORDER_ID}-2`}}));
+    const result = await startPayphonePayment(order, env, urls);
+    expect(result.clientTransactionId).toBe(`${ORDER_ID}-3`);
+    expect(calls.find((call) => call.url.endsWith('/api/button/Prepare'))?.body.clientTransactionId).toBe(
+      `${ORDER_ID}-3`,
+    );
+  });
+
+  it('skips past an id PayPhone already knows (attempt not recorded on the order)', async () => {
+    const {calls} = mockFetch({
+      prepare: (body) =>
+        body.clientTransactionId === ORDER_ID
+          ? new Response('{"message":"Ya existe una transacción","errorCode":23}', {status: 400})
+          : {paymentId: 'p2', payWithCard: CARD_URL, payWithPayPhone: CARD_URL},
+    });
+    const result = await startPayphonePayment(normalizeOrder(checkoutOrder()), env, urls);
+    expect(result.clientTransactionId).toBe(`${ORDER_ID}-2`);
+    expect(calls.filter((call) => call.url.endsWith('/api/button/Prepare'))).toHaveLength(2);
+  });
+
+  it('propagates other PayPhone errors and refuses paid orders', async () => {
+    mockFetch({prepare: () => new Response('{"message":"Validaciones fallidas","errorCode":800}', {status: 400})});
+    await expect(startPayphonePayment(normalizeOrder(checkoutOrder()), env, urls)).rejects.toThrow(
+      /Prepare API 400/,
+    );
+
+    const {calls} = mockFetch({});
+    await expect(
+      startPayphonePayment(normalizeOrder(checkoutOrder({displayFinancialStatus: 'PAID'})), env, urls),
+    ).rejects.toThrow(/already paid/);
+    expect(calls).toHaveLength(0);
+  });
+});
+
+describe('confirmPayphonePayment', () => {
+  const approved = {
+    transactionId: 23178284,
+    clientTransactionId: ORDER_ID,
+    transactionStatus: 'Approved',
+    statusCode: 3,
+    amount: 2895,
+    authorizationCode: 'W23178284',
+    messageCode: 0,
+    message: null,
+  };
+
+  it('confirms with PayPhone and marks the order paid on a matching approval', async () => {
+    const {calls} = mockFetch({
+      order: () => checkoutOrder({payphoneClientTx: {value: ORDER_ID}}),
+      confirm: (body) => (body.id === 23178284 && body.clientTxId === ORDER_ID ? approved : null),
+    });
+    const result = await confirmPayphonePayment({transactionId: '23178284', clientTransactionId: ORDER_ID}, env);
+    expect(result).toEqual({
+      status: 'paid',
+      order: '#1001',
+      transactionId: 23178284,
+      authorizationCode: 'W23178284',
+    });
+    expect(payphoneCalls(calls)).toEqual(['/api/button/V2/Confirm']);
+    expect(adminOps(calls)).toEqual(['PaymentOrder', 'MarkPaid', 'AddTags']);
+  });
+
+  it('is harmless to reload: a paid order is reported as already paid without a second MarkPaid', async () => {
+    const {calls} = mockFetch({
+      order: () => checkoutOrder({displayFinancialStatus: 'PAID', tags: ['payphone-checkout', 'payphone-paid']}),
+      confirm: () => approved,
+    });
+    const result = await confirmPayphonePayment({transactionId: 23178284, clientTransactionId: ORDER_ID}, env);
+    expect(result).toMatchObject({status: 'skipped', reason: 'already-paid', order: '#1001'});
+    expect(adminOps(calls)).toEqual(['PaymentOrder']);
+  });
+
+  it('reports rejected, unknown and mismatched transactions without touching the order', async () => {
+    const cases: Array<{
+      ref: {transactionId: string | null; clientTransactionId: string};
+      confirm: unknown;
+      order?: Record<string, unknown>;
+      reason: string;
+    }> = [
+      {ref: {transactionId: null, clientTransactionId: ORDER_ID}, confirm: approved, reason: 'sale-not-found'},
+      {ref: {transactionId: '1', clientTransactionId: ORDER_ID}, confirm: null, reason: 'sale-not-found'},
+      {
+        ref: {transactionId: '23178284', clientTransactionId: ORDER_ID},
+        confirm: {...approved, statusCode: 2, transactionStatus: 'Canceled', message: 'Fondos insuficientes'},
+        reason: 'not-approved',
+      },
+      {
+        ref: {transactionId: '23178284', clientTransactionId: ORDER_ID},
+        confirm: {...approved, clientTransactionId: '7000000000001'},
+        reason: 'client-tx-mismatch',
+      },
+      {
+        ref: {transactionId: '23178284', clientTransactionId: ORDER_ID},
+        confirm: {...approved, amount: 100},
+        reason: 'amount-mismatch',
+      },
+      {
+        ref: {transactionId: '23178284', clientTransactionId: `${ORDER_ID}-2`},
+        confirm: {...approved, clientTransactionId: `${ORDER_ID}-2`},
+        order: {payphoneClientTx: {value: `${ORDER_ID}-3`}},
+        reason: 'client-tx-mismatch',
+      },
+    ];
+    for (const testCase of cases) {
+      const {calls} = mockFetch({
+        order: () => checkoutOrder(testCase.order),
+        confirm: () => testCase.confirm,
+      });
+      const result = await confirmPayphonePayment(testCase.ref, env);
+      expect(result, testCase.reason).toMatchObject({status: 'skipped', reason: testCase.reason});
+      expect(adminOps(calls), testCase.reason).not.toContain('MarkPaid');
+    }
+  });
+
+  it('lets a PayPhone outage bubble up so the page can retry within the window', async () => {
+    mockFetch({});
+    vi.mocked(fetch).mockImplementation(async () => new Response('down', {status: 503}));
+    await expect(
+      confirmPayphonePayment({transactionId: '23178284', clientTransactionId: ORDER_ID}, env),
+    ).rejects.toThrow(/Confirm API 503/);
+  });
+});
+
 describe('settleTransaction', () => {
   const approvedSale = {
     transactionId: 45441137,
@@ -208,7 +431,7 @@ describe('settleTransaction', () => {
       sale: (path) => (path === `/api/Sale/client/${ORDER_ID}` ? approvedSale : null),
     });
     const result = await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
-    expect(result).toEqual({status: 'paid', order: '#1001', transactionId: 45441137});
+    expect(result).toEqual({status: 'paid', order: '#1001', transactionId: 45441137, authorizationCode: null});
     expect(adminOps(calls)).toEqual(['PaymentOrder', 'MarkPaid', 'AddTags']);
   });
 
@@ -278,6 +501,28 @@ describe('settleTransaction', () => {
     const result = await settleTransaction({clientTransactionId: ORDER_ID}, env);
     expect(result).toMatchObject({status: 'skipped', reason: 'order-not-found'});
   });
+
+  it('confirms an approved button transaction before settling when asked to', async () => {
+    const {calls} = mockFetch({
+      order: () => checkoutOrder({payphoneClientTx: {value: ORDER_ID}}),
+      sale: (path) => (path === `/api/Sale/client/${ORDER_ID}` ? approvedSale : null),
+      confirm: (body) => (body.id === 45441137 ? {...approvedSale, authorizationCode: 'W1'} : null),
+    });
+    const result = await settleTransaction({clientTransactionId: ORDER_ID}, env, {confirm: true});
+    expect(result).toMatchObject({status: 'paid', authorizationCode: 'W1'});
+    expect(payphoneCalls(calls)).toEqual([`/api/Sale/client/${ORDER_ID}`, '/api/button/V2/Confirm']);
+  });
+
+  it('does not settle a button transaction PayPhone will not confirm', async () => {
+    const {calls} = mockFetch({
+      order: () => checkoutOrder(),
+      sale: () => approvedSale,
+      confirm: () => null,
+    });
+    const result = await settleTransaction({clientTransactionId: ORDER_ID}, env, {confirm: true});
+    expect(result).toMatchObject({status: 'skipped', reason: 'unconfirmed'});
+    expect(adminOps(calls)).not.toContain('MarkPaid');
+  });
 });
 
 describe('reconcilePendingOrders', () => {
@@ -305,5 +550,21 @@ describe('reconcilePendingOrders', () => {
       {order: '#1002', result: 'skipped', reason: 'sale-not-found'},
     ]);
     expect(adminOps(calls).filter((op) => op === 'MarkPaid')).toHaveLength(1);
+    // Link-flow orders are settled from the Sale lookup alone.
+    expect(payphoneCalls(calls)).not.toContain('/api/button/V2/Confirm');
+  });
+
+  it('confirms button transactions of storefront-checkout orders before settling', async () => {
+    const clientTx = `${ORDER_ID}-2`;
+    const sale = {transactionId: 9, clientTransactionId: clientTx, transactionStatus: 'Approved', statusCode: 3, amount: 2895};
+    const {calls} = mockFetch({
+      orders: () => [checkoutOrder({payphoneClientTx: {value: clientTx}})],
+      order: () => checkoutOrder({payphoneClientTx: {value: clientTx}}),
+      sale: (path) => (path === `/api/Sale/client/${clientTx}` ? sale : null),
+      confirm: (body) => (body.id === 9 && body.clientTxId === clientTx ? sale : null),
+    });
+    const result = await reconcilePendingOrders(env);
+    expect(result).toMatchObject({checked: 1, paid: 1});
+    expect(payphoneCalls(calls)).toEqual([`/api/Sale/client/${clientTx}`, '/api/button/V2/Confirm']);
   });
 });

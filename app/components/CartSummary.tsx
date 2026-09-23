@@ -2,9 +2,10 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useRef} from 'react';
-import {useFetcher} from 'react-router';
+import {Link, useFetcher} from 'react-router';
 import type {FetcherWithComponents} from 'react-router';
 import {buttonClasses} from '~/components/marketing/Button';
+import {useAside} from '~/components/Aside';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -27,11 +28,11 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           )}
         </dd>
       </dl>
-      {/* Shipping and taxes are calculated by Shopify at checkout — saying so
-          here prevents the "why did the total change?" drop-off. */}
+      {/* Shipping and taxes are calculated at checkout — saying so here
+          prevents the "why did the total change?" drop-off. */}
       <p className="bt-note pb-3 text-muted">
         Envío e impuestos se calculan al finalizar la compra. Pagas con
-        PayPhone, DeUna o transferencia.
+        tarjeta de crédito o débito a través de PayPhone.
       </p>
       <CartDiscounts discountCodes={cart?.discountCodes} layout={layout} />
       {/* Gift cards aren't sold here, so the drawer skips the field. The full
@@ -39,26 +40,29 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       {layout === 'page' && (
         <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
       )}
-      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+      <CartCheckoutActions hasLines={Boolean(cart?.lines?.nodes?.length)} />
     </div>
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
-  if (!checkoutUrl) return null;
+function CartCheckoutActions({hasLines}: {hasLines: boolean}) {
+  const {close} = useAside();
+  if (!hasLines) return null;
 
   return (
     <div className="pt-3">
-      {/* checkoutUrl points at Shopify's hosted checkout, which is where the
-          payment providers configured in the admin (transferencia, PayPhone…)
-          actually appear. Nothing about payment lives in this app. */}
-      <a
-        href={checkoutUrl}
-        target="_self"
+      {/* /checkout is the storefront's own checkout: it collects the address,
+          creates the order and sends the customer straight to PayPhone. When
+          the payment secrets aren't configured it falls back to Shopify's
+          hosted checkout by itself. */}
+      <Link
+        to="/checkout"
+        prefetch="intent"
+        onClick={close}
         className={buttonClasses({className: 'w-full'})}
       >
         Finalizar compra
-      </a>
+      </Link>
     </div>
   );
 }

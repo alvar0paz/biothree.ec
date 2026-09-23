@@ -1,7 +1,8 @@
-// Minimal Admin GraphQL client for the payment-link flow. Server-only.
+// Minimal Admin GraphQL client for the PayPhone payment flows. Server-only.
 //
 // Auth: a Dev Dashboard app (dev.shopify.com) installed on the store, with
-// `read_orders` and `write_orders`. Its Client ID + Client Secret are
+// `read_orders`, `write_orders` and `write_draft_orders` (the storefront
+// checkout creates orders as draft orders). Its Client ID + Client Secret are
 // exchanged for a 24h Admin API token via the client-credentials grant and
 // cached in memory. A static SHOPIFY_ADMIN_API_TOKEN is also accepted for
 // legacy admin-created custom apps.
@@ -14,8 +15,13 @@ export const ADMIN_API_VERSION = '2025-07';
 export const METAFIELD_NAMESPACE = 'biothree';
 export const METAFIELD_LINK_KEY = 'payphone_link';
 export const METAFIELD_CLIENT_TX_KEY = 'payphone_client_tx';
+/** An order has at least one PayPhone payment attempt (link or button). */
 export const TAG_LINK_SENT = 'payphone-link';
 export const TAG_PAID = 'payphone-paid';
+/** Placed through the storefront's own checkout: pays via the PayPhone button. */
+export const TAG_CHECKOUT = 'payphone-checkout';
+/** Order attribute that carries the buyer's cédula/RUC for invoicing. */
+export const DOCUMENT_ATTRIBUTE_KEY = 'Cédula / RUC';
 
 export type AdminEnv = {
   PUBLIC_STORE_DOMAIN: string;
@@ -41,7 +47,7 @@ export function hasAdminCredentials(env: Partial<AdminEnv>): boolean {
   );
 }
 
-type CachedToken = {key: string; token: string; expiresAt: number};
+type CachedToken = {key: string; token: string; expiresAt: number; scopes: string[]};
 let cachedToken: CachedToken | null = null;
 
 /** Test hook: forget the cached client-credentials token. */
@@ -82,15 +88,29 @@ export async function getAdminAccessToken(env: AdminEnv): Promise<string> {
       `Client credentials grant ${response.status}: ${text.slice(0, 300)}`,
     );
   }
-  const json = (await response.json()) as {access_token?: string; expires_in?: number};
+  const json = (await response.json()) as {access_token?: string; expires_in?: number; scope?: string};
   if (!json.access_token) throw new ShopifyAdminError('Client credentials grant returned no token');
 
   cachedToken = {
     key,
     token: json.access_token,
     expiresAt: Date.now() + (json.expires_in ?? 3600) * 1000,
+    scopes: (json.scope ?? '')
+      .split(',')
+      .map((scope) => scope.trim())
+      .filter(Boolean),
   };
   return json.access_token;
+}
+
+/**
+ * Access scopes the store granted the app, as reported by the token
+ * exchange. Null with a static token, whose scopes are not visible here.
+ */
+export async function getAdminScopes(env: AdminEnv): Promise<string[] | null> {
+  if (env.SHOPIFY_ADMIN_API_TOKEN) return null;
+  const token = await getAdminAccessToken(env);
+  return cachedToken?.token === token ? cachedToken.scopes : null;
 }
 
 type Money = {amount: string; currencyCode: string};
@@ -101,6 +121,9 @@ export type PaymentOrder = {
   legacyResourceId: string;
   name: string;
   email: string | null;
+  phone: string | null;
+  /** Cédula/RUC captured by the storefront checkout, when present. */
+  documentId: string | null;
   displayFinancialStatus: string | null;
   taxesIncluded: boolean;
   totalPrice: Money;
@@ -112,12 +135,14 @@ export type PaymentOrder = {
   payphoneClientTx: string | null;
 };
 
-const PAYMENT_ORDER_FRAGMENT = `#graphql
+export const PAYMENT_ORDER_FRAGMENT = `#graphql
   fragment PaymentOrder on Order {
     id
     legacyResourceId
     name
     email
+    phone
+    customAttributes { key value }
     displayFinancialStatus
     taxesIncluded
     totalPriceSet { shopMoney { amount currencyCode } }
@@ -130,11 +155,13 @@ const PAYMENT_ORDER_FRAGMENT = `#graphql
   }
 `;
 
-type RawOrder = {
+export type RawOrder = {
   id: string;
   legacyResourceId: string;
   name: string;
   email: string | null;
+  phone?: string | null;
+  customAttributes?: Array<{key: string; value: string | null}> | null;
   displayFinancialStatus: string | null;
   taxesIncluded: boolean;
   totalPriceSet: {shopMoney: Money};
@@ -146,12 +173,17 @@ type RawOrder = {
   payphoneClientTx: {value: string} | null;
 };
 
-function normalizeOrder(raw: RawOrder): PaymentOrder {
+export function normalizeOrder(raw: RawOrder): PaymentOrder {
+  const documentAttribute = (raw.customAttributes ?? []).find(
+    (attribute) => attribute.key === DOCUMENT_ATTRIBUTE_KEY && attribute.value,
+  );
   return {
     id: raw.id,
     legacyResourceId: raw.legacyResourceId,
     name: raw.name,
     email: raw.email,
+    phone: raw.phone ?? null,
+    documentId: documentAttribute?.value ?? null,
     displayFinancialStatus: raw.displayFinancialStatus,
     taxesIncluded: raw.taxesIncluded,
     totalPrice: raw.totalPriceSet.shopMoney,
@@ -217,6 +249,11 @@ export function orderGid(legacyId: string | number): string {
   return `gid://shopify/Order/${legacyId}`;
 }
 
+/** Paid per Shopify, or already settled by this flow (tag survives edits). */
+export function isOrderPaid(order: Pick<PaymentOrder, 'displayFinancialStatus' | 'tags'>): boolean {
+  return order.displayFinancialStatus === 'PAID' || order.tags.includes(TAG_PAID);
+}
+
 export async function getOrder(env: AdminEnv, id: string): Promise<PaymentOrder | null> {
   const data = await adminRequest<{order: RawOrder | null}>(
     env,
@@ -229,7 +266,7 @@ export async function getOrder(env: AdminEnv, id: string): Promise<PaymentOrder 
   return data.order ? normalizeOrder(data.order) : null;
 }
 
-/** Pending orders that already got a link, newest first. */
+/** Pending orders with at least one PayPhone attempt (link or button), newest first. */
 export async function findPendingPayphoneOrders(
   env: AdminEnv,
   first = 25,
@@ -249,6 +286,11 @@ export async function findPendingPayphoneOrders(
   return data.orders.nodes.map(normalizeOrder);
 }
 
+/**
+ * Records the latest PayPhone attempt on the order: the URL the customer was
+ * given (emailed link or hosted button page) and its clientTransactionId.
+ * Overwrites the previous attempt, which is what the reconcile job wants.
+ */
 export async function savePaymentLink(
   env: AdminEnv,
   orderId: string,

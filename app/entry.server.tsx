@@ -54,6 +54,11 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
+  // PayPhone's hosted payment form only opens when the browser arrives from
+  // the domain registered in PayPhone Developer, which it reads from the
+  // Referer header. This is the browsers' default policy, made explicit so
+  // the origin keeps being sent on the redirect from /checkout.
+  responseHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   return new Response(body, {
     headers: responseHeaders,
