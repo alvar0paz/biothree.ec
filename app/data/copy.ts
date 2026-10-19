@@ -5,6 +5,12 @@
 // Social/contact links and fallback when Shopify product data is unavailable.
 export const INSTAGRAM_URL = 'https://instagram.com/biothree.ec';
 
+// Current commercial operator; import arrangements are described separately.
+export const COMMERCIAL_COMPANY = {
+  name: 'Biostradeglobal',
+  url: 'https://biostradeglobal.com',
+} as const;
+
 // Assets live in app/assets/biothree and are bundled through Vite, so they get
 // hashed/cached URLs. Import them here once and reference via ASSETS everywhere.
 import probioticChain from '~/assets/biothree/probiotic-chain.png';
@@ -50,7 +56,7 @@ export const hero = {
   primaryCta: 'Comprar Biothree',
   secondaryCta: 'Ver cómo funciona',
   // Spec-sheet entries under the hero CTAs (label + value), instead of a
-  // generic dotted strip. The importer stays in the footer's legal line.
+  // generic dotted strip. The commercial operator is identified in the footer.
   facts: [
     {label: 'Origen', value: 'Fórmula japonesa'},
     {label: 'Uso', value: 'Según el empaque'},
@@ -188,7 +194,5 @@ export const footer = {
   ],
   disclaimer:
     'Biothree es un suplemento alimenticio, no un medicamento. Consulta siempre las indicaciones del empaque. La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud.',
-  // Company legal name is the only all-caps element.
-  importer: 'BIOSCIENCE TRADING EC',
   copyright: '© 2026 Biothree Ecuador. Todos los derechos reservados.',
 };

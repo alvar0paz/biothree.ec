@@ -1,5 +1,5 @@
 import {Link} from 'react-router';
-import {footer} from '~/data/copy';
+import {COMMERCIAL_COMPANY, footer} from '~/data/copy';
 import biothreeLogo from '~/assets/biothree1.png';
 
 function FooterLink({href, label}: {href: string; label: string}) {
@@ -50,8 +50,13 @@ export function Footer() {
           <p className="max-w-[76ch]">{footer.disclaimer}</p>
           <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-6">
             <p>
-              Importado y distribuido por{' '}
-              <span className="font-medium text-ink/80">{footer.importer}</span>
+              Comercializado por{' '}
+              <a
+                href={COMMERCIAL_COMPANY.url}
+                className="font-medium text-ink/80 underline underline-offset-4"
+              >
+                {COMMERCIAL_COMPANY.name}
+              </a>
               {' · Ecuador'}
             </p>
             <p>{footer.copyright}</p>
