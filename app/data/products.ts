@@ -45,8 +45,8 @@ export const products: Product[] = [
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Tabletas',
     idealFor: 'Una rutina constante y fácil de llevar',
-    usage: 'Con alimentos, según la fase de uso',
-    format: 'Blíster de alta barrera',
+    usage: 'Según las indicaciones del empaque',
+    format: 'Tabletas en blíster',
   },
   {
     id: 'biothree-sobres',
@@ -61,8 +61,8 @@ export const products: Product[] = [
     image: ASSETS.productSobres,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Sobres',
-    idealFor: 'Personas con dificultad para deglutir',
-    usage: 'Con alimentos, según la fase de uso',
-    format: 'Sachets de polvo oral biosoluble',
+    idealFor: 'Quienes prefieren una presentación en polvo',
+    usage: 'Según las indicaciones del empaque',
+    format: 'Sobres individuales de polvo oral',
   },
 ];

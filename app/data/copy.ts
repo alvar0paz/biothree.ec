@@ -1,7 +1,6 @@
 // Central place for shared Spanish copy and asset paths.
-// Compliance note: keep language safe — acompaña / apoya / contribuye /
-// bienestar digestivo / rutina diaria / equilibrio intestinal / microbiota.
-// Avoid: cura, trata, previene enfermedades, desinflama, etc.
+// Match every claim to evidence for the specific preparation. Softer verbs alone
+// do not substantiate a benefit. Keep dosing tied to the current Ecuador label.
 
 // Social/contact links and fallback when Shopify product data is unavailable.
 export const INSTAGRAM_URL = 'https://instagram.com/biothree.ec';
@@ -41,6 +40,7 @@ export const heroBacteria = [
 export const NAV = [
   {label: 'Producto', href: '/productos'},
   {label: 'Ciencia', href: '/ciencia'},
+  {label: 'Blog', href: '/blogs/ciencia-intestinal'},
 ] as const;
 
 export const hero = {
@@ -53,29 +53,30 @@ export const hero = {
   // generic dotted strip. The importer stays in the footer's legal line.
   facts: [
     {label: 'Origen', value: 'Fórmula japonesa'},
-    {label: 'Uso', value: 'Diario, con las comidas'},
+    {label: 'Uso', value: 'Según el empaque'},
     {label: 'Presentaciones', value: 'Tabletas y sobres'},
   ],
 };
 
 export const benefits = {
-  title:
-    'Una sola fórmula para acompañar tres momentos clave de tu bienestar intestinal.',
+  title: 'Tres claves para conocer Biothree.',
   cards: [
     {
-      title: 'Digestión diaria',
+      title: 'Tres tipos de bacterias',
       description:
-        'Acompaña tu bienestar digestivo como parte de una rutina constante.',
+        'La fórmula reúne bacterias sacarolíticas, lácticas y productoras de butirato.',
       icon: ASSETS.iconDigestion,
     },
     {
-      title: 'Equilibrio intestinal',
-      description: 'Apoya el balance natural de tu microbiota todos los días.',
+      title: 'Ciencia en contexto',
+      description:
+        'Conoce qué se ha investigado y qué límites tienen los resultados.',
       icon: ASSETS.iconBalance,
     },
     {
       title: 'Rutina simple',
-      description: 'Junto con tus comidas, fácil de integrar a tu día.',
+      description:
+        'Tabletas y sobres con indicaciones propias que puedes consultar en el empaque.',
       icon: ASSETS.iconRoutine,
     },
   ],
@@ -94,15 +95,15 @@ export const howItWorks = {
   steps: [
     {
       number: '1',
-      title: 'Tómalo junto con los alimentos',
+      title: 'Revisa el empaque',
       description:
-        'Consulta el uso sugerido según la fase y la recomendación de tu profesional de la salud.',
+        'Comprueba la cantidad, la frecuencia y la edad de uso de tu presentación.',
     },
     {
       number: '2',
-      title: 'Sé constante',
+      title: 'Sigue las indicaciones',
       description:
-        'Los probióticos funcionan mejor cuando se toman de forma regular.',
+        'No adaptes dosis de otros productos o estudios. Consulta si tienes dudas sobre su uso.',
     },
     {
       number: '3',
@@ -115,7 +116,7 @@ export const howItWorks = {
 
 export const scienceTeaser = {
   title: 'La ciencia, explicada simple.',
-  body: 'Los probióticos son microorganismos vivos que, consumidos en cantidades adecuadas, pueden aportar beneficios al huésped. En Biothree, la idea es simple: convertir el cuidado intestinal en una rutina diaria clara y fácil de seguir.',
+  body: 'Tres tipos de bacterias y una pregunta importante: ¿qué sabemos de su función? Conoce la relación entre BIO-THREE, la microbiota y el butirato, con las fuentes y los límites de la evidencia.',
   cta: 'Leer sobre la ciencia',
   href: '/ciencia',
   note: 'Información educativa · No es un medicamento',
@@ -147,24 +148,23 @@ export const productosPage = {
 
 export const cienciaPage = {
   eyebrow: 'Ciencia',
-  heroTitle: 'Probióticos, microbiota y rutina diaria.',
+  heroTitle: 'La ciencia intestinal, explicada con claridad.',
   heroSubtitle:
-    'Una explicación simple sobre cómo Biothree acompaña el bienestar intestinal como parte de una rutina constante.',
-  // Science page uses the line icons only, at one consistent size.
+    'Qué contiene la fórmula, por qué importa la cepa y cómo leer la evidencia sin confundirla con una promesa.',
   sections: [
     {
-      title: '¿Qué son los probióticos?',
-      body: 'Los probióticos son microorganismos vivos presentes en alimentos y suplementos. Cuando se consumen en cantidades adecuadas, pueden contribuir al bienestar del huésped.',
+      title: 'Una fórmula con tres tipos de bacterias',
+      body: 'TOA describe BIO-THREE como una combinación de bacterias sacarolíticas, lácticas y productoras de butirato. Sus funciones explican el diseño de la fórmula; no garantizan un resultado individual.',
       image: ASSETS.iconBalance,
     },
     {
-      title: '¿Por qué importa la microbiota?',
-      body: 'La microbiota intestinal participa en procesos relacionados con la digestión, la absorción de nutrientes y el equilibrio general del intestino.',
+      title: 'El butirato es una molécula',
+      body: 'Algunas bacterias producen este ácido graso de cadena corta. Estudiar el butirato no equivale a demostrar un beneficio de cualquier producto que contenga bacterias capaces de producirlo.',
       image: ASSETS.iconDigestion,
     },
     {
-      title: '¿Qué hace diferente a Biothree?',
-      body: 'Biothree está basado en una fórmula japonesa de probióticos, presentada de forma simple para incorporarse al día a día.',
+      title: 'La evidencia tiene un contexto',
+      body: 'Antes de aplicar un resultado, hay que identificar la cepa, la preparación, la dosis y la población estudiada. Una evaluación de seguridad tampoco demuestra eficacia terapéutica.',
       image: ASSETS.iconRoutine,
     },
   ],
@@ -180,7 +180,9 @@ export const footer = {
     {label: 'Productos', href: '/productos'},
     {label: 'Envíos', href: '/productos#envios'},
     {label: 'Ciencia', href: '/ciencia'},
+    {label: 'Blog', href: '/blogs/ciencia-intestinal'},
     {label: 'Preguntas', href: '/ciencia#faq'},
+    {label: 'Acerca de', href: '/acerca-de'},
     {label: 'Instagram', href: INSTAGRAM_URL},
     {label: 'Contacto', href: 'mailto:info@biothree.ec'},
   ],

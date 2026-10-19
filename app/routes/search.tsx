@@ -14,7 +14,10 @@ import type {
 } from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Bio-Three | Search`}];
+  return [
+    {title: 'Buscar | Biothree Ecuador'},
+    {name: 'robots', content: 'noindex, follow'},
+  ];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -42,19 +45,19 @@ export default function SearchPage() {
 
   return (
     <div className="search">
-      <h1>Search</h1>
+      <h1>Buscar</h1>
       <SearchForm>
         {({inputRef}) => (
           <>
             <input
               defaultValue={term}
               name="q"
-              placeholder="Search…"
+              placeholder="Buscar…"
               ref={inputRef}
               type="search"
             />
             &nbsp;
-            <button type="submit">Search</button>
+            <button type="submit">Buscar</button>
           </>
         )}
       </SearchForm>

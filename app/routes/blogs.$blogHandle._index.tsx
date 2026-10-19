@@ -1,3 +1,4 @@
+import {pageMeta} from '~/lib/seo';
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle._index';
 import {Image, getPaginationVariables} from '@shopify/hydrogen';
@@ -6,7 +7,18 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Bio-Three | ${data?.blog.title ?? ''} blog`}];
+  if (!data?.blog)
+    return [
+      {title: 'Blog no encontrado | Biothree Ecuador'},
+      {name: 'robots', content: 'noindex'},
+    ];
+  return pageMeta({
+    title: data.blog.seo?.title || `${data.blog.title} | Biothree Ecuador`,
+    description:
+      data.blog.seo?.description ||
+      `Artículos de ${data.blog.title} en Biothree Ecuador.`,
+    path: `/blogs/${data.blog.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -65,8 +77,8 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
+    <div className="biothree bt-container bt-section">
+      <h1 className="bt-h1 mb-8">{blog.title}</h1>
       <div className="blog-grid">
         <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
           {({node: article, index}) => (
@@ -89,7 +101,7 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
-  const publishedAt = new Intl.DateTimeFormat('en-US', {
+  const publishedAt = new Intl.DateTimeFormat('es-EC', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

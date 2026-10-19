@@ -1,3 +1,5 @@
+import {pageMeta} from '~/lib/seo';
+import {SCIENCE_BLOG_PATH} from '~/data/editorial';
 import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
@@ -7,7 +9,12 @@ import type {BlogsQuery} from 'storefrontapi.generated';
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Bio-Three | Blogs`}];
+  return pageMeta({
+    title: 'Blog y artículos | Biothree Ecuador',
+    description:
+      'Explora artículos sobre BIO-THREE, microbiota y ciencia intestinal.',
+    path: '/blogs',
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -54,8 +61,13 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
-      <h1>Blogs</h1>
+    <div className="biothree bt-container-narrow bt-section">
+      <h1 className="bt-h1 mb-8">Blog y artículos</h1>
+      <p className="bt-lead mb-8">
+        <Link to={SCIENCE_BLOG_PATH} className="bt-editorial-link">
+          Ciencia intestinal: explicaciones y evidencia →
+        </Link>
+      </p>
       <div className="blogs-grid">
         <PaginatedResourceSection<BlogNode> connection={blogs}>
           {({node: blog}) => (

@@ -4,6 +4,7 @@ import type {Route} from './+types/test';
 export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Test Salud Intestinal | Bio-Three'},
+    {name: 'robots', content: 'noindex, follow'},
     {
       name: 'description',
       content: 'Realiza el test de salud intestinal de Bio-Three.',

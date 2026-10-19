@@ -1,3 +1,5 @@
+import {pageMeta} from '~/lib/seo';
+import {ArticlePreview} from '~/components/marketing/ArticlePreview';
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
 import {Hero} from '~/components/marketing/Hero';
@@ -14,18 +16,13 @@ import {benefits, productPreview, faqPreview} from '~/data/copy';
 import {faqs} from '~/data/faq';
 import {loadPresentations} from '~/lib/biothree';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {
-      title: 'Biothree Ecuador | Probióticos japoneses para tu rutina diaria',
-    },
-    {
-      name: 'description',
-      content:
-        'Probióticos japoneses para acompañar tu bienestar digestivo todos los días. Una rutina simple para cuidar tu microbiota.',
-    },
-  ];
-};
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Biothree Ecuador | Probióticos japoneses en tabletas y sobres',
+    description:
+      'Conoce Biothree en Ecuador: tabletas y sobres, información de uso y ciencia sobre microbiota y butirato explicada con sus fuentes.',
+    path: '/',
+  });
 
 export async function loader({context}: Route.LoaderArgs) {
   // Live price + stock for the two presentations. Never throws: an empty
@@ -47,7 +44,7 @@ export default function Homepage() {
         <div className="bt-container bt-section bt-benefits">
           <Reveal>
             <div className="flex flex-col items-start gap-4">
-              <SectionLabel index="01">Beneficios</SectionLabel>
+              <SectionLabel index="01">La fórmula</SectionLabel>
               <h2 className="bt-h2 max-w-[700px] text-ink">{benefits.title}</h2>
             </div>
           </Reveal>
@@ -88,6 +85,7 @@ export default function Homepage() {
       <HowItWorks />
 
       <ScienceTeaser />
+      <ArticlePreview />
 
       {/* FAQ preview */}
       <section>

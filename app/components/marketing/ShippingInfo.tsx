@@ -44,7 +44,7 @@ export function ShippingInfo() {
           </div>
         </div>
         <div className="mt-8 flex flex-col gap-3 border-t border-hairline pt-6">
-          <h3 className="bt-h3 text-ink">Rastreo de su tratamiento</h3>
+          <h3 className="bt-h3 text-ink">Rastreo de tu pedido</h3>
           <p className="bt-p max-w-3xl text-muted">{shipping.tracking}</p>
         </div>
       </div>

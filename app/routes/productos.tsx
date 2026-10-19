@@ -1,3 +1,4 @@
+import {pageMeta} from '~/lib/seo';
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/productos';
 import {ProductGrid} from '~/components/marketing/ProductGrid';
@@ -8,16 +9,13 @@ import {Reveal} from '~/components/marketing/Reveal';
 import {productosPage} from '~/data/copy';
 import {loadPresentations} from '~/lib/biothree';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Productos Biothree | Probióticos japoneses en Ecuador'},
-    {
-      name: 'description',
-      content:
-        'Conoce las presentaciones de Biothree y elige una rutina probiótica diaria para acompañar tu bienestar intestinal.',
-    },
-  ];
-};
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'Biothree en tabletas y sobres | Ecuador',
+    description:
+      'Compara las presentaciones de Biothree, consulta las indicaciones de uso y conoce las opciones de envío en Ecuador.',
+    path: '/productos',
+  });
 
 export async function loader({context}: Route.LoaderArgs) {
   // Live price + stock for the two presentations. Never throws: an empty
@@ -59,7 +57,9 @@ export default function Productos() {
           <Reveal>
             <div className="flex flex-col items-start gap-4">
               <SectionLabel index="01">Comparativa</SectionLabel>
-              <h2 className="bt-h2 text-ink">{productosPage.comparisonTitle}</h2>
+              <h2 className="bt-h2 text-ink">
+                {productosPage.comparisonTitle}
+              </h2>
             </div>
           </Reveal>
 
@@ -104,25 +104,19 @@ export default function Productos() {
                 <h3 className="bt-h3 text-ink">{product.name}</h3>
                 <dl className="pt-3 flex flex-col gap-2.5">
                   <div className="bt-spec-row">
-                    <dt className="bt-index-label">
-                      Ideal para
-                    </dt>
+                    <dt className="bt-index-label">Ideal para</dt>
                     <dd className="bt-p text-left text-muted">
                       {product.idealFor}
                     </dd>
                   </div>
                   <div className="bt-spec-row">
-                    <dt className="bt-index-label">
-                      Uso
-                    </dt>
+                    <dt className="bt-index-label">Uso</dt>
                     <dd className="bt-p text-left text-muted">
                       {product.usage}
                     </dd>
                   </div>
                   <div className="bt-spec-row">
-                    <dt className="bt-index-label">
-                      Formato
-                    </dt>
+                    <dt className="bt-index-label">Formato</dt>
                     <dd className="bt-p text-left text-muted">
                       {product.format}
                     </dd>

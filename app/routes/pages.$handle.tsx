@@ -1,9 +1,19 @@
+import {pageMeta} from '~/lib/seo';
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Bio-Three | ${data?.page.title ?? ''}`}];
+  if (!data?.page)
+    return [
+      {title: 'Página no encontrada | Biothree Ecuador'},
+      {name: 'robots', content: 'noindex'},
+    ];
+  return pageMeta({
+    title: data.page.seo?.title || `${data.page.title} | Biothree Ecuador`,
+    description: data.page.seo?.description || data.page.title,
+    path: `/pages/${data.page.handle}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

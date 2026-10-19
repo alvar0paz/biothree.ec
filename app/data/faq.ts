@@ -17,12 +17,12 @@ export const faqs: Faq[] = [
   {
     question: '¿Cómo se toma?',
     answer:
-      'Tómalo según las instrucciones del empaque. Lo importante es la constancia y usarlo como parte de una rutina saludable.',
+      'Sigue las instrucciones del empaque de tu presentación. La cantidad, frecuencia y edad de uso no deben extrapolarse de estudios clínicos ni de productos de otros países.',
   },
   {
     question: '¿Cuándo empiezo a sentir cambios?',
     answer:
-      'Cada cuerpo es distinto. Los probióticos funcionan mejor cuando se toman con constancia y se acompañan con buenos hábitos.',
+      'No podemos prometer un plazo ni un resultado para todas las personas. Los estudios investigan preparaciones y situaciones concretas. Si tienes molestias persistentes, consulta con un profesional de salud.',
   },
   {
     question: '¿Reemplaza una buena alimentación?',

@@ -52,6 +52,12 @@ export default async function handleRequest(
     await body.allReady;
   }
 
+  const pathname = new URL(request.url).pathname;
+  if (
+    /^\/(?:account|cart|checkout|pagar|pago|search|test)(?:\/|$)/.test(pathname)
+  ) {
+    responseHeaders.set('X-Robots-Tag', 'noindex, follow');
+  }
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
   // PayPhone's hosted payment form only opens when the browser arrives from

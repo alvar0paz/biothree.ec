@@ -1,3 +1,4 @@
+import {pageMeta, SITE_URL} from '~/lib/seo';
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
@@ -14,11 +15,43 @@ import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const product = data?.product;
+  if (!product)
+    return [
+      {title: 'Producto no encontrado | Biothree Ecuador'},
+      {name: 'robots', content: 'noindex'},
+    ];
+  const variant = product.selectedOrFirstAvailableVariant;
+  const path = `/products/${product.handle}`;
   return [
-    {title: `Bio-Three | ${data?.product.title ?? ''}`},
+    ...pageMeta({
+      title: product.seo.title || `${product.title} | Biothree Ecuador`,
+      description: product.seo.description || product.description,
+      path,
+      image: variant?.image?.url,
+    }),
     {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.title,
+        description: product.description,
+        url: `${SITE_URL}${path}`,
+        ...(variant?.image?.url ? {image: [variant.image.url]} : {}),
+        ...(variant
+          ? {
+              offers: {
+                '@type': 'Offer',
+                price: variant.price.amount,
+                priceCurrency: variant.price.currencyCode,
+                availability: variant.availableForSale
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+                url: `${SITE_URL}${path}?${new URLSearchParams(variant.selectedOptions.map(({name, value}) => [name, value])).toString()}`,
+              },
+            }
+          : {}),
+      },
     },
   ];
 };

@@ -1,10 +1,47 @@
+import {pageMeta, SITE_URL} from '~/lib/seo';
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Bio-Three | ${data?.article.title ?? ''} article`}];
+export const meta: Route.MetaFunction = ({data, params}) => {
+  const article = data?.article;
+  if (!article)
+    return [
+      {title: 'Artículo no encontrado | Biothree Ecuador'},
+      {name: 'robots', content: 'noindex'},
+    ];
+  const path = `/blogs/${params.blogHandle}/${article.handle}`;
+  const description = article.seo?.description || article.title;
+  return [
+    ...pageMeta({
+      title: article.seo?.title || `${article.title} | Biothree Ecuador`,
+      description,
+      path,
+      type: 'article',
+      image: article.image?.url,
+    }),
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: article.title,
+        description,
+        inLanguage: 'es-EC',
+        mainEntityOfPage: `${SITE_URL}${path}`,
+        datePublished: article.publishedAt,
+        ...(article.author?.name
+          ? {author: {'@type': 'Person', name: article.author.name}}
+          : {}),
+        ...(article.image?.url ? {image: [article.image.url]} : {}),
+        publisher: {
+          '@type': 'Organization',
+          name: 'Biothree Ecuador',
+          url: SITE_URL,
+        },
+      },
+    },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -69,28 +106,26 @@ export default function Article() {
   const {article} = useLoaderData<typeof loader>();
   const {title, image, contentHtml, author} = article;
 
-  const publishedDate = new Intl.DateTimeFormat('en-US', {
+  const publishedDate = new Intl.DateTimeFormat('es-EC', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
   return (
-    <div className="article">
-      <h1>
-        {title}
-        <div>
-          <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
-          <address>{author?.name}</address>
-        </div>
-      </h1>
+    <article className="biothree bt-container-narrow bt-section bt-editorial">
+      <h1 className="bt-h1">{title}</h1>
+      <div className="bt-note my-6">
+        <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
+        <address>{author?.name}</address>
+      </div>
 
       {image && <Image data={image} sizes="90vw" loading="eager" />}
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
+        className="bt-prose bt-p mt-8"
       />
-    </div>
+    </article>
   );
 }
 

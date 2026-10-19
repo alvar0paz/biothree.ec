@@ -1,3 +1,6 @@
+import {pageMeta} from '~/lib/seo';
+import {ArticlePreview} from '~/components/marketing/ArticlePreview';
+import {scienceSources} from '~/data/editorial';
 import type {Route} from './+types/ciencia';
 import {SectionLabel} from '~/components/marketing/SectionLabel';
 import {FAQAccordion} from '~/components/marketing/FAQAccordion';
@@ -5,16 +8,13 @@ import {Reveal} from '~/components/marketing/Reveal';
 import {cienciaPage} from '~/data/copy';
 import {faqs} from '~/data/faq';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Ciencia y preguntas frecuentes | Biothree Ecuador'},
-    {
-      name: 'description',
-      content:
-        'Aprende qué son los probióticos, cómo funcionan y cómo Biothree puede formar parte de una rutina diaria de bienestar intestinal.',
-    },
-  ];
-};
+export const meta: Route.MetaFunction = () =>
+  pageMeta({
+    title: 'BIO-THREE, microbiota y butirato | Ciencia y preguntas',
+    description:
+      'Conoce los tres tipos de bacterias de BIO-THREE, qué es el butirato y los límites de la evidencia. Fuentes y preguntas frecuentes.',
+    path: '/ciencia',
+  });
 
 export async function loader() {
   return {};
@@ -65,6 +65,23 @@ export default function Ciencia() {
         </div>
       </section>
 
+      <div className="bt-container-narrow pb-10">
+        <p className="bt-note text-muted">
+          Fuentes de esta explicación:{' '}
+          {scienceSources
+            .filter((source) => ['toa', 'nih', 'efsa'].includes(source.id))
+            .map((source, index) => (
+              <span key={source.id}>
+                {index > 0 && ' · '}
+                <a className="bt-editorial-link" href={source.url}>
+                  {source.label}
+                </a>
+              </span>
+            ))}
+          .
+        </p>
+      </div>
+      <ArticlePreview />
       {/* Full FAQ */}
       <section id="faq" className="scroll-mt-24">
         <div className="bt-container-narrow bt-section">
