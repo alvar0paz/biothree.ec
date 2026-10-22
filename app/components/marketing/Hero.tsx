@@ -28,7 +28,7 @@ export function Hero() {
             <Button href="/productos" size="lg">
               {hero.primaryCta}
             </Button>
-            <Button href="#como-funciona" variant="secondary" size="lg">
+            <Button href="/ciencia" variant="secondary" size="lg">
               {hero.secondaryCta}
             </Button>
           </div>

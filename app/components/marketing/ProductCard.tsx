@@ -120,14 +120,14 @@ export function ProductCard({presentation}: {presentation: Presentation}) {
       <div className="bt-product-specs">
         <dl>
           <SpecRow label="Formato" value={presentation.format} />
-          <SpecRow label="Uso sugerido" value={presentation.usage} />
-          <SpecRow label="Ideal para" value={presentation.idealFor} />
+          <SpecRow label="Indicaciones" value={presentation.usage} />
+          <SpecRow label="Preferencia de formato" value={presentation.idealFor} />
         </dl>
         <Link
           to="/productos#uso-sugerido"
           className="inline-flex min-h-11 items-center text-sm text-purple underline underline-offset-4"
         >
-          Ver uso sugerido e indicaciones
+          Consultar indicaciones de uso
         </Link>
         <div className="mt-4 border-t border-line pt-4">
           <p className="bt-note text-muted">Envíos a todo el Ecuador</p>

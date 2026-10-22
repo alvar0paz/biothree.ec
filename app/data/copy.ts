@@ -50,11 +50,11 @@ export const NAV = [
 ] as const;
 
 export const hero = {
-  title: 'Probióticos japoneses para tu rutina diaria.',
+  title: 'Conoce BIO-THREE. Decide con información clara.',
   subtitle:
-    'Biothree combina probióticos seleccionados en una fórmula simple, pensada para acompañar tu bienestar digestivo todos los días.',
+    'Conoce la formulación japonesa de BIO-THREE, compara sus presentaciones y consulta la información que necesitas para evaluar tu compra.',
   primaryCta: 'Comprar Biothree',
-  secondaryCta: 'Ver cómo funciona',
+  secondaryCta: 'Conocer la evidencia',
   // Spec-sheet entries under the hero CTAs (label + value), instead of a
   // generic dotted strip. The commercial operator is identified in the footer.
   facts: [
@@ -80,7 +80,7 @@ export const benefits = {
       icon: ASSETS.iconBalance,
     },
     {
-      title: 'Rutina simple',
+      title: 'Dos presentaciones',
       description:
         'Tabletas y sobres con indicaciones propias que puedes consultar en el empaque.',
       icon: ASSETS.iconRoutine,
@@ -92,12 +92,12 @@ export const productPreview = {
   eyebrow: 'Producto',
   title: 'Una fórmula japonesa. Dos presentaciones.',
   subtitle:
-    'Biothree está disponible en tabletas y sobres para que puedas incorporarlo a tu rutina de la forma que prefieras.',
+    'BIO-THREE está disponible en tabletas y sobres. Compara los formatos y revisa las indicaciones de cada presentación.',
   cta: 'Consultar por Instagram',
 };
 
 export const howItWorks = {
-  title: 'Cómo incorporar Biothree a tu día.',
+  title: 'Antes de elegir, revisa estos puntos.',
   steps: [
     {
       number: '1',
@@ -135,7 +135,7 @@ export const faqPreview = {
 };
 
 export const finalCta = {
-  title: 'Empieza con una rutina simple para tu bienestar digestivo.',
+  title: 'Compara las presentaciones de BIO-THREE.',
   cta: 'Comprar Biothree',
   note: 'Disponible en tabletas y sobres',
 };
@@ -144,9 +144,9 @@ export const productosPage = {
   eyebrow: 'Producto',
   heroTitle: 'Una fórmula japonesa. Dos presentaciones.',
   heroSubtitle:
-    'Biothree es un solo producto probiótico japonés, disponible en tabletas y sobres para que lo incorpores a tu rutina de la forma que prefieras.',
+    'Conoce BIO-THREE en tabletas y sobres. Compara sus formatos, consulta los precios y revisa la información de uso antes de elegir.',
   comparisonTitle: 'Compara las presentaciones',
-  comparisonHeaders: ['Presentación', 'Ideal para', 'Uso', 'Formato'],
+  comparisonHeaders: ['Presentación', 'Preferencia de formato', 'Indicaciones', 'Formato'],
   buyCta: 'Consultar por Instagram',
   disclaimer:
     'Biothree es un suplemento alimenticio. No es un medicamento. No está destinado a diagnosticar, tratar, curar ni prevenir enfermedades.',
@@ -180,7 +180,7 @@ export const cienciaPage = {
 };
 
 export const footer = {
-  tagline: 'Probióticos japoneses para tu rutina diaria.',
+  tagline: 'BIO-THREE en Ecuador. Información clara para elegir.',
   // One flat row of links; the footer no longer has column headings.
   links: [
     {label: 'Productos', href: '/productos'},

@@ -104,13 +104,13 @@ export default function Productos() {
                 <h3 className="bt-h3 text-ink">{product.name}</h3>
                 <dl className="pt-3 flex flex-col gap-2.5">
                   <div className="bt-spec-row">
-                    <dt className="bt-index-label">Ideal para</dt>
+                    <dt className="bt-index-label">Preferencia de formato</dt>
                     <dd className="bt-p text-left text-muted">
                       {product.idealFor}
                     </dd>
                   </div>
                   <div className="bt-spec-row">
-                    <dt className="bt-index-label">Uso</dt>
+                    <dt className="bt-index-label">Indicaciones</dt>
                     <dd className="bt-p text-left text-muted">
                       {product.usage}
                     </dd>
