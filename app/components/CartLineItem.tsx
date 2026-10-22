@@ -1,6 +1,8 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout} from '~/components/CartMain';
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {CartForm, type OptimisticCartLine} from '@shopify/hydrogen';
+import {PresentationImage} from './PresentationImage';
+import {getProductPresentation} from '~/lib/product-presentation';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
@@ -26,23 +28,20 @@ export function CartLineItem({
   line: CartLine;
 }) {
   const {id, merchandise} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+  const {product, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
+  const presentation = getProductPresentation(product.handle, selectedOptions);
 
   return (
     <li key={id} className="cart-line border-b border-line/70 last:border-0">
-      {image && (
-        <Image
-          alt={title}
-          aspectRatio="1/1"
-          data={image}
-          height={80}
-          loading="lazy"
-          width={80}
-          className="rounded-control border border-line/70 bg-cream/40"
-        />
-      )}
+      <PresentationImage
+        handle={product.handle}
+        selectedOptions={selectedOptions}
+        image={image}
+        size={80}
+        className="rounded-control border border-line/70 bg-cream/40"
+      />
 
       <div className="min-w-0 flex-1">
         <Link
@@ -72,6 +71,9 @@ export function CartLineItem({
               </li>
             ))}
         </ul>
+        {presentation && (
+          <p className="bt-note text-muted">{presentation.format}</p>
+        )}
         {/* Price and stepper on one row: the drawer is narrow, so stacking
             them left a lot of dead space under each line. */}
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-2">

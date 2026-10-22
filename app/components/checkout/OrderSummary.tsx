@@ -1,4 +1,6 @@
-import {Image, Money} from '@shopify/hydrogen';
+import {Money} from '@shopify/hydrogen';
+import {PresentationImage} from '~/components/PresentationImage';
+import {getProductPresentation} from '~/lib/product-presentation';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CheckoutQuote} from '~/lib/shopify-checkout';
 
@@ -29,7 +31,9 @@ function Row({
       }`}
     >
       <dt className={strong ? 'font-medium' : 'bt-note'}>{label}</dt>
-      <dd className={strong ? 'bt-price' : 'bt-note tabular-nums text-ink'}>{children}</dd>
+      <dd className={strong ? 'bt-price' : 'bt-note tabular-nums text-ink'}>
+        {children}
+      </dd>
     </div>
   );
 }
@@ -57,27 +61,30 @@ export function OrderSummary({
       <ul className="mt-4 flex list-none flex-col gap-4 p-0">
         {lines.map((line) => {
           const {merchandise} = line;
+          const presentation = getProductPresentation(
+            merchandise.product.handle,
+            merchandise.selectedOptions,
+          );
           const options = merchandise.selectedOptions
             .filter((option) => option.value !== 'Default Title')
             .map((option) => option.value)
             .join(' · ');
           return (
             <li key={line.id} className="flex items-start gap-4">
-              {merchandise.image && (
-                <Image
-                  alt={merchandise.title}
-                  aspectRatio="1/1"
-                  data={merchandise.image}
-                  height={64}
-                  width={64}
-                  loading="lazy"
-                  className="rounded-control border border-line/70 bg-cream/40"
-                />
-              )}
+              <PresentationImage
+                handle={merchandise.product.handle}
+                selectedOptions={merchandise.selectedOptions}
+                image={merchandise.image}
+                size={64}
+                className="rounded-control border border-line/70 bg-cream/40"
+              />
               <div className="min-w-0 flex-1">
                 <p className="bt-p font-medium leading-snug text-ink">
                   {merchandise.product.title}
                 </p>
+                {presentation && (
+                  <p className="bt-note text-muted">{presentation.format}</p>
+                )}
                 <p className="bt-note text-muted">
                   {options ? `${options} · ` : ''}Cantidad: {line.quantity}
                 </p>
@@ -97,12 +104,26 @@ export function OrderSummary({
               <Money as="span" data={money(quote.subtotal)} />
             </Row>
             {!isZero(quote.discounts) && (
-              <Row label={codes.length ? `Descuento (${codes.join(', ')})` : 'Descuento'}>
+              <Row
+                label={
+                  codes.length ? `Descuento (${codes.join(', ')})` : 'Descuento'
+                }
+              >
                 −<Money as="span" data={money(quote.discounts)} />
               </Row>
             )}
-            <Row label={quote.shippingLine ? `Envío · ${quote.shippingLine.title}` : 'Envío'}>
-              {isZero(quote.shipping) ? 'Gratis' : <Money as="span" data={money(quote.shipping)} />}
+            <Row
+              label={
+                quote.shippingLine
+                  ? `Envío · ${quote.shippingLine.title}`
+                  : 'Envío'
+              }
+            >
+              {isZero(quote.shipping) ? (
+                'Gratis'
+              ) : (
+                <Money as="span" data={money(quote.shipping)} />
+              )}
             </Row>
             {quote.taxLines.length ? (
               quote.taxLines.map((tax) => (

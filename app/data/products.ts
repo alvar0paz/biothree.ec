@@ -1,6 +1,5 @@
-// Biothree is ONE Japanese probiotic formula, offered in TWO presentations.
-// These are NOT separate products / SKUs / formulas — just two ways to take
-// the same product.
+// Shopify models BIO-THREE as one product with two presentation variants.
+// Each presentation has its own packaging and instructions.
 //
 // This file holds the *marketing* copy only. Price, stock and the buyable
 // variant id come from Shopify at request time — see ~/lib/biothree.ts, which
@@ -34,27 +33,28 @@ export const products: Product[] = [
     id: 'biothree-tabletas',
     name: 'BIO-THREE Tabletas',
     tagline: 'Tabletas',
-    description: 'Presentación en tabletas, envasadas en blíster.',
+    description: 'Caja con 42 tabletas en blíster. Contenido neto: 8,4 g.',
     bullets: [
-      'Tabletas en blíster',
+      '42 tabletas en blíster',
       'Información de uso en el empaque',
       'Consulta la conservación y la fecha de vencimiento',
     ],
-    // Presentation imagery: blister for tablets, sachet for sobres.
+    // Front panel rendered from the supplied current Ecuador packaging artwork.
     image: ASSETS.productTabletas,
     ctaUrl: INSTAGRAM_URL,
     optionValue: 'Tabletas',
     idealFor: 'Si prefieres tabletas',
     usage: 'Según las indicaciones del empaque',
-    format: 'Tabletas en blíster',
+    format: 'Caja con 42 tabletas en blíster',
   },
   {
     id: 'biothree-sobres',
     name: 'BIO-THREE Sobres',
     tagline: 'Sobres',
-    description: 'Presentación en polvo oral, en sobres individuales.',
+    description:
+      'Caja con 21 sobres individuales de polvo oral. Contenido neto: 21 g.',
     bullets: [
-      'Presentación individual',
+      '21 sobres individuales',
       'Información de preparación en el empaque',
       'Consulta la conservación y la fecha de vencimiento',
     ],
@@ -63,6 +63,6 @@ export const products: Product[] = [
     optionValue: 'Sobres',
     idealFor: 'Si prefieres polvo oral',
     usage: 'Según las indicaciones del empaque',
-    format: 'Sobres individuales de polvo oral',
+    format: 'Caja con 21 sobres de polvo oral',
   },
 ];

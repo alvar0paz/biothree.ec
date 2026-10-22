@@ -27,18 +27,21 @@ export function ProductCard({presentation}: {presentation: Presentation}) {
       aria-labelledby={`product-${presentation.id}`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3 pt-5">
-        <span className="bt-index-label">Presentación · {presentation.tagline}</span>
+        <span className="bt-index-label">
+          Presentación · {presentation.tagline}
+        </span>
         <StockBadge stock={stock} />
       </div>
       <div className="bt-product-stage">
         <img
           src={presentation.image}
-          alt={presentation.name}
+          alt={`Frente del empaque de ${presentation.name}. ${presentation.format}.`}
           loading="lazy"
           decoding="async"
         />
       </div>
       <div className="bt-product-copy">
+        <p className="bt-note text-muted">Vista frontal del empaque</p>
         <h3
           id={`product-${presentation.id}`}
           className="bt-product-title text-ink"
@@ -118,10 +121,17 @@ export function ProductCard({presentation}: {presentation: Presentation}) {
         )}
       </div>
       <div className="bt-product-specs">
+        <p className="bt-note mb-4 text-muted">
+          Revisa el envío, los impuestos y el total antes de pagar en el
+          checkout.
+        </p>
         <dl>
           <SpecRow label="Formato" value={presentation.format} />
           <SpecRow label="Indicaciones" value={presentation.usage} />
-          <SpecRow label="Preferencia de formato" value={presentation.idealFor} />
+          <SpecRow
+            label="Preferencia de formato"
+            value={presentation.idealFor}
+          />
         </dl>
         <Link
           to="/productos#uso-sugerido"

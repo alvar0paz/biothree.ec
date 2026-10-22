@@ -5,6 +5,7 @@ import type {
   CollectionItemFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {products} from '~/data/products';
 
 export function ProductItem({
   product,
@@ -22,14 +23,28 @@ export function ProductItem({
       prefetch="intent"
       to={variantUrl}
     >
-      {image && (
-        <Image
-          alt={image.altText || product.title}
-          aspectRatio="1/1"
-          data={image}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
+      {product.handle === 'biothree' ? (
+        <div className="grid gap-4 bg-white p-4">
+          {products.map((presentation) => (
+            <img
+              key={presentation.id}
+              src={presentation.image}
+              alt={`${presentation.name}: ${presentation.format}`}
+              loading={loading}
+              className="w-full object-contain"
+            />
+          ))}
+        </div>
+      ) : (
+        image && (
+          <Image
+            alt={image.altText || product.title}
+            aspectRatio="1/1"
+            data={image}
+            loading={loading}
+            sizes="(min-width: 45em) 400px, 100vw"
+          />
+        )
       )}
       <h4>{product.title}</h4>
       <small>

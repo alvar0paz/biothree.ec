@@ -11,6 +11,8 @@ import {
 } from '@shopify/hydrogen';
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
+import {PresentationImage} from '~/components/PresentationImage';
+import {getProductPresentation} from '~/lib/product-presentation';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
@@ -22,22 +24,31 @@ export const meta: Route.MetaFunction = ({data}) => {
       {name: 'robots', content: 'noindex'},
     ];
   const variant = product.selectedOrFirstAvailableVariant;
+  const presentation = getProductPresentation(
+    product.handle,
+    variant?.selectedOptions ?? [],
+  );
+  const image = presentation?.image || variant?.image?.url;
+  const description =
+    presentation?.description || product.seo.description || product.description;
   const path = `/products/${product.handle}`;
   return [
     ...pageMeta({
-      title: product.seo.title || `${product.title} | Biothree Ecuador`,
-      description: product.seo.description || product.description,
+      title: presentation
+        ? `${presentation.name} | Biothree Ecuador`
+        : product.seo.title || `${product.title} | Biothree Ecuador`,
+      description,
       path,
-      image: variant?.image?.url,
+      image,
     }),
     {
       'script:ld+json': {
         '@context': 'https://schema.org',
         '@type': 'Product',
-        name: product.title,
-        description: product.description,
+        name: presentation?.name || product.title,
+        description,
         url: `${SITE_URL}${path}`,
-        ...(variant?.image?.url ? {image: [variant.image.url]} : {}),
+        ...(image ? {image: [new URL(image, SITE_URL).href]} : {}),
         ...(variant
           ? {
               offers: {
@@ -129,13 +140,34 @@ export default function Product() {
   });
 
   const {title, descriptionHtml} = product;
+  const presentation = getProductPresentation(
+    product.handle,
+    selectedVariant.selectedOptions,
+  );
 
   return (
     <div className="biothree">
       <div className="bt-container bt-section bt-product-detail">
-        <ProductImage image={selectedVariant?.image} />
+        {presentation ? (
+          <figure className="product-image">
+            <PresentationImage
+              handle={product.handle}
+              selectedOptions={selectedVariant.selectedOptions}
+              image={selectedVariant.image}
+              size={720}
+            />
+            <figcaption className="bt-note mt-3 text-muted">
+              Vista frontal del empaque
+            </figcaption>
+          </figure>
+        ) : (
+          <ProductImage image={selectedVariant?.image} />
+        )}
         <div className="flex min-w-0 flex-col gap-6">
-          <h1 className="bt-h2">{title}</h1>
+          <h1 className="bt-h2">{presentation?.name || title}</h1>
+          {presentation && (
+            <p className="bt-p text-muted">{presentation.description}</p>
+          )}
           <ProductPrice
             price={selectedVariant?.price}
             compareAtPrice={selectedVariant?.compareAtPrice}
@@ -145,10 +177,28 @@ export default function Product() {
             selectedVariant={selectedVariant}
           />
           <h2 className="bt-h3 border-t border-line pt-6">Descripción</h2>
-          <div
-            className="bt-prose"
-            dangerouslySetInnerHTML={{__html: descriptionHtml}}
-          />
+          {presentation ? (
+            <div className="bt-prose">
+              <p>
+                {presentation.format}. Consulta las indicaciones de uso y
+                conservación de esta presentación.
+              </p>
+              <p>El contenido de la caja no indica una duración de uso.</p>
+              <a href="/productos#uso-sugerido">
+                Información de uso y orientación
+              </a>
+              <p>
+                Revisa el envío, los impuestos y el total en el checkout antes
+                de pagar.
+              </p>
+              <a href="/productos#envios">Consultar información de envío</a>
+            </div>
+          ) : (
+            <div
+              className="bt-prose"
+              dangerouslySetInnerHTML={{__html: descriptionHtml}}
+            />
+          )}
         </div>
       </div>
       <Analytics.ProductView

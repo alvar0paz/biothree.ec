@@ -13,18 +13,22 @@ export function ProductDetails() {
             <div className="bt-rule-block flex flex-col gap-4">
               <h3 className="bt-h3">Tabletas</h3>
               <p className="bt-p text-muted">
-                Presentación en blíster. Revisa en el empaque las indicaciones
-                de uso y conservación.
+                Caja con 42 tabletas en blíster (8,4 g). Revisa en el empaque
+                las indicaciones de uso y conservación.
               </p>
             </div>
             <div className="bt-rule-block flex flex-col gap-4">
               <h3 className="bt-h3">Sobres de polvo oral</h3>
               <p className="bt-p text-muted">
-                Presentación en sobres individuales. Sigue las instrucciones del
-                empaque para su preparación y consumo.
+                Caja con 21 sobres individuales de polvo oral (21 g). Sigue las
+                instrucciones del empaque para su preparación y consumo.
               </p>
             </div>
           </div>
+          <p className="bt-note mt-6 text-muted">
+            El número de tabletas o sobres indica el contenido de la caja, no la
+            duración de uso. Sigue las indicaciones de tu presentación.
+          </p>
         </div>
       </section>
       <section id="uso-sugerido" className="scroll-mt-24">

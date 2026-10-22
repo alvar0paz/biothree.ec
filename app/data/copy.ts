@@ -19,8 +19,8 @@ import probioticCells from '~/assets/biothree/probiotic-cells.png';
 import iconDigestion from '~/assets/biothree/icon-digestion.png';
 import iconRoutine from '~/assets/biothree/icon-routine.png';
 import iconBalance from '~/assets/biothree/icon-balance.png';
-import productTabletas from '~/assets/biothree/tabletas.png';
-import productSobres from '~/assets/biothree/sobres.png';
+import productTabletas from '~/assets/biothree/tabletas-empaque-actual.png';
+import productSobres from '~/assets/biothree/sobres-empaque-actual.png';
 import scienceBg from '~/assets/biothree/science-bg.webp';
 
 export const ASSETS = {
@@ -146,7 +146,12 @@ export const productosPage = {
   heroSubtitle:
     'Conoce BIO-THREE en tabletas y sobres. Compara sus formatos, consulta los precios y revisa la información de uso antes de elegir.',
   comparisonTitle: 'Compara las presentaciones',
-  comparisonHeaders: ['Presentación', 'Preferencia de formato', 'Indicaciones', 'Formato'],
+  comparisonHeaders: [
+    'Presentación',
+    'Preferencia de formato',
+    'Indicaciones',
+    'Formato',
+  ],
   buyCta: 'Consultar por Instagram',
   disclaimer:
     'Biothree es un suplemento alimenticio. No es un medicamento. No está destinado a diagnosticar, tratar, curar ni prevenir enfermedades.',
@@ -191,6 +196,7 @@ export const footer = {
     {label: 'Acerca de', href: '/acerca-de'},
     {label: 'Instagram', href: INSTAGRAM_URL},
     {label: 'Contacto', href: 'mailto:info@biothree.ec'},
+    {label: 'Políticas', href: '/policies'},
   ],
   disclaimer:
     'Biothree es un suplemento alimenticio, no un medicamento. Consulta siempre las indicaciones del empaque. La información de este sitio es educativa y no reemplaza la orientación de un profesional de salud.',
