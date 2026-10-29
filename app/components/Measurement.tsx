@@ -79,6 +79,7 @@ export function Measurement({children}: {children: React.ReactNode}) {
       // eslint-disable-next-line prefer-rest-params
       window.gtag = function () { window.dataLayer!.push(arguments); };
       window.gtag('consent', 'default', {analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied'});
+      window.gtag('set', {send_page_view: false, page_referrer: '', page_title: 'BIO-THREE Ecuador'});
       window.gtag('js', new Date());
       window.gtag('config', GA4_ID, {send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false, page_location: page, page_referrer: '', page_title: 'BIO-THREE Ecuador'});
       script('biothree-ga4', `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`, nonce);
