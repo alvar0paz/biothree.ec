@@ -89,6 +89,8 @@ export function ProductCard({presentation}: {presentation: Presentation}) {
           ) : (
             <AddToCartButton
               lines={[{merchandiseId: variant.id, quantity: 1}]}
+              measurement={{currency: variant.price.currencyCode, value: Number(variant.price.amount),
+                items: [{item_id: variant.id.split('/').pop()!, price: Number(variant.price.amount), quantity: 1}]}}
               onSuccess={() => open('cart')}
               className={buttonClasses({className: 'w-full'})}
               analytics={{

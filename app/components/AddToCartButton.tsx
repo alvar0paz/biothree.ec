@@ -1,5 +1,6 @@
 import {useEffect, useId, useRef} from 'react';
 import {useMeasurement} from './Measurement';
+import type {Commerce} from '~/lib/measurement';
 import {type FetcherWithComponents} from 'react-router';
 import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
 
@@ -86,6 +87,7 @@ export function AddToCartFeedback({
 
 export function AddToCartButton({
   analytics,
+  measurement,
   children,
   className,
   disabled,
@@ -93,6 +95,7 @@ export function AddToCartButton({
   onSuccess,
 }: {
   analytics?: unknown;
+  measurement?: Commerce;
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
@@ -117,6 +120,10 @@ export function AddToCartButton({
             onTrackedSuccess={() => {
               // Only confirmed, unadjusted additions are measured. Failed requests
               // and Shopify warning adjustments never count as a successful add.
+              if (measurement) {
+                track('add_to_cart', measurement, crypto.randomUUID());
+                return;
+              }
               for (const line of lines) {
                 const variant = line.selectedVariant as {price?: {amount: string; currencyCode: string}} | undefined;
                 const price = variant?.price;
