@@ -490,8 +490,12 @@ describe('settleTransaction', () => {
     ];
     for (const testCase of cases) {
       const {calls} = mockFetch({order: () => rawOrder(testCase.order), sale: () => testCase.sale});
-      const result = await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
-      expect(result, testCase.reason).toMatchObject({status: 'skipped', reason: testCase.reason});
+      if (testCase.reason === 'unknown-client-tx') {
+        await expect(settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env)).rejects.toThrow('different client transaction');
+      } else {
+        const result = await settleTransaction({transactionId: 45441137, clientTransactionId: ORDER_ID}, env);
+        expect(result, testCase.reason).toMatchObject({status: 'skipped', reason: testCase.reason});
+      }
       expect(adminOps(calls), testCase.reason).not.toContain('MarkPaid');
     }
   });

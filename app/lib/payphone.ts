@@ -306,6 +306,13 @@ function parseSale(text: string, source: string): PayphoneSale | null {
   } catch {
     throw new PayphoneError(`${source} returned non-JSON: ${text.slice(0, 300)}`);
   }
+  // Client-ID lookups may wrap the transaction in a list. Never choose
+  // arbitrarily when the provider returns multiple transactions.
+  if (Array.isArray(parsed)) {
+    if (parsed.length === 0) return null;
+    if (parsed.length !== 1) throw new PayphoneError(`${source} returned ambiguous transactions`);
+    parsed = parsed[0];
+  }
   const sale = parsed as Partial<PayphoneSale> | null;
   if (!sale || typeof sale.transactionId !== 'number' || !sale.clientTransactionId) {
     return null;
@@ -410,6 +417,10 @@ export function getSaleByTransactionId(env: PayphoneEnv, transactionId: number |
 }
 
 /** GET /api/Sale/client/{clientTransactionId} — our id. */
-export function getSaleByClientTransactionId(env: PayphoneEnv, clientTransactionId: string) {
-  return getSale(env, `/api/Sale/client/${encodeURIComponent(clientTransactionId)}`);
+export async function getSaleByClientTransactionId(env: PayphoneEnv, clientTransactionId: string) {
+  const sale = await getSale(env, `/api/Sale/client/${encodeURIComponent(clientTransactionId)}`);
+  if (sale && sale.clientTransactionId !== clientTransactionId) {
+    throw new PayphoneError('Sale API returned a different client transaction');
+  }
+  return sale;
 }

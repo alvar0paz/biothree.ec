@@ -3,6 +3,7 @@ import {
   attemptFromClientTransactionId,
   buildClientTransactionId,
   confirmButtonPayment,
+  getSaleByClientTransactionId,
   ERROR_CODE_DUPLICATE_CLIENT_TX,
   isApproved,
   nextClientTransactionId,
@@ -233,5 +234,29 @@ describe('button API', () => {
     await expect(confirmButtonPayment(env, {transactionId: 1, clientTransactionId: 'x'})).rejects.toThrow(
       /Confirm API 500/,
     );
+  });
+});
+
+
+describe('client transaction lookup', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const clientTransactionId = '19000000000000';
+  const sale = {transactionId: 123, clientTransactionId, amount: 2895, currency: 'USD', statusCode: 3, transactionStatus: 'Approved'};
+  const env = {PAYPHONE_API_TOKEN: 'test-token'};
+  it('accepts the provider single-result list', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json([sale])));
+    expect(await getSaleByClientTransactionId(env, clientTransactionId)).toEqual(sale);
+  });
+  it('returns missing for an empty list', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json([])));
+    expect(await getSaleByClientTransactionId(env, clientTransactionId)).toBeNull();
+  });
+  it('rejects ambiguous results', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json([sale, sale])));
+    await expect(getSaleByClientTransactionId(env, clientTransactionId)).rejects.toThrow('ambiguous');
+  });
+  it('rejects a different client transaction', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json([{...sale,clientTransactionId:'another'}])));
+    await expect(getSaleByClientTransactionId(env, clientTransactionId)).rejects.toThrow('different');
   });
 });
