@@ -6,6 +6,7 @@
 // Two steps, one route: step 1 posts `intent=quote`, step 2 carries the same
 // fields as hidden inputs and posts `intent=pay`. No client state to lose.
 
+import {CommerceView} from '~/components/Measurement';
 import {useState} from 'react';
 import {data, Form, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
 import type {Route} from './+types/checkout';
@@ -173,6 +174,8 @@ export async function action({request, context}: Route.ActionArgs) {
     }
   }
 
+  context.session.set('measurementOrder', order.legacyResourceId);
+
   // The order now owns the items: an empty cart is what the customer should
   // find if they come back without paying (the order itself stays payable
   // from /pagar/<id>).
@@ -205,6 +208,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="biothree">
+      <CommerceView name="begin_checkout" eventKey={cart.id.split('?')[0]} data={{currency: cart.cost.subtotalAmount.currencyCode, value: Number(cart.cost.subtotalAmount.amount), items: cart.lines.nodes.map(line => ({item_id: line.merchandise.id.split('/').pop()!, quantity: line.quantity, price: Number(line.merchandise.price.amount)}))}} />
       <div className="bt-container bt-section-compact">
         <div className="flex flex-col gap-2">
           <h1 className="bt-h2 text-ink">Finalizar compra</h1>

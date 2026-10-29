@@ -42,6 +42,7 @@ export function Footer() {
                   <FooterLink href={link.href} label={link.label} />
                 </li>
               ))}
+              <li><button type="button" className="bt-footer-link text-sm" onClick={() => window.dispatchEvent(new Event('biothree:privacy'))}>Preferencias de privacidad</button></li>
             </ul>
           </nav>
         </div>

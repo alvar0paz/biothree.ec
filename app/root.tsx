@@ -17,6 +17,8 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindStyles from '~/styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
+import {Measurement} from './components/Measurement';
+import {analyticsAllowed} from './lib/measurement';
 
 export type RootLoader = typeof loader;
 
@@ -198,10 +200,13 @@ export default function App() {
       cart={data.cart}
       shop={data.shop}
       consent={data.consent}
+      canTrack={analyticsAllowed}
     >
-      <PageLayout {...data}>
-        <Outlet />
-      </PageLayout>
+      <Measurement>
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+      </Measurement>
     </Analytics.Provider>
   );
 }

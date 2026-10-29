@@ -19,6 +19,9 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    scriptSrc: ["'self'", 'https://cdn.shopify.com', 'https://www.googletagmanager.com', 'https://connect.facebook.net'],
+    connectSrc: ["'self'", 'https://*.shopify.com', 'https://*.shopifycloud.com', 'https://*.google-analytics.com', 'https://www.google-analytics.com', 'https://www.facebook.com'],
+    imgSrc: ["'self'", 'data:', 'https://cdn.shopify.com', 'https://www.facebook.com', 'https://*.google-analytics.com'],
     // The marketing typography (Inter, Inter Tight, IBM Plex Mono) is served
     // from Google Fonts; Hydrogen's default CSP blocks it.
     styleSrc: [
