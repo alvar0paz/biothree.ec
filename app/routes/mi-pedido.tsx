@@ -230,7 +230,7 @@ export default function OrderPage() {
                   ? 'Pedido despachado.'
                   : order.fulfillment === 'PARTIALLY_FULFILLED'
                     ? 'Pedido despachado parcialmente.'
-                    : 'Tu pedido está pendiente de despacho.'}
+                    : 'Pago confirmado · listo para preparar.'}
               </p>
             )}
             {review?.reason && <p className="bt-p">{review.reason}</p>}

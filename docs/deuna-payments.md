@@ -42,3 +42,11 @@ Local TypeScript, targeted lint, full Vitest suite and production build. Browser
 Shopify skill's exact-version Admin docs/validator no longer list pinned 2025-07; Hydrogen component validator also lacks bundled types index. This is a remaining external validation limitation, not evidence of successful Shopify schema validation. Existing API pin is unchanged; review its effective supported version before production activation.
 
 References: https://shopify.dev/docs/api/admin-graphql/latest/mutations/metafieldsSet (CAS available since 2024-07); https://developers.cloudflare.com/r2/api/s3/api/ ; https://developers.cloudflare.com/turnstile/get-started/server-side-validation/ ; https://resend.com/docs/dashboard/emails/idempotency-keys .
+
+## Subdomain setup — November 9
+
+User approved `deuna.biothree.ec` as the owner-only dashboard. Shopify subdomain created, ID `145299374234`, targeting existing `biothree.ec (Production)` Oxygen environment. Last observed status: propagating, type redirect to biothree.ec. Keep redirect until protected dashboard deployment is verified; then change only this subdomain to Alias. Main domain stays primary.
+
+`payment-host.ts` directs the subdomain root to `/admin/pagos`, restricts other routes to dashboard/receipt/data/assets, and rejects customer checkout on the admin host. Main-site admin GETs redirect to the subdomain; POST bodies are never forwarded. Host-only Secure login cookies remain isolated. Dashboard uses a simple separate shell without storefront analytics. Both sites still use the same Shopify order ID, and customer paid status reads “Pago confirmado · listo para preparar.” Approval does not fulfill or ship the order.
+
+125 tests, typecheck, production build and targeted lint passed. Code remains local, not pushed/deployed. Cloudflare Chrome login tab is open for the user; no authenticated Cloudflare access, R2, Turnstile or Resend credentials are available yet. Do not claim a live protected dashboard. Domain proof: ../../output/deuna-integration-2026-11-09/subdomain-created.png.

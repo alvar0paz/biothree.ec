@@ -1,4 +1,5 @@
 // Virtual entry point for the app
+import {paymentHostResponse, PAYMENT_ADMIN_HOST} from '~/lib/payment-host';
 import {storefrontRedirect} from '@shopify/hydrogen';
 import {createRequestHandler} from '@shopify/hydrogen/oxygen';
 import {createHydrogenRouterContext} from '~/lib/context';
@@ -13,6 +14,8 @@ export default {
     executionContext: ExecutionContext,
   ): Promise<Response> {
     try {
+      const hostResponse = paymentHostResponse(request);
+      if (hostResponse) return hostResponse;
       const hydrogenContext = await createHydrogenRouterContext(
         request,
         env,
@@ -39,7 +42,10 @@ export default {
         );
       }
 
-      if (/^\/(mi-pedido|admin)(\/|$)/.test(new URL(request.url).pathname)) {
+      if (
+        new URL(request.url).hostname === PAYMENT_ADMIN_HOST ||
+        /^\/(mi-pedido|admin)(\/|$)/.test(new URL(request.url).pathname)
+      ) {
         response.headers.set('Cache-Control', 'private, no-store');
         response.headers.set('X-Robots-Tag', 'noindex');
         response.headers.set('Referrer-Policy', 'no-referrer');

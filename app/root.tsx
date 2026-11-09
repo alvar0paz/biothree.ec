@@ -16,6 +16,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindStyles from '~/styles/tailwind.css?url';
+import {PAYMENT_ADMIN_HOST} from './lib/payment-host';
 import {PageLayout} from './components/PageLayout';
 
 export type RootLoader = typeof loader;
@@ -89,6 +90,9 @@ export async function loader(args: Route.LoaderArgs) {
   const {storefront, env} = args.context;
 
   return {
+    privatePayments:
+      new URL(args.request.url).hostname === PAYMENT_ADMIN_HOST ||
+      new URL(args.request.url).pathname.startsWith('/admin/pagos'),
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
@@ -188,6 +192,20 @@ export function Layout({children}: {children?: React.ReactNode}) {
 
 export default function App() {
   const data = useRouteLoaderData<RootLoader>('root');
+
+  if (data?.privatePayments) {
+    return (
+      <div className="biothree">
+        <header className="bt-container py-6 border-b border-line">
+          <strong>BIO-THREE · Pagos Deuna</strong>
+          <a href="https://biothree.ec" className="ml-6 underline bt-note">
+            Ir a la tienda
+          </a>
+        </header>
+        <Outlet />
+      </div>
+    );
+  }
 
   if (!data) {
     return <Outlet />;
