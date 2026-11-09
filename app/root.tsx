@@ -18,6 +18,8 @@ import appStyles from '~/styles/app.css?url';
 import tailwindStyles from '~/styles/tailwind.css?url';
 import {PAYMENT_ADMIN_HOST} from './lib/payment-host';
 import {PageLayout} from './components/PageLayout';
+import {Measurement} from './components/Measurement';
+import {analyticsAllowed} from './lib/measurement';
 
 export type RootLoader = typeof loader;
 
@@ -101,7 +103,7 @@ export async function loader(args: Route.LoaderArgs) {
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
     }),
     consent: {
-      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN,
+      checkoutDomain: env.PUBLIC_CHECKOUT_DOMAIN || env.PUBLIC_STORE_DOMAIN,
       storefrontAccessToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       withPrivacyBanner: false,
       // localize the privacy banner
@@ -216,10 +218,13 @@ export default function App() {
       cart={data.cart}
       shop={data.shop}
       consent={data.consent}
+      canTrack={analyticsAllowed}
     >
-      <PageLayout {...data}>
-        <Outlet />
-      </PageLayout>
+      <Measurement>
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+      </Measurement>
     </Analytics.Provider>
   );
 }

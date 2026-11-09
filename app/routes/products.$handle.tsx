@@ -1,5 +1,6 @@
 import {pageMeta, SITE_URL} from '~/lib/seo';
 import {redirect, useLoaderData} from 'react-router';
+import {CommerceView} from '~/components/Measurement';
 import type {Route} from './+types/products.$handle';
 import {
   getSelectedProductOptions,
@@ -201,6 +202,7 @@ export default function Product() {
           )}
         </div>
       </div>
+      {selectedVariant && <CommerceView name="view_item" eventKey={selectedVariant.id} data={{currency: selectedVariant.price.currencyCode, value: Number(selectedVariant.price.amount), items: [{item_id: selectedVariant.id.split('/').pop()!, price: Number(selectedVariant.price.amount), quantity: 1}]}} />}
       <Analytics.ProductView
         data={{
           products: [

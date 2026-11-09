@@ -7,7 +7,7 @@
 // that is how PayPhone redirects, and reloading the page must be harmless.
 
 import {useEffect} from 'react';
-import {Link, useLoaderData, useRevalidator} from 'react-router';
+import {Link, redirect, useLoaderData, useRevalidator} from 'react-router';
 import type {Route} from './+types/pago.payphone.respuesta';
 import {buttonClasses} from '~/components/marketing/Button';
 import {
@@ -60,6 +60,13 @@ export async function loader({request, context}: Route.LoaderArgs) {
       payphoneMessage,
       ...result,
     });
+  }
+  // A signed checkout session proves this browser owns the order. The clean
+  // receipt URL keeps PayPhone reference parameters away from third-party tags.
+  if (orderLegacyId && context.session.get('measurementOrder') === orderLegacyId &&
+      (result.status === 'paid' || (result.status === 'skipped' && result.reason === 'already-paid'))) {
+    context.session.set('measurementReceipt', {orderId: orderLegacyId, expires: Date.now() + 86400000});
+    return redirect('/pago/confirmado', {headers: {'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer'}});
   }
   return {result, orderLegacyId, payphoneMessage};
 }
