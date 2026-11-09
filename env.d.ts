@@ -25,8 +25,7 @@ declare global {
     RECEIPTS_R2_BUCKET?: string;
     RECEIPTS_R2_ACCESS_KEY_ID?: string;
     RECEIPTS_R2_SECRET_ACCESS_KEY?: string;
-    RESEND_API_KEY?: string;
-    PAYMENT_EMAIL_FROM?: string;
+    PAYMENT_CONFIRMATION_EMAIL?: string;
     PAYMENT_ADMIN_SECRET?: string;
     SHOPIFY_CLIENT_ID?: string;
     SHOPIFY_CLIENT_SECRET?: string;

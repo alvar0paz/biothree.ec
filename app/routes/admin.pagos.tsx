@@ -12,6 +12,7 @@ import {buttonClasses} from '~/components/marketing/Button';
 import {adminRequest} from '~/lib/shopify-admin';
 import {
   adminSession,
+  confirmationDraft,
   deunaReady,
   limitedForm,
   verifyChallenge,
@@ -51,6 +52,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
         id: string;
         legacyResourceId: string;
         name: string;
+        email: string | null;
         displayFinancialStatus: string;
         totalOutstandingSet: {
           shopMoney: {amount: string; currencyCode: string};
@@ -60,14 +62,24 @@ export async function loader({request, context}: Route.LoaderArgs) {
     };
   }>(
     context.env,
-    `query DeunaQueue($after: String) { orders(first: 25, after: $after, query: "tag:deuna-checkout", sortKey: CREATED_AT, reverse: true) { nodes { id legacyResourceId name displayFinancialStatus totalOutstandingSet { shopMoney { amount currencyCode } } } pageInfo { hasNextPage endCursor } } }`,
+    `query DeunaQueue($after: String) { orders(first: 25, after: $after, query: "tag:deuna-checkout", sortKey: CREATED_AT, reverse: true) { nodes { id legacyResourceId name email displayFinancialStatus totalOutstandingSet { shopMoney { amount currencyCode } } } pageInfo { hasNextPage endCursor } } }`,
     {after: cursor},
   );
   const orders = await Promise.all(
-    result.orders.nodes.map(async (order) => ({
-      ...order,
-      review: await readReview(context.env, order.id),
-    })),
+    result.orders.nodes.map(async (order) => {
+      const review = await readReview(context.env, order.id);
+      return {
+        ...order,
+        review,
+        draft: review.value
+          ? confirmationDraft(
+              context.env.PAYMENT_CONFIRMATION_EMAIL!,
+              order,
+              review.value,
+            )
+          : null,
+      };
+    }),
   );
   return {
     sitekey: context.env.PAYMENT_TURNSTILE_SITE_KEY,
@@ -122,12 +134,17 @@ export async function action({request, context}: Route.ActionArgs) {
         'Set-Cookie': await auth.storage.destroySession(auth.session),
       },
     });
-  if (!['approve', 'reject', 'retry-email'].includes(intent))
+  if (!['approve', 'reject', 'email-sent'].includes(intent))
     throw new Response('Acción no válida', {status: 400});
   if (intent === 'approve' && form.get('verified') !== 'yes')
     return data(
       {message: 'Confirma primero que verificaste el pago en Deuna.'},
       {status: 400},
+    );
+  if (intent === 'email-sent' && form.get('emailConfirmed') !== 'yes')
+    return data(
+      {message: 'Confirma que ya enviaste el correo desde Gmail.'},
+      {status: 400, headers: PRIVATE_HEADERS},
     );
   const id = String(form.get('orderId'));
   if (!/^\d+$/.test(id)) throw new Response('Pedido no válido', {status: 400});
@@ -135,15 +152,15 @@ export async function action({request, context}: Route.ActionArgs) {
     const result = await reviewPayment(
       context.env,
       id,
-      intent as 'approve' | 'reject' | 'retry-email',
+      intent as 'approve' | 'reject' | 'email-sent',
       String(form.get('reason') ?? ''),
       String(form.get('digest') ?? ''),
     );
     return data(
       {
         message: result.emailPending
-          ? 'Revisión guardada. El correo sigue pendiente: usa «Reintentar correo».'
-          : 'Revisión guardada y correo enviado.',
+          ? 'Revisión guardada. Abre el mensaje en Gmail para enviar la confirmación.'
+          : 'Envío manual registrado. El estado del pago no cambió.',
       },
       {headers: PRIVATE_HEADERS},
     );
@@ -282,7 +299,7 @@ export default function ReviewPage() {
                           >
                             {order.review.value.status === 'approving'
                               ? 'Completar aprobación pendiente'
-                              : 'Confirmar pago y enviar correo'}
+                              : 'Confirmar pago'}
                           </button>
                           {order.review.value.status === 'review' && (
                             <>
@@ -310,17 +327,52 @@ export default function ReviewPage() {
                         order.review.value.status,
                       ) &&
                         !order.review.value.emailSentAt && (
-                          <button
-                            className={buttonClasses({})}
-                            name="intent"
-                            value="retry-email"
-                            disabled={busy}
-                          >
-                            Reintentar correo
-                          </button>
+                          <>
+                            {order.draft ? (
+                              <>
+                                <a
+                                  className={buttonClasses({})}
+                                  href={order.draft.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Enviar confirmación · abrir Gmail
+                                </a>
+                                <p className="bt-note">
+                                  Se abre un borrador para {order.draft.to}.
+                                  Revisa el remitente info@biostradeglobal.com y
+                                  pulsa Enviar en Gmail. Abrir el borrador no
+                                  envía el correo.
+                                </p>
+                                <label>
+                                  <input
+                                    type="checkbox"
+                                    name="emailConfirmed"
+                                    value="yes"
+                                  />{' '}
+                                  Ya envié este mensaje desde Gmail.
+                                </label>
+                                <button
+                                  className="underline"
+                                  name="intent"
+                                  value="email-sent"
+                                  disabled={busy}
+                                >
+                                  Registrar correo enviado
+                                </button>
+                              </>
+                            ) : (
+                              <p>
+                                Este pedido no tiene correo. Revisa sus datos en
+                                Shopify.
+                              </p>
+                            )}
+                          </>
                         )}
                       {order.review.value.emailSentAt && (
-                        <p className="bt-note">Correo enviado.</p>
+                        <p className="bt-note">
+                          Envío registrado manualmente; entrega no verificada.
+                        </p>
                       )}
                     </Form>
                   </>

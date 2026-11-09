@@ -30,6 +30,7 @@ export type Review = {
   reviewedAt?: string;
   reason?: string;
   emailSentAt?: string;
+  emailMethod?: 'manual-gmail';
 };
 export type ReviewRecord = {value: Review | null; digest: string | null};
 export function deunaReady(env: Partial<DeunaEnv>) {
@@ -41,8 +42,7 @@ export function deunaReady(env: Partial<DeunaEnv>) {
       env.RECEIPTS_R2_BUCKET &&
       env.RECEIPTS_R2_ACCESS_KEY_ID &&
       env.RECEIPTS_R2_SECRET_ACCESS_KEY &&
-      env.RESEND_API_KEY &&
-      env.PAYMENT_EMAIL_FROM &&
+      env.PAYMENT_CONFIRMATION_EMAIL &&
       env.PAYMENT_TURNSTILE_SITE_KEY &&
       env.PAYMENT_TURNSTILE_SECRET &&
       env.PAYMENT_ADMIN_SECRET &&
@@ -235,37 +235,40 @@ export async function uploadReceipt(
     throw error;
   }
 }
-export async function confirmationEmail(
-  env: DeunaEnv,
-  order: PaymentOrder,
+/** Opens a draft only; sending and recording it are explicit owner actions. */
+export function confirmationDraft(
+  account: string,
+  order: Pick<PaymentOrder, 'email' | 'name'>,
   state: Review,
 ) {
-  if (!order.email) throw new Error('Order email missing');
+  if (!order.email || !['approved', 'rejected'].includes(state.status))
+    return null;
   const approved = state.status === 'approved';
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-      'Idempotency-Key': `deuna-${order.legacyResourceId}-${state.reviewedAt}-${state.status}`,
-    },
-    body: JSON.stringify({
-      from: env.PAYMENT_EMAIL_FROM,
-      to: [order.email],
-      subject: approved
-        ? `Pago confirmado · BIO-THREE ${order.name}`
-        : `Revisa tu comprobante · BIO-THREE ${order.name}`,
-      text: approved
-        ? `Confirmamos el pago Deuna de tu pedido ${order.name}. Gracias por tu compra. Puedes consultar su estado en https://biothree.ec/mi-pedido con tu número de pedido y correo.`
-        : `No pudimos confirmar el pago de tu pedido ${order.name}. ${state.reason}\nPuedes revisar el estado y enviar otro comprobante en https://biothree.ec/mi-pedido. No realices otro pago sin revisar primero el movimiento en Deuna.`,
-    }),
+  const subject = approved
+    ? `Pago confirmado · BIO-THREE ${order.name}`
+    : `Revisa tu comprobante · BIO-THREE ${order.name}`;
+  const body = approved
+    ? `Hola,\n\nConfirmamos el pago Deuna de tu pedido ${order.name} por ${state.currency} ${state.amount}. Tu pedido está listo para preparar. Te avisaremos cuando sea enviado.\n\nPuedes consultar su estado en https://biothree.ec/mi-pedido con tu número de pedido y correo de compra.\n\nGracias por confiar en BIO-THREE.\nBiostrade Global`
+    : `Hola,\n\nNo pudimos confirmar el pago de tu pedido ${order.name}. ${state.reason ?? ''}\n\nPuedes consultar el estado y enviar otro comprobante en https://biothree.ec/mi-pedido. No realices otro pago sin revisar primero el movimiento en Deuna.\n\nBiostrade Global`;
+  const params = new URLSearchParams({
+    authuser: account,
+    view: 'cm',
+    fs: '1',
+    to: order.email,
+    su: subject,
+    body,
   });
-  if (!response.ok) throw new Error('Confirmation email not accepted');
+  return {
+    url: `https://mail.google.com/mail/?${params}`,
+    to: order.email,
+    subject,
+    body,
+  };
 }
 export async function reviewPayment(
   env: DeunaEnv,
   id: string,
-  decision: 'approve' | 'reject' | 'retry-email',
+  decision: 'approve' | 'reject' | 'email-sent',
   reason: string,
   expectedDigest: string,
 ) {
@@ -319,18 +322,15 @@ export async function reviewPayment(
   record = await readReview(env, order.id);
   if (!record.value || !['approved', 'rejected'].includes(record.value.status))
     throw new Response('La revisión aún no termina.', {status: 409});
-  if (!record.value.emailSentAt) {
-    try {
-      await confirmationEmail(env, order, record.value);
-      await saveReview(env, order.id, record, {
-        ...record.value,
-        emailSentAt: new Date().toISOString(),
-      });
-    } catch {
-      return {emailPending: true};
-    }
+  if (decision === 'email-sent' && !record.value.emailSentAt) {
+    await saveReview(env, order.id, record, {
+      ...record.value,
+      emailSentAt: new Date().toISOString(),
+      emailMethod: 'manual-gmail',
+    });
+    return {emailPending: false};
   }
-  return {emailPending: false};
+  return {emailPending: !record.value.emailSentAt};
 }
 export async function findCustomerOrder(
   env: DeunaEnv,

@@ -1,6 +1,7 @@
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import {
   deunaReady,
+  confirmationDraft,
   sameOrigin,
   secretMatches,
   validateReceipt,
@@ -34,7 +35,6 @@ const raw = {
 };
 function backend(
   options: {
-    emailFails?: boolean;
     changedAmount?: boolean;
     stale?: boolean;
   } = {},
@@ -56,7 +56,7 @@ function backend(
     vi.fn(async (url: string, init: RequestInit) => {
       if (String(url).includes('resend.com')) {
         emailCalls++;
-        return new Response('{}', {status: options.emailFails ? 503 : 200});
+        throw new Error('No email service should be called');
       }
       const {query, variables} = JSON.parse(String(init.body)) as {
         query: string;
@@ -190,26 +190,59 @@ describe('Deuna payment boundaries', () => {
       }),
     ).rejects.toThrow('cannot be paid');
   });
-  it('marks paid once and sends the confirmation only after approval', async () => {
+  it('approves the order without sending mail, then records explicit manual sending', async () => {
     const mock = backend();
-    expect(await reviewPayment(env, '123', 'approve', '', 'v1')).toEqual({
-      emailPending: false,
-    });
-    expect(mock.paidCalls).toBe(1);
-    expect(mock.emailCalls).toBe(1);
-    expect(mock.state.status).toBe('approved');
-    await reviewPayment(env, '123', 'retry-email', '', mock.digest);
-    expect(mock.emailCalls).toBe(1);
-    expect(mock.paidCalls).toBe(1);
-  });
-  it('keeps a payment approved when the email fails, allowing email-only retry', async () => {
-    const mock = backend({emailFails: true});
     expect(await reviewPayment(env, '123', 'approve', '', 'v1')).toEqual({
       emailPending: true,
     });
-    expect(mock.state.status).toBe('approved');
-    await reviewPayment(env, '123', 'retry-email', '', mock.digest);
     expect(mock.paidCalls).toBe(1);
+    expect(mock.emailCalls).toBe(0);
+    expect(mock.state.status).toBe('approved');
+    expect(mock.state.emailSentAt).toBeUndefined();
+    await reviewPayment(env, '123', 'email-sent', '', mock.digest);
+    expect(mock.state.emailMethod).toBe('manual-gmail');
+    expect(mock.state.emailSentAt).toBeTruthy();
+    await reviewPayment(env, '123', 'email-sent', '', mock.digest);
+    expect(mock.paidCalls).toBe(1);
+    expect(mock.emailCalls).toBe(0);
+  });
+  it('cannot record a confirmation before reviewing payment', async () => {
+    const mock = backend();
+    await expect(
+      reviewPayment(env, '123', 'email-sent', '', mock.digest),
+    ).rejects.toHaveProperty('status', 409);
+    expect(mock.state.emailSentAt).toBeUndefined();
+    expect(mock.paidCalls).toBe(0);
+  });
+  it('prepares a Gmail draft only after review, preserving recipient and escaping text', () => {
+    const mock = backend();
+    expect(
+      confirmationDraft('info@biostradeglobal.com', raw, mock.state),
+    ).toBeNull();
+    const draft = confirmationDraft('info@biostradeglobal.com', raw, {
+      ...mock.state,
+      status: 'approved',
+    });
+    const params = new URL(draft!.url).searchParams;
+    expect(params.get('authuser')).toBe('info@biostradeglobal.com');
+    expect(params.get('to')).toBe(raw.email);
+    expect(params.get('su')).toContain('#1001');
+    expect(params.get('body')).toContain('USD 20.00');
+    expect(
+      confirmationDraft(
+        'info@biostradeglobal.com',
+        {...raw, email: null},
+        {...mock.state, status: 'approved'},
+      ),
+    ).toBeNull();
+    const rejected = confirmationDraft('info@biostradeglobal.com', raw, {
+      ...mock.state,
+      status: 'rejected',
+      reason: 'Revisar & confirmar #2',
+    });
+    expect(new URL(rejected!.url).searchParams.get('body')).toContain(
+      'Revisar & confirmar #2',
+    );
   });
   it('does not mark paid on rejection', async () => {
     const mock = backend();
@@ -230,15 +263,13 @@ describe('Deuna payment boundaries', () => {
     expect(mock.paidCalls).toBe(0);
   });
   it('requires an exact number/email match and rejects query injection', async () => {
-    const fetch = vi
-      .fn()
-      .mockResolvedValue(
-        Response.json({
-          data: {
-            orders: {nodes: [{id: raw.id, name: '#1001', email: raw.email}]},
-          },
-        }),
-      );
+    const fetch = vi.fn().mockResolvedValue(
+      Response.json({
+        data: {
+          orders: {nodes: [{id: raw.id, name: '#1001', email: raw.email}]},
+        },
+      }),
+    );
     vi.stubGlobal('fetch', fetch);
     expect(
       await findCustomerOrder(env, '1001', 'wrong@example.com'),
