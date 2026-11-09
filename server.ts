@@ -33,10 +33,16 @@ export default {
       const response = await handleRequest(request);
 
       if (hydrogenContext.session.isPending) {
-        response.headers.set(
+        response.headers.append(
           'Set-Cookie',
           await hydrogenContext.session.commit(),
         );
+      }
+
+      if (/^\/(mi-pedido|admin)(\/|$)/.test(new URL(request.url).pathname)) {
+        response.headers.set('Cache-Control', 'private, no-store');
+        response.headers.set('X-Robots-Tag', 'noindex');
+        response.headers.set('Referrer-Policy', 'no-referrer');
       }
 
       if (response.status === 404) {

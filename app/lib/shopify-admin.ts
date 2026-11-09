@@ -124,6 +124,8 @@ export type PaymentOrder = {
   phone: string | null;
   /** Cédula/RUC captured by the storefront checkout, when present. */
   documentId: string | null;
+  cancelledAt?: string | null;
+  displayFulfillmentStatus?: string;
   displayFinancialStatus: string | null;
   taxesIncluded: boolean;
   totalPrice: Money;
@@ -144,6 +146,8 @@ export const PAYMENT_ORDER_FRAGMENT = `#graphql
     phone
     customAttributes { key value }
     displayFinancialStatus
+    cancelledAt
+    displayFulfillmentStatus
     taxesIncluded
     totalPriceSet { shopMoney { amount currencyCode } }
     totalTaxSet { shopMoney { amount } }
@@ -162,6 +166,8 @@ export type RawOrder = {
   email: string | null;
   phone?: string | null;
   customAttributes?: Array<{key: string; value: string | null}> | null;
+  cancelledAt?: string | null;
+  displayFulfillmentStatus?: string;
   displayFinancialStatus: string | null;
   taxesIncluded: boolean;
   totalPriceSet: {shopMoney: Money};
@@ -185,6 +191,8 @@ export function normalizeOrder(raw: RawOrder): PaymentOrder {
     phone: raw.phone ?? null,
     documentId: documentAttribute?.value ?? null,
     displayFinancialStatus: raw.displayFinancialStatus,
+    cancelledAt: raw.cancelledAt ?? null,
+    displayFulfillmentStatus: raw.displayFulfillmentStatus,
     taxesIncluded: raw.taxesIncluded,
     totalPrice: raw.totalPriceSet.shopMoney,
     totalTax: raw.totalTaxSet.shopMoney,

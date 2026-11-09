@@ -13,7 +13,9 @@ function FooterLink({href, label}: {href: string; label: string}) {
     <a
       href={href}
       className={className}
-      {...(href.startsWith('http') ? {target: '_blank', rel: 'noopener noreferrer'} : {})}
+      {...(href.startsWith('http')
+        ? {target: '_blank', rel: 'noopener noreferrer'}
+        : {})}
     >
       {label}
     </a>
@@ -30,18 +32,25 @@ export function Footer() {
       <div className="bt-container py-10 md:py-12">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
           <div className="flex flex-col gap-3">
-            <Link to="/" prefetch="intent" className="inline-flex self-start" aria-label="Biothree, inicio">
+            <Link
+              to="/"
+              prefetch="intent"
+              className="inline-flex self-start"
+              aria-label="Biothree, inicio"
+            >
               <img src={biothreeLogo} alt="" className="h-6 w-auto" />
             </Link>
             <p className="bt-note max-w-[34ch] text-muted">{footer.tagline}</p>
           </div>
           <nav aria-label="Pie de página">
             <ul className="grid list-none grid-cols-2 gap-x-10 p-0 sm:flex sm:flex-wrap sm:gap-x-7">
-              {footer.links.map((link) => (
-                <li key={link.label}>
-                  <FooterLink href={link.href} label={link.label} />
-                </li>
-              ))}
+              {[{label: 'Mi pedido', href: '/mi-pedido'}, ...footer.links].map(
+                (link) => (
+                  <li key={link.label}>
+                    <FooterLink href={link.href} label={link.label} />
+                  </li>
+                ),
+              )}
             </ul>
           </nav>
         </div>

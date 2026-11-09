@@ -1,0 +1,15 @@
+# One-time merchant-owned definition, before enabling the feature.
+# No storefront/customer access is granted. Check userErrors before proceeding.
+mutation CreateDeunaReviewDefinition {
+  metafieldDefinitionCreate(definition: {
+    name: "Deuna payment review"
+    namespace: "biothree"
+    key: "deuna_review"
+    type: "json"
+    ownerType: ORDER
+    description: "Private receipt object key and manual payment review state. No public receipt URL."
+  }) {
+    createdDefinition { id }
+    userErrors { field message }
+  }
+}

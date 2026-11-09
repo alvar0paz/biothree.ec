@@ -183,13 +183,13 @@ export async function handleOrderCreated(
   if (payload.financial_status && payload.financial_status !== 'pending') {
     return {status: 'skipped', order: orderId, reason: 'not-pending'};
   }
-  if (payloadTags(payload).includes(TAG_CHECKOUT)) {
+  if (payloadTags(payload).some(tag => [TAG_CHECKOUT, 'deuna-checkout'].includes(tag))) {
     return {status: 'skipped', order: orderId, reason: 'checkout-order'};
   }
 
   const order = await getOrder(env, orderId);
   if (!order) return {status: 'skipped', order: orderId, reason: 'order-not-found'};
-  if (order.tags.includes(TAG_CHECKOUT)) {
+  if (order.tags.some(tag => [TAG_CHECKOUT, 'deuna-checkout'].includes(tag))) {
     return {status: 'skipped', order: order.name, reason: 'checkout-order'};
   }
   if (order.displayFinancialStatus && order.displayFinancialStatus !== 'PENDING') {
@@ -242,6 +242,9 @@ export async function startPayphonePayment(
   env: FlowEnv,
   urls: PayphoneReturnUrls,
 ): Promise<StartPaymentResult> {
+  if (order.tags.includes('deuna-checkout') || order.cancelledAt) {
+    throw new PayphoneError('This order cannot be paid through PayPhone');
+  }
   if (isOrderPaid(order)) {
     throw new PayphoneError(`Order ${order.name} is already paid`);
   }

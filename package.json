@@ -19,6 +19,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@shopify/hydrogen": "^2025.7.0",
+    "aws4fetch": "1.0.20",
     "framer-motion": "^12.40.0",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",

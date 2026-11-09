@@ -19,6 +19,7 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    frameSrc: ["'self'", 'https://challenges.cloudflare.com'],
     // The marketing typography (Inter, Inter Tight, IBM Plex Mono) is served
     // from Google Fonts; Hydrogen's default CSP blocks it.
     styleSrc: [
@@ -64,7 +65,7 @@ export default async function handleRequest(
   // the domain registered in PayPhone Developer, which it reads from the
   // Referer header. This is the browsers' default policy, made explicit so
   // the origin keeps being sent on the redirect from /checkout.
-  responseHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  responseHeaders.set('Referrer-Policy', /^\/(mi-pedido|admin)(\/|$)/.test(pathname) ? 'no-referrer' : 'strict-origin-when-cross-origin');
 
   return new Response(body, {
     headers: responseHeaders,

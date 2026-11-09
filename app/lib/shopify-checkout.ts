@@ -43,6 +43,7 @@ export type CheckoutAddress = {
 };
 
 export type CheckoutInput = {
+  paymentMethod?: 'payphone' | 'deuna';
   lines: CheckoutLine[];
   email: string;
   phone: string;
@@ -159,7 +160,7 @@ export function buildDraftOrderInput(input: CheckoutInput): Record<string, unkno
     ...(input.documentId
       ? {customAttributes: [{key: DOCUMENT_ATTRIBUTE_KEY, value: input.documentId}]}
       : {}),
-    tags: [TAG_CHECKOUT],
+    tags: [input.paymentMethod === 'deuna' ? 'deuna-checkout' : TAG_CHECKOUT],
     ...(input.shippingRateHandle
       ? {shippingLine: {shippingRateHandle: input.shippingRateHandle}}
       : {}),

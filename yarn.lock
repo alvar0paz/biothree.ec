@@ -3748,6 +3748,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"aws4fetch@npm:1.0.20":
+  version: 1.0.20
+  resolution: "aws4fetch@npm:1.0.20"
+  checksum: 34c6904cee62d9a5d29224a3c13dc1b8fbdf569387f56fe528a0089bf710ca600193fca1863298014d6f2eabfdad6c49ec458c379d661d230252927e1046ebff
+  languageName: node
+  linkType: hard
+
 "axe-core@npm:^4.10.0":
   version: 4.11.1
   resolution: "axe-core@npm:4.11.1"
@@ -3820,6 +3827,7 @@ __metadata:
     "@types/react-dom": ^18.2.7
     "@typescript-eslint/eslint-plugin": ^8.21.0
     "@typescript-eslint/parser": ^8.21.0
+    aws4fetch: 1.0.20
     eslint: ^9.18.0
     eslint-config-prettier: ^10.0.1
     eslint-import-resolver-typescript: ^3.7.0

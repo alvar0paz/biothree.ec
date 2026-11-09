@@ -7,7 +7,14 @@
 // fields as hidden inputs and posts `intent=pay`. No client state to lose.
 
 import {useState} from 'react';
-import {data, Form, redirect, useActionData, useLoaderData, useNavigation} from 'react-router';
+import {
+  data,
+  Form,
+  redirect,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from 'react-router';
 import type {Route} from './+types/checkout';
 import {Money} from '@shopify/hydrogen';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
@@ -22,7 +29,11 @@ import {
   type CheckoutFormErrors,
   type CheckoutFormValues,
 } from '~/lib/checkout';
-import {getFlowEnv, payphoneReturnUrls, startPayphonePayment} from '~/lib/payphone-flow';
+import {
+  getFlowEnv,
+  payphoneReturnUrls,
+  startPayphonePayment,
+} from '~/lib/payphone-flow';
 import {
   CheckoutError,
   createPendingOrder,
@@ -30,7 +41,8 @@ import {
   type CheckoutInput,
   type CheckoutQuote,
 } from '~/lib/shopify-checkout';
-import type {PaymentOrder} from '~/lib/shopify-admin';
+import {hasAdminCredentials, type PaymentOrder} from '~/lib/shopify-admin';
+import {deunaReady, sameOrigin} from '~/lib/deuna.server';
 
 export const meta: Route.MetaFunction = () => [
   {title: 'Finalizar compra | Biothree Ecuador'},
@@ -43,7 +55,12 @@ const NO_SHIPPING_ERROR =
   'No tenemos envío configurado para esa dirección. Revisa la provincia y la ciudad, o escríbenos para coordinar la entrega.';
 
 type ActionData =
-  | {step: 'details'; values: CheckoutFormValues; errors: CheckoutFormErrors; formError?: string}
+  | {
+      step: 'details';
+      values: CheckoutFormValues;
+      errors: CheckoutFormErrors;
+      formError?: string;
+    }
   | {
       step: 'review';
       values: CheckoutFormValues;
@@ -68,7 +85,9 @@ function applicableDiscountCodes(cart: CartApiQueryFragment | null) {
 function userMessage(error: unknown): string {
   // Permission problems ("must have access to ...") are ours to fix, not
   // the customer's; they stay in the server log.
-  return error instanceof CheckoutError && error.userFacing && !/must have access/i.test(error.message)
+  return error instanceof CheckoutError &&
+    error.userFacing &&
+    !/must have access/i.test(error.message)
     ? `Shopify no aceptó el pedido: ${error.message.replace(/^\w+: /, '')}`
     : GENERIC_ERROR;
 }
@@ -80,7 +99,7 @@ export async function loader({context}: Route.LoaderArgs) {
 
   // Without the Admin + PayPhone secrets (local preview, mock store) fall
   // back to Shopify's hosted checkout so the store keeps selling.
-  if (!getFlowEnv(env)) {
+  if (!getFlowEnv(env) && !deunaReady(env)) {
     if (cartData.checkoutUrl) return redirect(cartData.checkoutUrl);
     throw new Response('Checkout no disponible', {status: 503});
   }
@@ -88,6 +107,8 @@ export async function loader({context}: Route.LoaderArgs) {
   const buyer = cartData.buyerIdentity;
   return {
     cart: cartData,
+    deunaEnabled: deunaReady(env),
+    payphoneEnabled: Boolean(getFlowEnv(env)),
     prefill: {
       email: buyer?.email ?? buyer?.customer?.email ?? '',
       phone: buyer?.phone ?? '',
@@ -100,14 +121,27 @@ export async function loader({context}: Route.LoaderArgs) {
 export async function action({request, context}: Route.ActionArgs) {
   const {cart, env} = context;
   const flowEnv = getFlowEnv(env);
-  if (!flowEnv) throw new Response('Checkout no disponible', {status: 503});
+  if (!hasAdminCredentials(env) || (!flowEnv && !deunaReady(env)))
+    throw new Response('Checkout no disponible', {status: 503});
+  sameOrigin(request);
 
   const formData = await request.formData();
   const intent = String(formData.get('intent') ?? 'quote');
   const parsed = parseCheckoutForm(formData);
+  const paymentMethod =
+    formData.get('paymentMethod') === 'deuna' ? 'deuna' : 'payphone';
+  if (
+    intent === 'pay' &&
+    (paymentMethod === 'deuna' ? !deunaReady(env) : !flowEnv)
+  )
+    throw new Response('Método de pago no disponible', {status: 503});
 
   if (intent === 'edit') {
-    return data<ActionData>({step: 'details', values: parsed.values, errors: {}});
+    return data<ActionData>({
+      step: 'details',
+      values: parsed.values,
+      errors: {},
+    });
   }
   if (!parsed.ok || !parsed.normalized) {
     return data<ActionData>(
@@ -123,6 +157,7 @@ export async function action({request, context}: Route.ActionArgs) {
   const requested = String(formData.get('shippingRateHandle') ?? '') || null;
   const input: CheckoutInput = {
     lines,
+    paymentMethod,
     email: parsed.normalized.email,
     phone: parsed.normalized.phone,
     address: parsed.normalized.address,
@@ -132,20 +167,32 @@ export async function action({request, context}: Route.ActionArgs) {
   };
 
   const detailsError = (formError: string, status: number) =>
-    data<ActionData>({step: 'details', values: parsed.values, errors: {}, formError}, {status});
+    data<ActionData>(
+      {step: 'details', values: parsed.values, errors: {}, formError},
+      {status},
+    );
 
   // Quote (or re-quote after changing the shipping option): make sure the
   // totals shown include a rate Shopify actually offers for the address.
   // Null when Shopify offers no rate at all for it.
-  const quoteFor = async (): Promise<Extract<ActionData, {step: 'review'}> | null> => {
-    let quote = await quoteCheckout(flowEnv, input);
+  const quoteFor = async (): Promise<Extract<
+    ActionData,
+    {step: 'review'}
+  > | null> => {
+    let quote = await quoteCheckout(env, input);
     const offered = quote.shippingRates.map((rate) => rate.handle);
-    const handle = requested && offered.includes(requested) ? requested : offered[0];
+    const handle =
+      requested && offered.includes(requested) ? requested : offered[0];
     if (!handle) return null;
     if (handle !== requested) {
-      quote = await quoteCheckout(flowEnv, {...input, shippingRateHandle: handle});
+      quote = await quoteCheckout(env, {...input, shippingRateHandle: handle});
     }
-    return {step: 'review', values: parsed.values, quote, shippingRateHandle: handle};
+    return {
+      step: 'review',
+      values: parsed.values,
+      quote,
+      shippingRateHandle: handle,
+    };
   };
 
   if (intent !== 'pay' || !requested) {
@@ -160,13 +207,19 @@ export async function action({request, context}: Route.ActionArgs) {
 
   let order: PaymentOrder;
   try {
-    order = await createPendingOrder(flowEnv, {...input, shippingRateHandle: requested});
+    order = await createPendingOrder(env, {
+      ...input,
+      shippingRateHandle: requested,
+    });
   } catch (error) {
     console.error('Checkout order creation failed:', error);
     try {
       const review = await quoteFor();
       if (!review) return detailsError(NO_SHIPPING_ERROR, 400);
-      return data<ActionData>({...review, formError: userMessage(error)}, {status: 502});
+      return data<ActionData>(
+        {...review, formError: userMessage(error)},
+        {status: 502},
+      );
     } catch (quoteError) {
       console.error('Checkout re-quote failed:', quoteError);
       return detailsError(userMessage(error), 502);
@@ -177,6 +230,12 @@ export async function action({request, context}: Route.ActionArgs) {
   // find if they come back without paying (the order itself stays payable
   // from /pagar/<id>).
   const headers = new Headers({'Set-Cookie': CLEAR_CART_COOKIE});
+  context.session.set('orderAccess', {
+    id: order.legacyResourceId,
+    expires: Date.now() + 30 * 60 * 1000,
+  });
+  if (paymentMethod === 'deuna') return redirect('/mi-pedido', {headers});
+  if (!flowEnv) throw new Response('PayPhone no disponible', {status: 503});
   const origin = new URL(request.url).origin;
   try {
     const {url} = await startPayphonePayment(
@@ -187,19 +246,25 @@ export async function action({request, context}: Route.ActionArgs) {
     return redirect(url, {headers});
   } catch (error) {
     console.error(`PayPhone prepare failed for ${order.name}:`, error);
-    return redirect(`/pagar/${order.legacyResourceId}?error=payphone`, {headers});
+    return redirect(`/pagar/${order.legacyResourceId}?error=payphone`, {
+      headers,
+    });
   }
 }
 
 export default function CheckoutPage() {
-  const {cart, prefill} = useLoaderData<typeof loader>();
+  const {cart, prefill, deunaEnabled, payphoneEnabled} =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as ActionData | undefined;
   const navigation = useNavigation();
   const busy = navigation.state !== 'idle';
   const submitting = navigation.formData?.get('intent');
 
   const step = actionData?.step ?? 'details';
-  const values: CheckoutFormValues = actionData?.values ?? {...EMPTY_CHECKOUT_VALUES, ...prefill};
+  const values: CheckoutFormValues = actionData?.values ?? {
+    ...EMPTY_CHECKOUT_VALUES,
+    ...prefill,
+  };
   const quote = actionData?.step === 'review' ? actionData.quote : null;
   const stepError = actionData?.formError;
 
@@ -208,10 +273,17 @@ export default function CheckoutPage() {
       <div className="bt-container bt-section-compact">
         <div className="flex flex-col gap-2">
           <h1 className="bt-h2 text-ink">Finalizar compra</h1>
-          <ol className="flex flex-wrap gap-x-6 gap-y-1 bt-note text-muted" aria-label="Pasos">
-            <li className={step === 'details' ? 'font-medium text-ink' : ''}>1. Tus datos</li>
-            <li className={step === 'review' ? 'font-medium text-ink' : ''}>2. Envío y pago</li>
-            <li>3. Pago seguro en PayPhone</li>
+          <ol
+            className="flex flex-wrap gap-x-6 gap-y-1 bt-note text-muted"
+            aria-label="Pasos"
+          >
+            <li className={step === 'details' ? 'font-medium text-ink' : ''}>
+              1. Tus datos
+            </li>
+            <li className={step === 'review' ? 'font-medium text-ink' : ''}>
+              2. Envío y pago
+            </li>
+            <li>3. Completar pago</li>
           </ol>
         </div>
 
@@ -229,7 +301,9 @@ export default function CheckoutPage() {
               <Form method="post" className="flex flex-col gap-8">
                 <CheckoutFields
                   values={values}
-                  errors={actionData?.step === 'details' ? actionData.errors : {}}
+                  errors={
+                    actionData?.step === 'details' ? actionData.errors : {}
+                  }
                 />
                 <div className="flex flex-col gap-3">
                   <button
@@ -240,17 +314,22 @@ export default function CheckoutPage() {
                     disabled={busy}
                     aria-busy={busy}
                   >
-                    {busy && submitting === 'quote' ? 'Calculando envío…' : 'Continuar al envío'}
+                    {busy && submitting === 'quote'
+                      ? 'Calculando envío…'
+                      : 'Continuar al envío'}
                   </button>
                   <p className="bt-note text-muted">
-                    Pagarás con tarjeta de crédito o débito en la página segura de
-                    PayPhone. No necesitas tener la app.
+                    {deunaEnabled
+                      ? 'Elige PayPhone o Deuna en el siguiente paso.'
+                      : 'Pagarás con tarjeta en la página segura de PayPhone. No necesitas tener la app.'}
                   </p>
                 </div>
               </Form>
             ) : (
               actionData?.step === 'review' && (
                 <ReviewStep
+                  deunaEnabled={deunaEnabled}
+                  payphoneEnabled={payphoneEnabled}
                   values={values}
                   quote={actionData.quote}
                   shippingRateHandle={actionData.shippingRateHandle}
@@ -274,15 +353,20 @@ export default function CheckoutPage() {
  * cart-clearing cookie intact, with no client router in between.
  */
 function ReviewStep({
+  deunaEnabled,
+  payphoneEnabled,
   values,
   quote,
   shippingRateHandle,
 }: {
+  deunaEnabled: boolean;
+  payphoneEnabled: boolean;
   values: CheckoutFormValues;
   quote: CheckoutQuote;
   shippingRateHandle: string;
 }) {
   const [submitting, setSubmitting] = useState<string | null>(null);
+  const [method, setMethod] = useState(payphoneEnabled ? 'payphone' : 'deuna');
   const busy = submitting !== null;
   const address = formatAddress({
     firstName: values.firstName,
@@ -301,7 +385,8 @@ function ReviewStep({
       className="flex flex-col gap-8"
       onSubmit={(event) => {
         const submitter = (event.nativeEvent as SubmitEvent).submitter;
-        const intent = submitter instanceof HTMLButtonElement ? submitter.value : 'pay';
+        const intent =
+          submitter instanceof HTMLButtonElement ? submitter.value : 'pay';
         // Only after the browser has serialised the form: a button disabled
         // during the submit event loses its name/value (the intent).
         setTimeout(() => setSubmitting(intent), 0);
@@ -350,7 +435,9 @@ function ReviewStep({
                 // Re-quote so the totals follow the chosen rate. Without JS
                 // the totals simply refresh on the next submit.
                 const form = event.currentTarget.form;
-                const requote = form?.querySelector<HTMLButtonElement>('button[value="quote"]');
+                const requote = form?.querySelector<HTMLButtonElement>(
+                  'button[value="quote"]',
+                );
                 if (form && requote) form.requestSubmit(requote);
               }}
               className="h-4 w-4 accent-purple"
@@ -360,7 +447,10 @@ function ReviewStep({
               {Number(rate.price.amount) === 0 ? (
                 'Gratis'
               ) : (
-                <Money as="span" data={rate.price as {amount: string; currencyCode: 'USD'}} />
+                <Money
+                  as="span"
+                  data={rate.price as {amount: string; currencyCode: 'USD'}}
+                />
               )}
             </span>
           </label>
@@ -377,7 +467,14 @@ function ReviewStep({
           </button>
         )}
         {quote.shippingRates.length <= 1 && (
-          <button type="submit" name="intent" value="quote" className="hidden" tabIndex={-1} aria-hidden="true">
+          <button
+            type="submit"
+            name="intent"
+            value="quote"
+            className="hidden"
+            tabIndex={-1}
+            aria-hidden="true"
+          >
             Actualizar
           </button>
         )}
@@ -385,10 +482,37 @@ function ReviewStep({
 
       <section className="flex flex-col gap-4 border-t border-line pt-6">
         <h2 className="bt-h3 text-ink">Pago</h2>
+        <fieldset className="flex flex-col gap-3">
+          <legend className="sr-only">Método de pago</legend>
+          {payphoneEnabled && (
+            <label>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="payphone"
+                checked={method === 'payphone'}
+                onChange={() => setMethod('payphone')}
+              />{' '}
+              PayPhone · tarjeta de crédito o débito
+            </label>
+          )}
+          {deunaEnabled && (
+            <label>
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="deuna"
+                checked={method === 'deuna'}
+                onChange={() => setMethod('deuna')}
+              />{' '}
+              Deuna · QR y comprobante
+            </label>
+          )}
+        </fieldset>
         <p className="bt-p text-muted">
-          Al continuar te llevamos a la página segura de PayPhone para pagar
-          con tarjeta de crédito o débito. Cuando termines, vuelves
-          automáticamente a biothree.ec con la confirmación de tu pedido.
+          {method === 'deuna'
+            ? 'Verás el QR y el importe de tu pedido. Sube tu comprobante después de pagar; confirmaremos el pago por correo cuando lo verifiquemos.'
+            : 'Te llevamos a la página segura de PayPhone para pagar con tarjeta. Al terminar, vuelves a biothree.ec.'}
         </p>
         <button
           type="submit"
@@ -398,11 +522,15 @@ function ReviewStep({
           disabled={busy}
           aria-busy={busy && submitting === 'pay'}
         >
-          {submitting === 'pay' ? 'Creando tu pedido…' : 'Pagar con PayPhone'}
+          {submitting === 'pay'
+            ? 'Creando tu pedido…'
+            : method === 'deuna'
+              ? 'Continuar con Deuna'
+              : 'Pagar con PayPhone'}
         </button>
         <p className="bt-note text-muted">
-          Tu pedido queda reservado mientras pagas. Si cancelas en PayPhone,
-          podrás volver a intentarlo.
+          Puedes consultar el estado de tu pedido con su número y tu correo en
+          «Mi pedido».
         </p>
       </section>
     </form>

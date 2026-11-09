@@ -32,6 +32,7 @@ async function loadOrder(context: Route.LoaderArgs['context'], orderId: string |
   if (!flowEnv) throw new Response('Pagos no disponibles', {status: 503});
   const order = await getOrder(flowEnv, orderGid(orderId));
   if (!order) throw new Response('Pedido no encontrado', {status: 404});
+  if (order.tags.includes('deuna-checkout')) throw redirect('/mi-pedido');
   return {flowEnv, order};
 }
 
